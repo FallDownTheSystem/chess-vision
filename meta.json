@@ -1,0 +1,9 @@
+{
+	"name": "Chess vision",
+	"version": "0.1.0",
+	"author": "FallDownTheSystem",
+	"namespace": "FallDownTheSystem",
+	"grant": ["none"],
+	"match": ["*://lichess.org/*", "*://www.chess.com/*", "*://chess24.com/*", "*://arena.myfide.net/*"],
+	"inject-into": "content"
+}
