@@ -1,13 +1,22 @@
 # Chess vision!
 
-**Tested on Greasemonkey of Firefox or Violentmonkey on Chrome**  
-*Firefox only works with Greasemonkey, as they bypass CSP.*
+![Example](https://i.imgur.com/gFe4zaP.jpeg)
 
-A userscript that shows attacked and defended squares on.
+**Tested on Greasemonkey on Firefox or Violentmonkey on Chrome**  
+*Firefox only works with Greasemonkey, as they properly bypass CSP.*
+
+A userscript that shows attacked and defended squares, for various chess sites.
+
+- Lichess.org
+- Chess.com
+- Chess24.com
+- arena.myfide.net
+
+Controlled squares are marked by different colors.
 
 - Squares controlled by the opponent are marked as red.
 - Squares controlled by you are marked as green.
-- Squares controlled by both are marked either red or green, depending on who wins if the pieces are traded.
+- Squares controlled by both are marked either red or green with a solid border around the square, depending on who wins if the pieces are traded.
 - Squares controlled equally by both are marked as blue.
 
 Each square has four numbers on it.
