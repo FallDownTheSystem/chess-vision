@@ -76,35 +76,39 @@ export function drawControlledSquares(squares, mySide) {
 	}
 }
 
-function calculateContestedSquare(square, _myAttackers, _opAttackers, side) {
+function calculateContestedSquare(square, myAttackers, opAttackers, side) {
 	let attackedSquareColor = squareColor(square);
 
 	const mySide = side;
 	const opSide = mySide === WHITE ? BLACK : WHITE;
-	let myAttackers = [..._myAttackers];
-	let opAttackers = [..._opAttackers];
+	let myPieces = [...myAttackers];
+	let opPieces = [...opAttackers];
 	let myTotalCost = 0;
 	let opTotalCost = 0;
 
 	if (attackedSquareColor === mySide) {
-		myAttackers.unshift(square);
+		myPieces.unshift(square);
 	}
 
 	if (attackedSquareColor === opSide) {
-		opAttackers.unshift(square);
+		opPieces.unshift(square);
 	}
 
-	for (let i = 0; i < Math.max(myAttackers.length, opAttackers.length); i++) {
-		const myPiece = myAttackers.length > i ? myAttackers[i] : null;
+	for (let i = 0; i < Math.max(myPieces.length, opPieces.length); i++) {
+		const myPiece = myPieces.length > i ? myPieces[i] : null;
 		let myCost = myPiece ? squareValue(myPiece) : 0;
 
-		const opPiece = opAttackers.length > i ? opAttackers[i] : null;
+		const opPiece = opPieces.length > i ? opPieces[i] : null;
 		let opCost = opPiece ? squareValue(opPiece) : 0;
 
 		// Trade
 		if (attackedSquareColor !== null && myPiece && opPiece) {
-			opTotalCost += opCost;
-			myTotalCost += myCost;
+			if (myAttackers.length > i) {
+				opTotalCost += opCost;
+			}
+			if (opAttackers.length > i) {
+				myTotalCost += myCost;
+			}
 		}
 		// They capture
 		if (attackedSquareColor === mySide && opPiece && !myPiece) {
