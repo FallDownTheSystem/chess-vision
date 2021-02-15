@@ -19,6 +19,10 @@ export function replay(moves) {
 	}
 }
 
+export function replayFen(fen) {
+	position.fen(fen);
+}
+
 const history = [];
 
 export function push(from, to) {

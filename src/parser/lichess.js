@@ -4,7 +4,8 @@ import { WHITE, BLACK, cleanse } from '../helpers';
 
 export class LichessParser {
 	constructor() {
-		this.moveSelector = '.buttons + * > *:nth-child(3n-1), .buttons + * > *:nth-child(3n), move > san';
+		this.moveSelector =
+			'.buttons + * > *:nth-child(3n-1), .buttons + * > *:nth-child(3n), move > san, .puzzle__moves move';
 		this.sideSelector = '.orientation-white';
 		this.overlaySelector = '.cg-wrap';
 		this.gameSelector = '.rmoves, .tview2, .ruser';

@@ -47,7 +47,8 @@
 
 	class LichessParser {
 		constructor() {
-			this.moveSelector = '.buttons + * > *:nth-child(3n-1), .buttons + * > *:nth-child(3n), move > san';
+			this.moveSelector =
+				'.buttons + * > *:nth-child(3n-1), .buttons + * > *:nth-child(3n), move > san, .puzzle__moves move';
 			this.sideSelector = '.orientation-white';
 			this.overlaySelector = '.cg-wrap';
 			this.gameSelector = '.rmoves, .tview2, .ruser';
@@ -79,15 +80,11 @@
 
 	class ChessDotComParser {
 		constructor() {
-			this.moveSelector = '.move .node, .move-list-controls-move';
-			this.sideSelector = '.clock-bottom.clock-black, .board.flipped';
-			this.overlaySelector = 'chess-board.board, .board-layout-chessboard';
-			this.gameSelector = '.computer-move-list, .move-list-component, .move-list-controls-component';
 			this.zIndex = '0';
 		}
 
 		parseMoves() {
-			const moves = [...document.querySelectorAll(this.moveSelector)]
+			const moves = [...document.querySelectorAll('.move .node, .move-list-controls-move')]
 				.map((x) => cleanse(x.innerText))
 				.filter((x) => x !== '');
 
@@ -95,15 +92,92 @@
 		}
 
 		getSide() {
-			return document.querySelector(this.sideSelector) !== null ? BLACK : WHITE;
+			return document.querySelector('.clock-bottom.clock-black, .board.flipped') !== null ? BLACK : WHITE;
 		}
 
 		getOverlay() {
-			return document.querySelector(this.overlaySelector);
+			return document.querySelector('chess-board.board, .board-layout-chessboard');
 		}
 
 		isReady() {
-			return document.querySelector(this.gameSelector) !== null && this.getOverlay() != null;
+			return this.getOverlay() != null;
+		}
+
+		getFen(side) {
+			let files = getFiles();
+			let ranks = getRanks();
+			let pieces = [...document.querySelectorAll('chess-board .piece')];
+			let occupiedSquares = {};
+
+			if (!pieces.length) {
+				return null;
+			}
+
+			for (const pieceElement of pieces) {
+				let classes = [...pieceElement.classList];
+
+				let coloredPiece = classes.filter((x) => x.includes('w') || x.includes('b'))[0].split('');
+				let color = coloredPiece[0];
+				let piece = coloredPiece[1];
+				if (color === 'w') {
+					piece = piece.toUpperCase();
+				}
+
+				let position = classes.filter((x) => x.includes('square'))[0].split('-')[1];
+				let file = files[position[0] - 1];
+				let rank = position[1];
+				let square = file + rank;
+
+				occupiedSquares[square] = piece;
+			}
+
+			// Castling rules
+			let castles = [];
+
+			if ('e1' in occupiedSquares && occupiedSquares['e1'] == 'K') {
+				if ('a1' in occupiedSquares && occupiedSquares['a1'] == 'R') {
+					castles.push('K');
+				}
+				if ('h1' in occupiedSquares && occupiedSquares['h1'] == 'R') {
+					castles.push('Q');
+				}
+			}
+
+			if ('e8' in occupiedSquares && occupiedSquares['e1'] == 'k') {
+				if ('a8' in occupiedSquares && occupiedSquares['a8'] == 'r') {
+					castles.push('q');
+				}
+				if ('h8' in occupiedSquares && occupiedSquares['h8'] == 'r') {
+					castles.push('k');
+				}
+			}
+
+			let fen = [];
+			for (const r of ranks.reverse()) {
+				let empty = 0;
+				let row = '';
+				for (const f of files) {
+					const square = f + r;
+					if (square in occupiedSquares) {
+						if (empty > 0) {
+							row += empty.toString();
+							empty = 0;
+						}
+						row += occupiedSquares[square];
+					} else {
+						empty++;
+					}
+				}
+				if (empty > 0) {
+					row += empty.toString();
+					empty = 0;
+				}
+				fen.push(row);
+			}
+			fen = fen.join('/');
+			fen += ` ${side} ${castles.join('') || '-'} - 0 1`;
+
+			return fen;
 		}
 	}
 
@@ -5669,6 +5743,10 @@
 		}
 	}
 
+	function replayFen(fen) {
+		position$1.fen(fen);
+	}
+
 	function squareValue(square) {
 		let coloredPiece = position$1.square(square);
 		if (coloredPiece === '-') {
@@ -8061,12 +8139,17 @@
 			let mySide = parser.getSide();
 			let boardSize = 0;
 			let overlayElement = parser.getOverlay();
+			let fen = null;
 			console.log('Starting main loop');
 
 			while (true) {
 				await sleep(16.667);
 				const parsedSide = parser.getSide();
 				const moves = parser.parseMoves();
+				let newFen = null;
+				if (typeof parser.getFen !== 'undefined') {
+					newFen = parser.getFen(parsedSide);
+				}
 				const width = overlayElement.clientWidth;
 
 				if (width === 0) {
@@ -8074,17 +8157,24 @@
 				}
 
 				// If the number of moves, the mySide or the size of the board changes, redraw all the things!
-				if (moves.length !== numOfMoves || mySide !== parsedSide || boardSize !== width) {
+				if (moves.length !== numOfMoves || mySide !== parsedSide || boardSize !== width || fen !== newFen) {
 					numOfMoves = moves.length;
 					mySide = parsedSide;
 					boardSize = width;
-
-					replay(moves);
-
+					fen = newFen;
+					if (numOfMoves) {
+						replay(moves);
+					} else if (fen) {
+						replayFen(fen);
+					}
 					createOverlay('cv-overlay', overlayElement, mySide, parser.zIndex, false);
 					createOverlay('cv-overlay-text', overlayElement, mySide, 99999, true);
-					const squares = controlledSquares(position$1);
-					drawControlledSquares(squares, mySide);
+					if (numOfMoves || fen) {
+						const squares = controlledSquares(position$1);
+						drawControlledSquares(squares, mySide);
+					} else {
+						document.querySelector('#cv-overlay').style.border = '1px dashed hsl(140, 100%, 50%)';
+					}
 				}
 			}
 		} catch (e) {
