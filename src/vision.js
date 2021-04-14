@@ -25,7 +25,7 @@ export function controlledSquares(position) {
 	return squares;
 }
 
-export function drawControlledSquares(squares, mySide) {
+export function drawControlledSquares(squares, mySide, numbers) {
 	const opSide = mySide === WHITE ? BLACK : WHITE;
 
 	for (const [square, attackers] of Object.entries(squares)) {
@@ -69,10 +69,12 @@ export function drawControlledSquares(squares, mySide) {
 			drawSquare(square, { background: `${color}, 0.25)`, border: `1px solid ${color}, 1)` });
 		}
 
-		drawText(square, 'tl', myAttackers.length);
-		drawText(square, 'bl', myTotalValue);
-		drawText(square, 'tr', opAttackers.length);
-		drawText(square, 'br', opponentTotalValue);
+		if (numbers) {
+			drawText(square, 'tl', myAttackers.length);
+			drawText(square, 'bl', myTotalValue);
+			drawText(square, 'tr', opAttackers.length);
+			drawText(square, 'br', opponentTotalValue);
+		}
 	}
 }
 

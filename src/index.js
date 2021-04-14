@@ -23,6 +23,14 @@ const main = async () => {
 		let boardSize = 0;
 		let overlayElement = parser.getOverlay();
 		let fen = null;
+		let numbers = false;
+
+		document.onkeypress = function (e) {
+			if (e.key == 'n') {
+				numbers = !numbers;
+			}
+		};
+
 		console.log('Starting main loop');
 
 		while (true) {
@@ -54,7 +62,7 @@ const main = async () => {
 				createOverlay('cv-overlay-text', overlayElement, mySide, 99999, true);
 				if (numOfMoves || fen) {
 					const squares = controlledSquares(position);
-					drawControlledSquares(squares, mySide);
+					drawControlledSquares(squares, mySide, numbers);
 				} else {
 					document.querySelector('#cv-overlay').style.border = '1px dashed hsl(140, 100%, 50%)';
 				}
