@@ -41,3 +41,7 @@ I use pnpm, but you can replace those with npm/yarn if you prefer.
 
 To add sites, add another parser (see the parse folder for examples),
 add the approriate DOM selectors and zIndex (so that the drawn overlay is on top of the board) and it'll likely work without much tweaking. Remember to add the new parser to the `siteParser` function in parser/index.js, where the key is the `window.location.host`.
+
+TODO:
+- Get score from SF
+- Show eval bar

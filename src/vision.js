@@ -1,7 +1,8 @@
 import { WHITE, BLACK, getFiles, getRanks } from './helpers';
 import { valueMap, squareValue, squareColor } from './game';
-import { drawSquare, drawText } from './draw';
+import { drawSquare, drawText, drawTextBelow } from './draw';
 import { isEqual } from 'lodash-es';
+import { state } from './engine';
 
 export function controlledSquares(position) {
 	let files = getFiles();
@@ -25,7 +26,7 @@ export function controlledSquares(position) {
 	return squares;
 }
 
-export function drawControlledSquares(squares, mySide, numbers) {
+export function drawControlledSquares(squares, mySide, debug) {
 	const opSide = mySide === WHITE ? BLACK : WHITE;
 
 	for (const [square, attackers] of Object.entries(squares)) {
@@ -51,7 +52,7 @@ export function drawControlledSquares(squares, mySide, numbers) {
 			let color = 'hsla(130, 100%, 50%, 0.15)';
 			drawSquare(square, { background: color });
 		}
-		// Both are contesting the square, resolve who wins of if its in tension
+		// Both are contesting the square, resolve who wins if it's in tension
 		if (opponentTotalValue && myTotalValue) {
 			let contestedValue = calculateContestedSquare(square, myAttackers, opAttackers, mySide);
 
@@ -69,11 +70,13 @@ export function drawControlledSquares(squares, mySide, numbers) {
 			drawSquare(square, { background: `${color}, 0.25)`, border: `1px solid ${color}, 1)` });
 		}
 
-		if (numbers) {
+		if (debug) {
 			drawText(square, 'tl', myAttackers.length);
 			drawText(square, 'bl', myTotalValue);
 			drawText(square, 'tr', opAttackers.length);
 			drawText(square, 'br', opponentTotalValue);
+			drawTextBelow('cv-overlay', 'best-move', '50%', state.bestMoveSAN);
+			drawTextBelow('cv-overlay', 'score', '-30px', state.score);
 		}
 	}
 }
@@ -180,7 +183,7 @@ function findAttackers(position, squares, square, side) {
 	let fen = position.fen();
 	// We always sort the attackers after getting them, so that each 'wave' of xrays is in correct order
 	let attackers = sortAttackers(position, position.getAttacks(square, side)).filter(
-		(x) => !isKingCheckedAfterMove(position, x, square, side)
+		x => !isKingCheckedAfterMove(position, x, square, side)
 	);
 	squares[square][side] = attackers;
 	let previousAttackers = attackers;
@@ -188,7 +191,7 @@ function findAttackers(position, squares, square, side) {
 	while (attackers.length > 0) {
 		xray(position, attackers);
 		attackers = sortAttackers(position, position.getAttacks(square, side)).filter(
-			(x) => !isKingCheckedAfterMove(position, x, square, side)
+			x => !isKingCheckedAfterMove(position, x, square, side)
 		);
 		if (isEqual(attackers, previousAttackers)) {
 			break;

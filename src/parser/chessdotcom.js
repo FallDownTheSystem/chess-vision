@@ -8,7 +8,7 @@ export class ChessDotComParser {
 	}
 
 	parseMoves() {
-		const moves = [...document.querySelectorAll('.move .node, .move-list-controls-move')]
+		const moves = [...document.querySelectorAll('.move .node, .move-list-controls-move, .move-text-component')]
 			.map((x) => cleanse(x.innerText))
 			.filter((x) => x !== '');
 
@@ -16,7 +16,9 @@ export class ChessDotComParser {
 	}
 
 	getSide() {
-		return document.querySelector('.clock-bottom.clock-black, .board.flipped') !== null ? BLACK : WHITE;
+		return document.querySelector('.clock-black .main-clock-bottom, .layout-bottom-player .move-time-dark, .board.flipped') !== null
+			? BLACK
+			: WHITE;
 	}
 
 	getOverlay() {

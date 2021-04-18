@@ -1,4 +1,4 @@
-import { WHITE, getFiles, getRanks } from './helpers';
+import { WHITE, BLACK, getFiles, getRanks } from './helpers';
 
 export function drawSquare(square, { background, border }) {
 	const squareElement = document.querySelector(`.cv-${square}`);
@@ -39,9 +39,9 @@ export function createOverlay(id, element, side, zIndex, addText) {
 	overlayElement.style.position = 'absolute';
 	overlayElement.style.zIndex = zIndex;
 	overlayElement.style.pointerEvents = 'none';
-	overlayElement.style.fontFamily = "'Noto Sans','Segoe UI', sans-serif";
+	overlayElement.style.fontFamily = 'sans-serif';
 	overlayElement.style.fontSize = '12px';
-	overlayElement.style.fontWeight = 'bold';
+	overlayElement.style.fontWeight = '500';
 	overlayElement.style.width = width + 'px';
 	overlayElement.style.height = height + 'px';
 	overlayElement.style.top = top + window.scrollY + 'px';
@@ -75,7 +75,6 @@ function generateSquare(overlayElement, square, addText) {
 	let squareElement = document.createElement('div');
 	squareElement.style.gridArea = square;
 	squareElement.className = `cv-${square}${addText ? '-text' : ''}`;
-	squareElement.style.position = 'relative';
 	squareElement.style.position = 'relative';
 
 	overlayElement.appendChild(squareElement);
@@ -117,4 +116,51 @@ function generateText(squareElement, position) {
 	}
 
 	squareElement.appendChild(textElement);
+}
+
+export function drawEvalBar(id, score, side, turn) {
+	if (side !== turn) {
+		score *= -1;
+	}
+	let height = (2 / (1 + Math.exp(-0.004 * score)) - 1 + 1) * 50;
+
+	let element = document.getElementById(id);
+	let evalBarElement = document.createElement('div');
+	evalBarElement.id = `cv-evalbar`;
+	evalBarElement.style.position = 'absolute';
+	evalBarElement.style.height = element.style.height;
+	evalBarElement.style.width = '12px';
+	evalBarElement.style.left = '-14px';
+	evalBarElement.style.backgroundColor = side === WHITE ? 'hsla(0, 0%, 0%, 0.5)' : 'hsla(0, 0%, 100%, 1.0)';
+
+	let evalBarLevel = document.createElement('div');
+	evalBarLevel.id = `cv-evalbar-level`;
+	evalBarLevel.style.position = 'absolute';
+	evalBarLevel.style.height = `${height}%`;
+	evalBarLevel.style.width = '12px';
+	evalBarLevel.style.bottom = '0';
+
+	evalBarLevel.style.backgroundColor = side === WHITE ? 'white' : 'black';
+
+	evalBarElement.appendChild(evalBarLevel);
+
+	element.appendChild(evalBarElement);
+}
+
+export function drawTextBelow(id, uid, pos, text) {
+	let element = document.getElementById(id);
+	let existing = document.getElementById(uid);
+	if (existing) {
+		existing.remove();
+	}
+	let textElement = document.createElement('div');
+	textElement.id = uid;
+	textElement.style.position = 'absolute';
+	textElement.style.height = element.style.height;
+	textElement.style.top = `calc(${element.style.height} + 25px)`;
+	textElement.style.left = pos;
+	textElement.style.color = 'white';
+	textElement.style.textShadow = '1px 1px 0px black';
+	textElement.innerText = text;
+	element.appendChild(textElement);
 }

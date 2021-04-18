@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name        Chess vision
 // @namespace   FallDownTheSystem
-// @version     0.1.1
+// @version     0.2.1
 // @author      FallDownTheSystem
 // @match       *://lichess.org/*
 // @match       *://www.chess.com/*
 // @match       *://chess24.com/*
 // @match       *://arena.myfide.net/*
 // @inject-into content
+// @require     https://raw.githubusercontent.com/nmrugg/stockfish.js/master/src/stockfish.asm.js
 // @grant       none
 // ==/UserScript==
 (function () {
@@ -84,7 +85,7 @@
 		}
 
 		parseMoves() {
-			const moves = [...document.querySelectorAll('.move .node, .move-list-controls-move')]
+			const moves = [...document.querySelectorAll('.move .node, .move-list-controls-move, .move-text-component')]
 				.map((x) => cleanse(x.innerText))
 				.filter((x) => x !== '');
 
@@ -92,7 +93,9 @@
 		}
 
 		getSide() {
-			return document.querySelector('.clock-bottom.clock-black, .board.flipped') !== null ? BLACK$1 : WHITE$1;
+			return document.querySelector('.clock-black .main-clock-bottom, .layout-bottom-player .move-time-dark, .board.flipped') !== null
+				? BLACK$1
+				: WHITE$1;
 		}
 
 		getOverlay() {
@@ -5817,9 +5820,9 @@
 		overlayElement.style.position = 'absolute';
 		overlayElement.style.zIndex = zIndex;
 		overlayElement.style.pointerEvents = 'none';
-		overlayElement.style.fontFamily = "'Noto Sans','Segoe UI', sans-serif";
+		overlayElement.style.fontFamily = 'sans-serif';
 		overlayElement.style.fontSize = '12px';
-		overlayElement.style.fontWeight = 'bold';
+		overlayElement.style.fontWeight = '500';
 		overlayElement.style.width = width + 'px';
 		overlayElement.style.height = height + 'px';
 		overlayElement.style.top = top + window.scrollY + 'px';
@@ -5853,7 +5856,6 @@
 		let squareElement = document.createElement('div');
 		squareElement.style.gridArea = square;
 		squareElement.className = `cv-${square}${addText ? '-text' : ''}`;
-		squareElement.style.position = 'relative';
 		squareElement.style.position = 'relative';
 
 		overlayElement.appendChild(squareElement);
@@ -5895,6 +5897,53 @@
 		}
 
 		squareElement.appendChild(textElement);
+	}
+
+	function drawEvalBar(id, score, side, turn) {
+		if (side !== turn) {
+			score *= -1;
+		}
+		let height = (2 / (1 + Math.exp(-0.004 * score)) - 1 + 1) * 50;
+
+		let element = document.getElementById(id);
+		let evalBarElement = document.createElement('div');
+		evalBarElement.id = `cv-evalbar`;
+		evalBarElement.style.position = 'absolute';
+		evalBarElement.style.height = element.style.height;
+		evalBarElement.style.width = '12px';
+		evalBarElement.style.left = '-14px';
+		evalBarElement.style.backgroundColor = side === WHITE$1 ? 'hsla(0, 0%, 0%, 0.5)' : 'hsla(0, 0%, 100%, 1.0)';
+
+		let evalBarLevel = document.createElement('div');
+		evalBarLevel.id = `cv-evalbar-level`;
+		evalBarLevel.style.position = 'absolute';
+		evalBarLevel.style.height = `${height}%`;
+		evalBarLevel.style.width = '12px';
+		evalBarLevel.style.bottom = '0';
+
+		evalBarLevel.style.backgroundColor = side === WHITE$1 ? 'white' : 'black';
+
+		evalBarElement.appendChild(evalBarLevel);
+
+		element.appendChild(evalBarElement);
+	}
+
+	function drawTextBelow(id, uid, pos, text) {
+		let element = document.getElementById(id);
+		let existing = document.getElementById(uid);
+		if (existing) {
+			existing.remove();
+		}
+		let textElement = document.createElement('div');
+		textElement.id = uid;
+		textElement.style.position = 'absolute';
+		textElement.style.height = element.style.height;
+		textElement.style.top = `calc(${element.style.height} + 25px)`;
+		textElement.style.left = pos;
+		textElement.style.color = 'white';
+		textElement.style.textShadow = '1px 1px 0px black';
+		textElement.innerText = text;
+		element.appendChild(textElement);
 	}
 
 	/** Detect free variable `global` from Node.js. */
@@ -7914,6 +7963,57 @@
 	  return baseIsEqual(value, other);
 	}
 
+	// eslint-disable-next-line no-undef
+	var stockfish = STOCKFISH();
+
+	let state = {
+		score: 0,
+		bestMove: null,
+		bestMoveSAN: null,
+		evalPercent: 50.0,
+		mate: null,
+		triggerUpdate: false,
+	};
+
+	stockfish.postMessage('uci');
+	stockfish.postMessage('ucinewgame');
+
+	function playMove(fen, depth) {
+		if (fen) {
+			stockfish.postMessage(`position fen ${fen}`);
+			stockfish.postMessage(`go depth ${depth}`);
+		}
+	}
+
+	stockfish.onmessage = async function (event) {
+		// console.log(event);
+		if (!event) {
+			return;
+		}
+		let args = event.split(' ');
+
+		if (event.includes('bestmove')) {
+			let index = args.findIndex(x => x == 'bestmove');
+			let value = args[index + 1];
+			if (value.includes('none')) {
+				return;
+			}
+			state.bestMove = value;
+			state.bestMoveSAN = position.notation(position.uci(state.bestMove));
+			// console.log(state.bestMove, state.bestMoveSAN, state.score, state.mate);
+			state.triggerUpdate = true;
+		}
+		if (event.includes('score')) {
+			if (event.includes('cp')) {
+				state.score = parseInt(args[args.findIndex(x => x == 'cp') + 1]);
+				state.mate = null;
+			} else if (event.includes('mate')) {
+				state.score = position.turn() == WHITE$1 ? 9999 : -9999;
+				state.mate = parseInt(args[args.findIndex(x => x == 'mate') + 1]);
+			}
+		}
+	};
+
 	function controlledSquares(position) {
 		let files = getFiles();
 		let ranks = getRanks();
@@ -7936,7 +8036,7 @@
 		return squares;
 	}
 
-	function drawControlledSquares(squares, mySide, numbers) {
+	function drawControlledSquares(squares, mySide, debug) {
 		const opSide = mySide === WHITE$1 ? BLACK$1 : WHITE$1;
 
 		for (const [square, attackers] of Object.entries(squares)) {
@@ -7962,7 +8062,7 @@
 				let color = 'hsla(130, 100%, 50%, 0.15)';
 				drawSquare(square, { background: color });
 			}
-			// Both are contesting the square, resolve who wins of if its in tension
+			// Both are contesting the square, resolve who wins if it's in tension
 			if (opponentTotalValue && myTotalValue) {
 				let contestedValue = calculateContestedSquare(square, myAttackers, opAttackers, mySide);
 
@@ -7980,11 +8080,13 @@
 				drawSquare(square, { background: `${color}, 0.25)`, border: `1px solid ${color}, 1)` });
 			}
 
-			if (numbers) {
+			if (debug) {
 				drawText(square, 'tl', myAttackers.length);
 				drawText(square, 'bl', myTotalValue);
 				drawText(square, 'tr', opAttackers.length);
 				drawText(square, 'br', opponentTotalValue);
+				drawTextBelow('cv-overlay', 'best-move', '50%', state.bestMoveSAN);
+				drawTextBelow('cv-overlay', 'score', '-30px', state.score);
 			}
 		}
 	}
@@ -8091,7 +8193,7 @@
 		let fen = position.fen();
 		// We always sort the attackers after getting them, so that each 'wave' of xrays is in correct order
 		let attackers = sortAttackers(position, position.getAttacks(square, side)).filter(
-			(x) => !isKingCheckedAfterMove(position, x, square, side)
+			x => !isKingCheckedAfterMove(position, x, square, side)
 		);
 		squares[square][side] = attackers;
 		let previousAttackers = attackers;
@@ -8099,7 +8201,7 @@
 		while (attackers.length > 0) {
 			xray(position, attackers);
 			attackers = sortAttackers(position, position.getAttacks(square, side)).filter(
-				(x) => !isKingCheckedAfterMove(position, x, square, side)
+				x => !isKingCheckedAfterMove(position, x, square, side)
 			);
 			if (isEqual(attackers, previousAttackers)) {
 				break;
@@ -8154,11 +8256,14 @@
 			let boardSize = 0;
 			let overlayElement = parser.getOverlay();
 			let fen = null;
-			let numbers = false;
+			let drawDebug = false;
+			let triggerUpdate = true;
+			let evalPercentage = 50;
 
 			document.onkeypress = function (e) {
 				if (e.key == 'n') {
-					numbers = !numbers;
+					drawDebug = !drawDebug;
+					triggerUpdate = true;
 				}
 			};
 
@@ -8179,7 +8284,15 @@
 				}
 
 				// If the number of moves, the mySide or the size of the board changes, redraw all the things!
-				if (moves.length !== numOfMoves || mySide !== parsedSide || boardSize !== width || fen !== newFen) {
+				if (
+					triggerUpdate ||
+					moves.length !== numOfMoves ||
+					mySide !== parsedSide ||
+					boardSize !== width ||
+					fen !== newFen ||
+					state.triggerUpdate
+				) {
+					triggerUpdate = false;
 					numOfMoves = moves.length;
 					mySide = parsedSide;
 					boardSize = width;
@@ -8189,11 +8302,24 @@
 					} else if (fen) {
 						replayFen(fen);
 					}
+					// Post position to the engine only if the engine didn't trigger the update
+					if (!state.triggerUpdate) {
+						playMove(position.fen(), 8);
+					}
+
 					createOverlay('cv-overlay', overlayElement, mySide, parser.zIndex, false);
 					createOverlay('cv-overlay-text', overlayElement, mySide, 99999, true);
+
+					// Eval bar should only be rendered if the engine updated its state
+					if (state.triggerUpdate) {
+						drawEvalBar('cv-overlay', state.score, mySide, position.turn());
+					}
+
+					state.triggerUpdate = false;
+
 					if (numOfMoves || fen) {
 						const squares = controlledSquares(position);
-						drawControlledSquares(squares, mySide, numbers);
+						drawControlledSquares(squares, mySide, drawDebug);
 					} else {
 						document.querySelector('#cv-overlay').style.border = '1px dashed hsl(140, 100%, 50%)';
 					}

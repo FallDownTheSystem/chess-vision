@@ -1,9 +1,10 @@
 {
 	"name": "Chess vision",
-	"version": "0.1.1",
+	"version": "0.2.1",
 	"author": "FallDownTheSystem",
 	"namespace": "FallDownTheSystem",
 	"grant": ["none"],
 	"match": ["*://lichess.org/*", "*://www.chess.com/*", "*://chess24.com/*", "*://arena.myfide.net/*"],
-	"inject-into": "content"
+	"inject-into": "content",
+	"require": "https://raw.githubusercontent.com/nmrugg/stockfish.js/master/src/stockfish.asm.js"
 }
