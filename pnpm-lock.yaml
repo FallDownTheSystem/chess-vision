@@ -9,10 +9,12 @@ specifiers:
   lodash-es: ^4.17.21
   rollup: ^2.45.2
   rollup-plugin-userscript-metablock: ^0.3.0
+  shortcuts: ^1.7.0
 
 dependencies:
   kokopu: 1.7.3
   lodash-es: 4.17.21
+  shortcuts: 1.7.0
 
 devDependencies:
   '@rollup/plugin-commonjs': 18.0.0_rollup@2.45.2
@@ -852,6 +854,10 @@ packages:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
     dev: true
+
+  /shortcuts/1.7.0:
+    resolution: {integrity: sha512-5UFv5eVBaq60jjKl0qBBz0AsDtUtG8fejNMAZMcrV8/c8OEiyAOCQ7xxwpEnTCMNz6ItTvFZuvpI8u6JJypuyg==}
+    dev: false
 
   /slice-ansi/4.0.0:
     resolution: {integrity: sha512-qMCMfhY040cVHT43K9BFygqYbUPFZKHOg7K73mtTWJRb8pyP3fzf4Ixd5SzdEJQ6MRUg/WBnOLxghZtKKurENQ==}

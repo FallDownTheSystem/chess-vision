@@ -4,6 +4,7 @@ import { position, replay, replayFen } from './game';
 import { controlledSquares, drawControlledSquares } from './vision';
 import { createOverlay, drawEvalBar } from './draw';
 import { playMove, state } from './engine';
+import { Shortcuts } from 'shortcuts';
 
 console.log('Script is running');
 
@@ -26,14 +27,18 @@ const main = async () => {
 		let fen = null;
 		let drawDebug = false;
 		let triggerUpdate = true;
-		let evalPercentage = 50;
 
-		document.onkeypress = function (e) {
-			if (e.key == 'n') {
-				drawDebug = !drawDebug;
-				triggerUpdate = true;
-			}
-		};
+		const shortcuts = new Shortcuts();
+
+		shortcuts.add([
+			{
+				shortcut: 'D E B U G',
+				handler: () => {
+					drawDebug = !drawDebug;
+					triggerUpdate = true;
+				},
+			},
+		]);
 
 		console.log('Starting main loop');
 

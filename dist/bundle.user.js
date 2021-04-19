@@ -8237,6 +8237,1083 @@
 		return attackers.reduce((a, b) => a + squareValue(b), 0);
 	}
 
+	/* UTILS */
+
+	var Utils = {
+	    plusesRe: /\+{2,}/gi,
+	    whitespaceRe: /\s+/gi,
+	    isMac: /mac|ipod|iphone|ipad/i.test(navigator.platform),
+	    isEqual: function (x, y) {
+	        if (x.length !== y.length)
+	            return false;
+	        for (var i = 0, l = x.length; i < l; i++) {
+	            if (x[i] !== y[i])
+	                return false;
+	        }
+	        return true;
+	    },
+	    memoize: function (fn) {
+	        var cache = {};
+	        return function memoizedFunction(id) {
+	            var cached = cache[id];
+	            if (cached)
+	                return cached;
+	            return cache[id] = fn.apply(undefined, arguments);
+	        };
+	    },
+	};
+	/* EXPORT */
+	var _default$4 = Utils;
+
+	var utils = /*#__PURE__*/Object.defineProperty({
+		default: _default$4
+	}, '__esModule', {value: true});
+
+	/* IMPORT */
+
+
+	/* CONSTS */
+	var Consts = {
+	    key2id: {
+	        /* MODIFIERS */
+	        alt: 256,
+	        option: 256,
+	        cmd: 512,
+	        command: 512,
+	        meta: 512,
+	        ctrl: 1024,
+	        control: 1024,
+	        shift: 2048,
+	        cmdorctrl: utils.default.isMac ? 512 : 1024,
+	        commandorcontrol: utils.default.isMac ? 512 : 1024,
+	        /* SPECIAL CHARACTERS */
+	        backspace: 1,
+	        capslock: 2,
+	        del: 3,
+	        delete: 3,
+	        down: 4,
+	        end: 5,
+	        enter: 6,
+	        return: 6,
+	        esc: 7,
+	        escape: 7,
+	        home: 8,
+	        insert: 9,
+	        left: 10,
+	        pagedown: 11,
+	        pageup: 12,
+	        right: 13,
+	        space: 14,
+	        spacebar: 14,
+	        tab: 15,
+	        up: 16,
+	        /* DIGITS */
+	        0: 17,
+	        1: 18,
+	        2: 19,
+	        3: 20,
+	        4: 21,
+	        5: 22,
+	        6: 23,
+	        7: 24,
+	        8: 25,
+	        9: 26,
+	        /* ALPHABET */
+	        a: 27,
+	        b: 28,
+	        c: 29,
+	        d: 30,
+	        e: 31,
+	        f: 32,
+	        g: 33,
+	        h: 34,
+	        i: 35,
+	        j: 36,
+	        k: 37,
+	        l: 38,
+	        m: 39,
+	        n: 40,
+	        o: 41,
+	        p: 42,
+	        q: 43,
+	        r: 44,
+	        s: 45,
+	        t: 46,
+	        u: 47,
+	        v: 48,
+	        w: 49,
+	        x: 50,
+	        y: 51,
+	        z: 52,
+	        /* PUNCTUATION */
+	        '!': 53,
+	        '"': 54,
+	        '#': 55,
+	        '$': 56,
+	        '%': 57,
+	        '&': 58,
+	        '\'': 59,
+	        '(': 60,
+	        ')': 61,
+	        '*': 62,
+	        '+': 63,
+	        plus: 63,
+	        ',': 64,
+	        '-': 65,
+	        '.': 66,
+	        '/': 67,
+	        ':': 68,
+	        ';': 69,
+	        '<': 70,
+	        '=': 71,
+	        '>': 72,
+	        '?': 73,
+	        '@': 74,
+	        '[': 75,
+	        '\\': 76,
+	        ']': 77,
+	        '^': 78,
+	        '_': 79,
+	        '`': 80,
+	        '{': 81,
+	        '|': 82,
+	        '}': 83,
+	        '~': 84,
+	        /* FUNCTION KEYS */
+	        f1: 85,
+	        f2: 86,
+	        f3: 87,
+	        f4: 88,
+	        f5: 89,
+	        f6: 90,
+	        f7: 91,
+	        f8: 92,
+	        f9: 93,
+	        f10: 94,
+	        f11: 95,
+	        f12: 96,
+	        f13: 97,
+	        f14: 98,
+	        f15: 99,
+	        f16: 100,
+	        f17: 101,
+	        f18: 102,
+	        f19: 103,
+	        f20: 104,
+	        f21: 105,
+	        f22: 106,
+	        f23: 107,
+	        f24: 108,
+	        /* NUMPAD DIGITS */
+	        numpad0: 109,
+	        numpad1: 110,
+	        numpad2: 111,
+	        numpad3: 112,
+	        numpad4: 113,
+	        numpad5: 114,
+	        numpad6: 115,
+	        numpad7: 116,
+	        numpad8: 117,
+	        numpad9: 118
+	    },
+	    code2id: {
+	        /* MODIFIERS */
+	        18: 256,
+	        91: 512,
+	        92: 512,
+	        93: 512,
+	        224: 512,
+	        17: 1024,
+	        16: 2048,
+	        /* SPECIAL CHARACTERS */
+	        8: 1,
+	        20: 2,
+	        46: 3,
+	        40: 4,
+	        35: 5,
+	        13: 6,
+	        27: 7,
+	        36: 8,
+	        45: 9,
+	        37: 10,
+	        34: 11,
+	        33: 12,
+	        39: 13,
+	        32: 14,
+	        9: 15,
+	        38: 16,
+	        /* PUNCTUATION */ // Ensuring Shift+Punctuation works more reliably
+	        222: 59,
+	        188: 64,
+	        189: 65,
+	        190: 66,
+	        191: 67,
+	        186: 69,
+	        187: 71,
+	        219: 75,
+	        220: 76,
+	        221: 77,
+	        192: 80,
+	        /* FUNCTION KEYS */
+	        112: 85,
+	        113: 86,
+	        114: 87,
+	        115: 88,
+	        116: 89,
+	        117: 90,
+	        118: 91,
+	        119: 92,
+	        120: 93,
+	        121: 94,
+	        122: 95,
+	        123: 96,
+	        124: 97,
+	        125: 98,
+	        126: 99,
+	        127: 100,
+	        128: 101,
+	        129: 102,
+	        130: 103,
+	        131: 104,
+	        132: 105,
+	        133: 106,
+	        134: 107,
+	        135: 108,
+	        /* NUMPAD DIGITS */
+	        96: 109,
+	        97: 110,
+	        98: 111,
+	        99: 112,
+	        100: 113,
+	        101: 114,
+	        102: 115,
+	        103: 116,
+	        104: 117,
+	        105: 118 // numpad9
+	    },
+	    id2shortcut: {
+	        /* MODIFIERS */
+	        256: 'Alt',
+	        512: 'Cmd',
+	        1024: 'Ctrl',
+	        2048: 'Shift',
+	        /* SPECIAL CHARACTERS */
+	        1: 'Backspace',
+	        2: 'Capslock',
+	        3: 'Delete',
+	        4: 'Down',
+	        5: 'End',
+	        6: 'Enter',
+	        7: 'Escape',
+	        8: 'Home',
+	        9: 'Insert',
+	        10: 'Left',
+	        11: 'PageDown',
+	        12: 'PageUp',
+	        13: 'Right',
+	        14: 'Space',
+	        15: 'Tab',
+	        16: 'Up',
+	        /* DIGITS */
+	        17: '0',
+	        18: '1',
+	        19: '2',
+	        20: '3',
+	        21: '4',
+	        22: '5',
+	        23: '6',
+	        24: '7',
+	        25: '8',
+	        26: '9',
+	        /* ALPHABET */
+	        27: 'A',
+	        28: 'B',
+	        29: 'C',
+	        30: 'D',
+	        31: 'E',
+	        32: 'F',
+	        33: 'G',
+	        34: 'H',
+	        35: 'I',
+	        36: 'J',
+	        37: 'K',
+	        38: 'L',
+	        39: 'M',
+	        40: 'N',
+	        41: 'O',
+	        42: 'P',
+	        43: 'Q',
+	        44: 'R',
+	        45: 'S',
+	        46: 'T',
+	        47: 'U',
+	        48: 'V',
+	        49: 'W',
+	        50: 'X',
+	        51: 'Y',
+	        52: 'Z',
+	        /* PUNCTUATION */
+	        53: '!',
+	        54: '"',
+	        55: '#',
+	        56: '$',
+	        57: '%',
+	        58: '&',
+	        59: '\'',
+	        60: '(',
+	        61: ')',
+	        62: '*',
+	        63: 'Plus',
+	        64: ',',
+	        65: '-',
+	        66: '.',
+	        67: '/',
+	        68: ':',
+	        69: ';',
+	        70: '<',
+	        71: '=',
+	        72: '>',
+	        73: '?',
+	        74: '@',
+	        75: '[',
+	        76: '\\',
+	        77: ']',
+	        78: '^',
+	        79: '_',
+	        80: '`',
+	        81: '{',
+	        82: '|',
+	        83: '}',
+	        84: '~',
+	        /* FUNCTION KEYS */
+	        85: 'F1',
+	        86: 'F2',
+	        87: 'F3',
+	        88: 'F4',
+	        89: 'F5',
+	        90: 'F6',
+	        91: 'F7',
+	        92: 'F8',
+	        93: 'F9',
+	        94: 'F10',
+	        95: 'F11',
+	        96: 'F12',
+	        97: 'F13',
+	        98: 'F14',
+	        99: 'F15',
+	        100: 'F16',
+	        101: 'F17',
+	        102: 'F18',
+	        103: 'F19',
+	        104: 'F20',
+	        105: 'F21',
+	        106: 'F22',
+	        107: 'F23',
+	        108: 'F24',
+	        /* NUMPAD DIGITS */
+	        109: 'Numpad0',
+	        110: 'Numpad1',
+	        111: 'Numpad2',
+	        112: 'Numpad3',
+	        113: 'Numpad4',
+	        114: 'Numpad5',
+	        115: 'Numpad6',
+	        116: 'Numpad7',
+	        117: 'Numpad8',
+	        118: 'Numpad9'
+	    },
+	    id2accelerator: {
+	        /* MODIFIERS */
+	        256: 'Alt',
+	        512: 'Cmd',
+	        1024: 'Ctrl',
+	        2048: 'Shift',
+	        /* SPECIAL CHARACTERS */
+	        1: 'Backspace',
+	        2: 'Capslock',
+	        3: 'Delete',
+	        4: 'Down',
+	        5: 'End',
+	        6: 'Enter',
+	        7: 'Escape',
+	        8: 'Home',
+	        9: 'Insert',
+	        10: 'Left',
+	        11: 'PageDown',
+	        12: 'PageUp',
+	        13: 'Right',
+	        14: 'Space',
+	        15: 'Tab',
+	        16: 'Up',
+	        /* DIGITS */
+	        17: '0',
+	        18: '1',
+	        19: '2',
+	        20: '3',
+	        21: '4',
+	        22: '5',
+	        23: '6',
+	        24: '7',
+	        25: '8',
+	        26: '9',
+	        /* ALPHABET */
+	        27: 'A',
+	        28: 'B',
+	        29: 'C',
+	        30: 'D',
+	        31: 'E',
+	        32: 'F',
+	        33: 'G',
+	        34: 'H',
+	        35: 'I',
+	        36: 'J',
+	        37: 'K',
+	        38: 'L',
+	        39: 'M',
+	        40: 'N',
+	        41: 'O',
+	        42: 'P',
+	        43: 'Q',
+	        44: 'R',
+	        45: 'S',
+	        46: 'T',
+	        47: 'U',
+	        48: 'V',
+	        49: 'W',
+	        50: 'X',
+	        51: 'Y',
+	        52: 'Z',
+	        /* PUNCTUATION */
+	        53: '!',
+	        54: '"',
+	        55: '#',
+	        56: '$',
+	        57: '%',
+	        58: '&',
+	        59: '\'',
+	        60: '(',
+	        61: ')',
+	        62: '*',
+	        63: 'Plus',
+	        64: ',',
+	        65: '-',
+	        66: '.',
+	        67: '/',
+	        68: ':',
+	        69: ';',
+	        70: '<',
+	        71: '=',
+	        72: '>',
+	        73: '?',
+	        74: '@',
+	        75: '[',
+	        76: '\\',
+	        77: ']',
+	        78: '^',
+	        79: '_',
+	        80: '`',
+	        81: '{',
+	        82: '|',
+	        83: '}',
+	        84: '~',
+	        /* FUNCTION KEYS */
+	        85: 'F1',
+	        86: 'F2',
+	        87: 'F3',
+	        88: 'F4',
+	        89: 'F5',
+	        90: 'F6',
+	        91: 'F7',
+	        92: 'F8',
+	        93: 'F9',
+	        94: 'F10',
+	        95: 'F11',
+	        96: 'F12',
+	        97: 'F13',
+	        98: 'F14',
+	        99: 'F15',
+	        100: 'F16',
+	        101: 'F17',
+	        102: 'F18',
+	        103: 'F19',
+	        104: 'F20',
+	        105: 'F21',
+	        106: 'F22',
+	        107: 'F23',
+	        108: 'F24',
+	        /* NUMPAD DIGITS */
+	        109: 'num0',
+	        110: 'num1',
+	        111: 'num2',
+	        112: 'num3',
+	        113: 'num4',
+	        114: 'num5',
+	        115: 'num6',
+	        116: 'num7',
+	        117: 'num8',
+	        118: 'num9'
+	    },
+	    id2symbol: {
+	        /* MODIFIERS */
+	        256: '⌥',
+	        512: '⌘',
+	        1024: '⌃',
+	        2048: '⇧',
+	        /* SPECIAL CHARACTERS */
+	        1: '⌫',
+	        2: '⇪',
+	        3: '⌦',
+	        4: '↓',
+	        5: '↘',
+	        6: '⏎',
+	        7: '⎋',
+	        8: '↖',
+	        9: '⎀',
+	        10: '←',
+	        11: '⇟',
+	        12: '⇞',
+	        13: '→',
+	        14: '␣',
+	        15: '⇥',
+	        16: '↑',
+	        /* DIGITS */
+	        17: '0',
+	        18: '1',
+	        19: '2',
+	        20: '3',
+	        21: '4',
+	        22: '5',
+	        23: '6',
+	        24: '7',
+	        25: '8',
+	        26: '9',
+	        /* ALPHABET */
+	        27: 'A',
+	        28: 'B',
+	        29: 'C',
+	        30: 'D',
+	        31: 'E',
+	        32: 'F',
+	        33: 'G',
+	        34: 'H',
+	        35: 'I',
+	        36: 'J',
+	        37: 'K',
+	        38: 'L',
+	        39: 'M',
+	        40: 'N',
+	        41: 'O',
+	        42: 'P',
+	        43: 'Q',
+	        44: 'R',
+	        45: 'S',
+	        46: 'T',
+	        47: 'U',
+	        48: 'V',
+	        49: 'W',
+	        50: 'X',
+	        51: 'Y',
+	        52: 'Z',
+	        /* PUNCTUATION */
+	        53: '!',
+	        54: '"',
+	        55: '#',
+	        56: '$',
+	        57: '%',
+	        58: '&',
+	        59: '\'',
+	        60: '(',
+	        61: ')',
+	        62: '*',
+	        63: '+',
+	        64: ',',
+	        65: '-',
+	        66: '.',
+	        67: '/',
+	        68: ':',
+	        69: ';',
+	        70: '<',
+	        71: '=',
+	        72: '>',
+	        73: '?',
+	        74: '@',
+	        75: '[',
+	        76: '\\',
+	        77: ']',
+	        78: '^',
+	        79: '_',
+	        80: '`',
+	        81: '{',
+	        82: '|',
+	        83: '}',
+	        84: '~',
+	        /* FUNCTION KEYS */
+	        85: 'F1',
+	        86: 'F2',
+	        87: 'F3',
+	        88: 'F4',
+	        89: 'F5',
+	        90: 'F6',
+	        91: 'F7',
+	        92: 'F8',
+	        93: 'F9',
+	        94: 'F10',
+	        95: 'F11',
+	        96: 'F12',
+	        97: 'F13',
+	        98: 'F14',
+	        99: 'F15',
+	        100: 'F16',
+	        101: 'F17',
+	        102: 'F18',
+	        103: 'F19',
+	        104: 'F20',
+	        105: 'F21',
+	        106: 'F22',
+	        107: 'F23',
+	        108: 'F24',
+	        /* NUMPAD DIGITS */
+	        109: 'Numpad0',
+	        110: 'Numpad1',
+	        111: 'Numpad2',
+	        112: 'Numpad3',
+	        113: 'Numpad4',
+	        114: 'Numpad5',
+	        115: 'Numpad6',
+	        116: 'Numpad7',
+	        117: 'Numpad8',
+	        118: 'Numpad9' // numpad9
+	    },
+	    modifierKeyBitmask: 65280,
+	    triggerKeyBitmask: 255,
+	    shortcutRe: /^\s*?(?:(?:^|\s|\+)(?:alt|option|cmd|command|meta|ctrl|control|shift|cmdorctrl|commandorcontrol|backspace|capslock|del|delete|down|end|enter|return|esc|escape|home|insert|left|pagedown|pageup|right|space|spacebar|tab|up|plus|\d|[a-z]|f(?:\d|1\d|2[0-4])|numpad\d|[!"#$%&'()*+,./:;<=>?@[\]^_`{|}~-]))+\s*$/i // Regex that matches a shortcut
+	};
+	/* EXPORT */
+	var _default$3 = Consts;
+
+	var consts = /*#__PURE__*/Object.defineProperty({
+		default: _default$3
+	}, '__esModule', {value: true});
+
+	/* IMPORT */
+
+
+
+	/* SHORTCUT */
+	var Shortcut = {
+	    /* MODIFIER KEY */
+	    getModifierKey: function (id) {
+	        return consts.default.modifierKeyBitmask & id;
+	    },
+	    hasModifierKey: function (id) {
+	        return !!Shortcut.getModifierKey(id);
+	    },
+	    /* TRIGGER KEY */
+	    getTriggerKey: function (id) {
+	        return consts.default.triggerKeyBitmask & id;
+	    },
+	    hasTriggerKey: function (id) {
+	        return !!Shortcut.getTriggerKey(id);
+	    },
+	    /* EVENT */
+	    event2id: function (event) {
+	        /* TRIGGER */
+	        var isKeypress = (event.type === 'keypress'), code = event.which || event['keyCode'] || 0, char = String.fromCharCode(code).toLowerCase(), key = event['key'];
+	        var id = isKeypress ? consts.default.key2id[key] || consts.default.key2id[char] || 0 : consts.default.code2id[code] || consts.default.key2id[char] || consts.default.key2id[key] || 0;
+	        /* MODIFIERS */
+	        if (event.ctrlKey)
+	            id |= consts.default.key2id.ctrl;
+	        if (event.altKey)
+	            id |= consts.default.key2id.alt;
+	        if (event.shiftKey)
+	            id |= consts.default.key2id.shift;
+	        if (event.metaKey)
+	            id |= consts.default.key2id.cmd;
+	        return id;
+	    },
+	    event2shortcut: function (event) {
+	        return Shortcut.id2shortcut([Shortcut.event2id(event)]);
+	    },
+	    event2accelerator: function (event) {
+	        return Shortcut.id2accelerator([Shortcut.event2id(event)]);
+	    },
+	    event2symbols: function (event) {
+	        return Shortcut.id2symbols([Shortcut.event2id(event)]);
+	    },
+	    /* CHORD */
+	    chord2id: utils.default.memoize(function (chord) {
+	        var keys = chord.replace(utils.default.plusesRe, '+Plus').toLowerCase().split('+');
+	        return keys.reduce(function (keyCode, key) {
+	            return keyCode | (consts.default.key2id[key] || 0);
+	        }, 0);
+	    }),
+	    chord2accelerator: function (chord) {
+	        return Shortcut.id2accelerator([Shortcut.chord2id(chord)]);
+	    },
+	    chord2symbols: function (chord) {
+	        return Shortcut.id2symbols([Shortcut.chord2id(chord)]);
+	    },
+	    /* SHORTCUT */
+	    isValidShortcut: function (shortcut) {
+	        return consts.default.shortcutRe.test(shortcut);
+	    },
+	    checkValidShortcut: function (shortcut) {
+	        var isValid = Shortcut.isValidShortcut(shortcut);
+	        if (!isValid)
+	            console.error("Invalid shortcut: \"" + shortcut + "\"");
+	        return isValid;
+	    },
+	    shortcut2id: utils.default.memoize(function (shortcut) {
+	        var chords = shortcut.trim().split(utils.default.whitespaceRe);
+	        return chords.map(Shortcut.chord2id);
+	    }),
+	    shortcut2accelerator: utils.default.memoize(function (shortcut) {
+	        return Shortcut.id2accelerator(Shortcut.shortcut2id(shortcut));
+	    }),
+	    shortcut2symbols: utils.default.memoize(function (shortcut) {
+	        return Shortcut.id2symbols(Shortcut.shortcut2id(shortcut));
+	    }),
+	    /* ID */
+	    isValidID: function (id) {
+	        return id.find(function (id) { return !id; }) === undefined;
+	    },
+	    checkValidID: function (id) {
+	        var isValid = Shortcut.isValidID(id);
+	        if (!isValid)
+	            console.error("Invalid shortcut: \"" + Shortcut.id2accelerator(id) + "\"");
+	        return isValid;
+	    },
+	    id2output: function (id, outputMap, chordSeparator, sequenceSeparator) {
+	        if (outputMap === void 0) { outputMap = {}; }
+	        if (chordSeparator === void 0) { chordSeparator = '+'; }
+	        if (sequenceSeparator === void 0) { sequenceSeparator = ' '; }
+	        var _a = consts.default.key2id, ctrl = _a.ctrl, alt = _a.alt, shift = _a.shift, cmd = _a.cmd;
+	        return id.map(function (id) {
+	            var keys = [];
+	            if (ctrl & id)
+	                keys.push(outputMap[ctrl]);
+	            if (alt & id)
+	                keys.push(outputMap[alt]);
+	            if (shift & id)
+	                keys.push(outputMap[shift]);
+	            if (cmd & id)
+	                keys.push(outputMap[cmd]);
+	            var triggerKey = Shortcut.getTriggerKey(id);
+	            if (triggerKey)
+	                keys.push(outputMap[triggerKey] || String.fromCharCode(triggerKey).toUpperCase());
+	            return keys.join(chordSeparator);
+	        }).join(sequenceSeparator);
+	    },
+	    id2shortcut: utils.default.memoize(function (id) {
+	        return Shortcut.id2output(id, consts.default.id2shortcut);
+	    }),
+	    id2accelerator: utils.default.memoize(function (id) {
+	        return Shortcut.id2output(id, consts.default.id2accelerator);
+	    }),
+	    id2symbols: utils.default.memoize(function (id) {
+	        return Shortcut.id2output(id, consts.default.id2symbol, '');
+	    })
+	};
+	/* EXPORT */
+	var _default$2 = Shortcut;
+
+	var shortcut = /*#__PURE__*/Object.defineProperty({
+		default: _default$2
+	}, '__esModule', {value: true});
+
+	/* ENUMS */
+
+	var ListenerResult;
+	(function (ListenerResult) {
+	    ListenerResult[ListenerResult["HANDLED"] = 0] = "HANDLED";
+	    ListenerResult[ListenerResult["UNHANDLED"] = 1] = "UNHANDLED";
+	    ListenerResult[ListenerResult["UNHANDLEABLE"] = 2] = "UNHANDLEABLE"; // No handler caught that, and there are no deeper handlers that could catch that
+	})(ListenerResult || (ListenerResult = {}));
+	var ListenerResult_1 = ListenerResult;
+
+	var enums = /*#__PURE__*/Object.defineProperty({
+		ListenerResult: ListenerResult_1
+	}, '__esModule', {value: true});
+
+	/* IMPORT */
+
+
+
+
+	/* LISTENER */
+	var Listener = /** @class */ (function () {
+	    function Listener(options) {
+	        var _this = this;
+	        this.lastKeydownID = -1;
+	        this.currentKeydownShortcutID = [];
+	        this.currentKeypressShortcutID = [];
+	        this.currentKeyupShortcutID = [];
+	        this.resetNextKeydownShortcutID = false;
+	        this.triggeredNextKeypress = true;
+	        this.ignoreNextKeypress = false;
+	        this.listening = false;
+	        this.handler = function (event) {
+	            if (!_this.shouldHandleEvent(event))
+	                return;
+	            var type = event.type, isKeydown = (type === 'keydown'), isKeypress = (type === 'keypress'), isKeyup = (type === 'keyup');
+	            if (isKeydown) { // Resetting, in case two keydown events get triggered in a row
+	                _this.ignoreNextKeypress = false;
+	            }
+	            if (isKeypress && _this.ignoreNextKeypress) { // Ignoring this keypress, already handled on keydown
+	                _this.triggeredNextKeypress = true;
+	                return;
+	            }
+	            var id = shortcut.default.event2id(event), triggerKey = shortcut.default.getTriggerKey(id);
+	            if (isKeydown) {
+	                _this.lastKeydownID = id;
+	            }
+	            if (isKeyup && (triggerKey || id !== _this.lastKeydownID)) { // Keyup only handles no-trigger events, if no other shortcuts with triggers have been triggered before, if no other keys havve been registered on keyPress
+	                _this.currentKeyupShortcutID.length = 0;
+	                return;
+	            }
+	            if (!isKeyup && !triggerKey)
+	                return; // Only keyup handles non-trigger events
+	            var shortcutID = isKeydown ? _this.currentKeydownShortcutID : (isKeyup ? _this.currentKeyupShortcutID : _this.currentKeypressShortcutID);
+	            if (isKeydown && !_this.resetNextKeydownShortcutID && !_this.triggeredNextKeypress) { // A chord triggered on keydown didn't get triggered on keypress also, so we copy it over manually
+	                _this.currentKeypressShortcutID.push(_this.currentKeydownShortcutID[_this.currentKeydownShortcutID.length - 1]);
+	            }
+	            if (isKeydown && _this.resetNextKeydownShortcutID) { // Resetting keydown shortcut id
+	                shortcutID.length = 0;
+	                _this.resetNextKeydownShortcutID = false;
+	            }
+	            shortcutID.push(id);
+	            if (isKeypress && utils.default.isEqual(_this.currentKeydownShortcutID, shortcutID)) { // Avoiding handling keypress for the same detected shortcut in order to maximize performance. Unless the handler for this shortcut has been added between keydown and keypress (weird) this won't be a problem
+	                if (_this.resetNextKeydownShortcutID) {
+	                    _this.currentKeypressShortcutID.length = 0;
+	                }
+	                _this.triggeredNextKeypress = true;
+	                return;
+	            }
+	            var result = _this.options.handler(shortcutID, event);
+	            if (result === enums.ListenerResult.HANDLED) { // Resetting all shortcuts
+	                _this.resetNextKeydownShortcutID = true;
+	                _this.currentKeypressShortcutID.length = 0;
+	                _this.currentKeyupShortcutID.length = 0;
+	            }
+	            else if (result === enums.ListenerResult.UNHANDLEABLE) { // Resetting only the current shortcut
+	                if (isKeydown) {
+	                    _this.resetNextKeydownShortcutID = true;
+	                }
+	                else if (isKeypress) {
+	                    _this.currentKeypressShortcutID.length = 0;
+	                }
+	                else if (isKeyup) {
+	                    _this.currentKeyupShortcutID.length = 0;
+	                }
+	            }
+	            else if (typeof result === 'object') { // Changing the current shortcut
+	                shortcutID.splice.apply(// Changing the current shortcut
+	                shortcutID, [0, Infinity].concat(result));
+	            }
+	            if (!isKeyup) {
+	                _this.ignoreNextKeypress = isKeydown && result === enums.ListenerResult.HANDLED;
+	                _this.triggeredNextKeypress = isKeypress;
+	            }
+	        };
+	        this.options = options;
+	        this.capture = !!options.capture;
+	        this.target = options.target || document;
+	        this.shouldHandleEvent = options.shouldHandleEvent || (function (event) { return !event.defaultPrevented; });
+	    }
+	    Listener.prototype.on = function () {
+	        if (this.listening)
+	            return;
+	        this.listening = true;
+	        this.target.addEventListener('keydown', this.handler, { capture: this.capture });
+	        this.target.addEventListener('keypress', this.handler, { capture: this.capture });
+	        this.target.addEventListener('keyup', this.handler, { capture: this.capture });
+	    };
+	    Listener.prototype.off = function () {
+	        if (!this.listening)
+	            return;
+	        this.listening = false;
+	        this.target.removeEventListener('keydown', this.handler, { capture: this.capture });
+	        this.target.removeEventListener('keypress', this.handler, { capture: this.capture });
+	        this.target.removeEventListener('keyup', this.handler, { capture: this.capture });
+	    };
+	    Listener.prototype.isListening = function () {
+	        return this.listening;
+	    };
+	    return Listener;
+	}());
+	/* EXPORT */
+	var _default$1 = Listener;
+
+	var listener = /*#__PURE__*/Object.defineProperty({
+		default: _default$1
+	}, '__esModule', {value: true});
+
+	/* IMPORT */
+
+
+
+
+
+	/* SHORTCUTS */
+	var Shortcuts$1 = /** @class */ (function () {
+	    function Shortcuts(options) {
+	        var _this = this;
+	        if (options === void 0) { options = {}; }
+	        this.handler = function (id, event) {
+	            if (_this.recordHandler) { // Recording
+	                _this.recordHandler(shortcut.default.id2accelerator(id));
+	                return enums.ListenerResult.UNHANDLED;
+	            }
+	            var handleable = false, firstHandleableIndex = -1;
+	            outer: for (var i = 0, l = id.length; i < l; i++) { // Trying all possible combinations (e.g 'A B C' => ['A B C', 'B C ', 'C'])
+	                var target = _this.shortcuts;
+	                for (var ci = i; ci < l; ci++) { // Getting all chords in the current combination
+	                    target = target[id[ci]];
+	                    if (!target) {
+	                        if (!handleable && i === (l - 1))
+	                            return enums.ListenerResult.UNHANDLEABLE; // Can't be handled by any deeper shortcuts
+	                        continue outer;
+	                    }
+	                }
+	                handleable = true;
+	                if (firstHandleableIndex === -1)
+	                    firstHandleableIndex = i;
+	                var handlers = target.handlers;
+	                for (var hi = 0, hl = handlers.length; hi < hl; hi++) {
+	                    if (handlers[hi](event) === true) { // Handled, stopping here
+	                        if (event) {
+	                            event.preventDefault();
+	                            event.stopPropagation();
+	                        }
+	                        return enums.ListenerResult.HANDLED;
+	                    }
+	                }
+	            }
+	            if (firstHandleableIndex > 0)
+	                return id.slice(firstHandleableIndex); // Simplifying the shortcut, no point in checking unhandleable combinations
+	            return enums.ListenerResult.UNHANDLED;
+	        };
+	        this.listener = new listener.default({
+	            capture: options.capture,
+	            handler: this.handler,
+	            target: options.target,
+	            shouldHandleEvent: options.shouldHandleEvent
+	        });
+	        this.reset();
+	        if (options.shortcuts) {
+	            this.add(options.shortcuts);
+	        }
+	    }
+	    Shortcuts.prototype._updateListener = function () {
+	        var shouldListen = !!this.shortcuts.size;
+	        if (shouldListen === this.listener.isListening())
+	            return;
+	        shouldListen ? this.listener.on() : this.listener.off();
+	    };
+	    Shortcuts.prototype.get = function () {
+	        return this.descriptors;
+	    };
+	    Shortcuts.prototype.add = function (descriptors) {
+	        var _this = this;
+	        if (!(descriptors instanceof Array))
+	            return this.add([descriptors]);
+	        descriptors.forEach(function (descriptor) {
+	            var shortcut$1 = descriptor.shortcut, handler = descriptor.handler;
+	            if (shortcut$1[0] === '-')
+	                return _this.remove([{ shortcut: shortcut$1, handler: handler }]);
+	            if (!handler)
+	                return console.error("Can't add shortcut \"" + shortcut$1 + "\" which has no handler");
+	            var id = shortcut.default.shortcut2id(shortcut$1);
+	            // if ( !Shortcut.checkValidID ( id ) ) return; //TODO: Maybe enable this check, sacrificing some performance for some user friendliness
+	            _this.descriptors.push(descriptor);
+	            var lastIndex = id.length - 1;
+	            id.reduce(function (parent, id, index) {
+	                if (!parent[id]) {
+	                    parent.size++;
+	                    parent[id] = {
+	                        parent: parent,
+	                        id: id,
+	                        size: 0,
+	                        handlers: []
+	                    };
+	                }
+	                if (index === lastIndex) {
+	                    parent[id].handlers.unshift(handler);
+	                }
+	                return parent[id];
+	            }, _this.shortcuts);
+	        });
+	        this._updateListener();
+	    };
+	    Shortcuts.prototype.remove = function (descriptors) {
+	        var _this = this;
+	        if (!(descriptors instanceof Array))
+	            return this.remove([descriptors]);
+	        descriptors.forEach(function (descriptor) {
+	            var shortcut$1 = descriptor.shortcut, handler = descriptor.handler;
+	            if (shortcut$1[0] === '-')
+	                shortcut$1 = shortcut$1.slice(1);
+	            var id = shortcut.default.shortcut2id(shortcut$1);
+	            // if ( !Shortcut.checkValidID ( id ) ) return; //TODO: Maybe enable this check, sacrificing some performance for some user friendliness
+	            _this.descriptors = _this.descriptors.filter(function (d) { return (d.shortcut !== shortcut$1 && !utils.default.isEqual(shortcut.default.shortcut2id(d.shortcut), id)) || (handler && d.handler !== handler); });
+	            var lastIndex = id.length - 1;
+	            id.reduce(function (parent, id, index) {
+	                var child = parent[id];
+	                if (!child)
+	                    return {};
+	                if (index === lastIndex) {
+	                    if (handler) {
+	                        child.handlers = child.handlers.filter(function (h) { return h !== handler; });
+	                    }
+	                    else {
+	                        child.handlers.length = 0;
+	                    }
+	                    var target = child;
+	                    while (!target.size && !target.handlers.length && target.parent && target.id) { // Cleaning up
+	                        delete target.parent[target.id];
+	                        target.parent.size--;
+	                        target = target.parent;
+	                    }
+	                }
+	                return child;
+	            }, _this.shortcuts);
+	        });
+	        this._updateListener();
+	    };
+	    Shortcuts.prototype.reset = function () {
+	        this.descriptors = [];
+	        this.shortcuts = {
+	            size: 0,
+	            handlers: []
+	        };
+	        this._updateListener();
+	    };
+	    Shortcuts.prototype.record = function (handler) {
+	        var _this = this;
+	        this.recordHandler = handler;
+	        return function () { return delete _this.recordHandler; };
+	    };
+	    Shortcuts.prototype.trigger = function (shortcut$1) {
+	        var id = typeof shortcut$1 === 'string' ? shortcut.default.shortcut2id(shortcut$1) : shortcut$1;
+	        // if ( !Shortcut.checkValidID ( id ) ) return ListenerResult.UNHANDLEABLE; //TODO: Maybe enable this check, sacrificing some performance for some user friendliness
+	        return this.handler(id) === enums.ListenerResult.HANDLED;
+	    };
+	    return Shortcuts;
+	}());
+	/* EXPORT */
+	var _default = Shortcuts$1;
+
+	var shortcuts = /*#__PURE__*/Object.defineProperty({
+		default: _default
+	}, '__esModule', {value: true});
+
+	/* IMPORT */
+
+
+	shortcut.default;
+
+	var Shortcuts = shortcuts.default;
+
 	console.log('Script is running');
 
 	const main = async () => {
@@ -8258,14 +9335,18 @@
 			let fen = null;
 			let drawDebug = false;
 			let triggerUpdate = true;
-			let evalPercentage = 50;
 
-			document.onkeypress = function (e) {
-				if (e.key == 'n') {
-					drawDebug = !drawDebug;
-					triggerUpdate = true;
-				}
-			};
+			const shortcuts = new Shortcuts();
+
+			shortcuts.add([
+				{
+					shortcut: 'D E B U G',
+					handler: () => {
+						drawDebug = !drawDebug;
+						triggerUpdate = true;
+					},
+				},
+			]);
 
 			console.log('Starting main loop');
 
