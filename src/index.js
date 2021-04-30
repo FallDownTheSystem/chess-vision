@@ -2,7 +2,7 @@ import { sleep, oppositeColor, opponentColor } from './helpers';
 import { siteParser } from './parser';
 import { position, replay, replayFen } from './game';
 import { controlledSquares, drawControlledSquares } from './vision';
-import { createOverlay, drawEvalBar, drawArrow } from './draw';
+import { createOverlay, drawEvalBar, drawArrow, drawDepthSlider } from './draw';
 import { playMove, state } from './engine';
 import { Shortcuts } from 'shortcuts';
 
@@ -27,6 +27,7 @@ const main = async () => {
 		let fen = null;
 		let drawDebug = false;
 		let triggerUpdate = true;
+		let depth = 8;
 
 		const shortcuts = new Shortcuts();
 
@@ -77,7 +78,7 @@ const main = async () => {
 				}
 				// Post position to the engine only if the engine didn't trigger the update
 				if (!state.triggerUpdate) {
-					playMove(position.fen(), 8);
+					playMove(position.fen(), depth);
 				}
 
 				createOverlay('cv-overlay', overlaySelector, mySide, parser.zIndex, false, false);
@@ -90,6 +91,12 @@ const main = async () => {
 					if (drawDebug) {
 						drawArrow(overlayElement, state.bestMove, opponentColor(position.turn(), mySide), width, mySide);
 						drawArrow(overlayElement, state.ponder, opponentColor(oppositeColor(position.turn()), mySide), width, mySide);
+						drawDepthSlider('cv-overlay', 'cv-depth', depth);
+
+						document.getElementById('cv-depth').addEventListener('change', e => {
+							depth = parseInt(e.target.value);
+							console.log(depth);
+						});
 					}
 				}
 

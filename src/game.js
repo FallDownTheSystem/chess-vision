@@ -1,7 +1,6 @@
-import { WHITE, BLACK } from './helpers';
-import kokopu from 'kokopu';
+import { Position } from 'kokopu';
 
-export const position = new kokopu.Position();
+export const position = new Position();
 
 export const valueMap = {
 	p: 1,
@@ -27,7 +26,7 @@ const history = [];
 
 export function push(from, to) {
 	const legalMoves = position.moves();
-	if (legalMoves.map((m) => m.from + m.to).includes(from + to)) {
+	if (legalMoves.map(m => m.from + m.to).includes(from + to)) {
 		let move = position.uci(from + to, false);
 		position.play(move);
 		history.push(position.fen());

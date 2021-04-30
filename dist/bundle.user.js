@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Chess vision
 // @namespace   FallDownTheSystem
-// @version     0.2.1
+// @version     0.3.0
 // @author      FallDownTheSystem
 // @match       *://lichess.org/*
 // @match       *://www.chess.com/*
@@ -44,7 +44,7 @@
 		return x.trim();
 	};
 
-	function oppositeColor$2(turn) {
+	function oppositeColor(turn) {
 		return turn == WHITE$1 ? BLACK$1 : WHITE$1;
 	}
 
@@ -400,7 +400,7 @@
 	var UNKNOWN_VARIANT                 = 'Unknown chess game variant (%1$s).';
 	var VARIANT_WITHOUT_FEN             = 'For non-standard game variant, the FEN header is mandatory.';
 
-	var i18n$1 = {
+	var i18n = {
 		ORDINALS: ORDINALS,
 		WRONG_NUMBER_OF_FEN_FIELDS: WRONG_NUMBER_OF_FEN_FIELDS,
 		WRONG_NUMBER_OF_SUBFIELDS_IN_BOARD_FIELD: WRONG_NUMBER_OF_SUBFIELDS_IN_BOARD_FIELD,
@@ -480,7 +480,7 @@
 	 *                                                                            *
 	 ******************************************************************************/
 
-	var exception$1 = createCommonjsModule(function (module, exports) {
+	var exception = createCommonjsModule(function (module, exports) {
 
 
 	/**
@@ -881,114 +881,6 @@
 
 
 
-	/**
-	 * Execute the given callback on each of the 64 squares.
-	 *
-	 * @param {function(Square)} callback
-	 */
-	var forEachSquare$1 = function(callback) {
-		for(var rank=0; rank<8; ++rank) {
-			for(var file=0; file<8; ++file) {
-				callback(basetypes.squareToString(rank * 16 + file));
-			}
-		}
-	};
-
-
-	/**
-	 * Return the color of a square.
-	 *
-	 * @param {Square} square
-	 * @returns {Color}
-	 */
-	var squareColor$2 = function(square) {
-		square = basetypes.squareFromString(square);
-		if(square < 0) {
-			throw new exception$1.IllegalArgument('squareColor()');
-		}
-		return Math.floor(square/16) % 2 === square % 2 ? 'b' : 'w';
-	};
-
-
-	/**
-	 * Return the coordinates of a square.
-	 *
-	 * @param {Square} square
-	 * @returns {{rank: number, file: number}} The `rank` and `file` fields have the same meaning as in {@link coordinatesToSquare}.
-	 */
-	var squareToCoordinates$1 = function(square) {
-		square = basetypes.squareFromString(square);
-		if(square < 0) {
-			throw new exception$1.IllegalArgument('squareToCoordinates()');
-		}
-		return { rank:Math.floor(square/16), file:square%16 };
-	};
-
-
-	/**
-	 * Return the square corresponding to the given coordinates.
-	 *
-	 * @param {number} file `0` for file A, `1` for file B, ..., `7` for file H.
-	 * @param {number} rank `0` for the first rank, ..., `7` for the eighth rank.
-	 * @returns {Square}
-	 * @throws {exception.IllegalArgument} If either `file` or `rank` is not between 0 and 7 (inclusive).
-	 */
-	var coordinatesToSquare$1 = function(file, rank) {
-		if(file<0 || file>=8 || rank<0 || rank>= 8) {
-			throw new exception$1.IllegalArgument('coordinatesToSquare()');
-		}
-		return basetypes.fileToString(file) + basetypes.rankToString(rank);
-	};
-
-
-	/**
-	 * Change white to black, and black to white.
-	 *
-	 * @param {Color} color
-	 * @returns {Color}
-	 */
-	var oppositeColor$1 = function(color) {
-		color = basetypes.colorFromString(color);
-		if (color < 0) {
-			throw new exception$1.IllegalArgument('oppositeColor()');
-		}
-		return basetypes.colorToString(1 - color);
-	};
-
-	var util = {
-		forEachSquare: forEachSquare$1,
-		squareColor: squareColor$2,
-		squareToCoordinates: squareToCoordinates$1,
-		coordinatesToSquare: coordinatesToSquare$1,
-		oppositeColor: oppositeColor$1
-	};
-
-	/******************************************************************************
-	 *                                                                            *
-	 *    This file is part of Kokopu, a JavaScript chess library.                *
-	 *    Copyright (C) 2018-2021  Yoann Le Montagner <yo35 -at- melix.net>       *
-	 *                                                                            *
-	 *    This program is free software: you can redistribute it and/or           *
-	 *    modify it under the terms of the GNU Lesser General Public License      *
-	 *    as published by the Free Software Foundation, either version 3 of       *
-	 *    the License, or (at your option) any later version.                     *
-	 *                                                                            *
-	 *    This program is distributed in the hope that it will be useful,         *
-	 *    but WITHOUT ANY WARRANTY; without even the implied warranty of          *
-	 *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the            *
-	 *    GNU Lesser General Public License for more details.                     *
-	 *                                                                            *
-	 *    You should have received a copy of the GNU Lesser General               *
-	 *    Public License along with this program. If not, see                     *
-	 *    <http://www.gnu.org/licenses/>.                                         *
-	 *                                                                            *
-	 ******************************************************************************/
-
-
-
-
-
-
 	var CASTLING_FLAG   = 0x01;
 	var EN_PASSANT_FLAG = 0x02;
 	var CAPTURE_FLAG    = 0x04;
@@ -1050,7 +942,7 @@
 	 * @param {Object} obj
 	 * @returns {boolean}
 	 */
-	var isMoveDescriptor$1 = function(obj) {
+	var isMoveDescriptor = function(obj) {
 		return obj instanceof MoveDescriptor;
 	};
 
@@ -1164,7 +1056,7 @@
 	 * @throws {module:exception.IllegalArgument} If the current move is not a capture (see {@link MoveDescriptor#isCapture}).
 	 */
 	MoveDescriptor.prototype.capturedPiece = function() {
-		if(!this.isCapture()) { throw new exception$1.IllegalArgument('MoveDescriptor#capturedPiece()'); }
+		if(!this.isCapture()) { throw new exception.IllegalArgument('MoveDescriptor#capturedPiece()'); }
 		return basetypes.pieceToString(Math.floor(this._optionalPiece / 2));
 	};
 
@@ -1176,7 +1068,7 @@
 	 * @throws {module:exception.IllegalArgument} If the current move is not a capture (see {@link MoveDescriptor#isCapture}).
 	 */
 	MoveDescriptor.prototype.capturedColoredPiece = function() {
-		if(!this.isCapture()) { throw new exception$1.IllegalArgument('MoveDescriptor#capturedColoredPiece()'); }
+		if(!this.isCapture()) { throw new exception.IllegalArgument('MoveDescriptor#capturedColoredPiece()'); }
 		return basetypes.coloredPieceToString(this._optionalPiece);
 	};
 
@@ -1188,7 +1080,7 @@
 	 * @throws {module:exception.IllegalArgument} If the current move is not a castling move (see {@link MoveDescriptor#isCastling}).
 	 */
 	MoveDescriptor.prototype.rookFrom = function() {
-		if(!this.isCastling()) { throw new exception$1.IllegalArgument('MoveDescriptor#rookFrom()'); }
+		if(!this.isCastling()) { throw new exception.IllegalArgument('MoveDescriptor#rookFrom()'); }
 		return basetypes.squareToString(this._optionalSquare1);
 	};
 
@@ -1200,7 +1092,7 @@
 	 * @throws {module:exception.IllegalArgument} If the current move is not a castling move (see {@link MoveDescriptor#isCastling}).
 	 */
 	MoveDescriptor.prototype.rookTo = function() {
-		if(!this.isCastling()) { throw new exception$1.IllegalArgument('MoveDescriptor#rookTo()'); }
+		if(!this.isCastling()) { throw new exception.IllegalArgument('MoveDescriptor#rookTo()'); }
 		return basetypes.squareToString(this._optionalSquare2);
 	};
 
@@ -1212,7 +1104,7 @@
 	 * @throws {module:exception.IllegalArgument} If the current move is not a *en-passant* move (see {@link MoveDescriptor#isEnPassant}).
 	 */
 	MoveDescriptor.prototype.enPassantSquare = function() {
-		if(!this.isEnPassant()) { throw new exception$1.IllegalArgument('MoveDescriptor#enPassantSquare()'); }
+		if(!this.isEnPassant()) { throw new exception.IllegalArgument('MoveDescriptor#enPassantSquare()'); }
 		return basetypes.squareToString(this._optionalSquare1);
 	};
 
@@ -1224,7 +1116,7 @@
 	 * @throws {module:exception.IllegalArgument} If the current move is not a promotion (see {@link MoveDescriptor#isPromotion}).
 	 */
 	MoveDescriptor.prototype.promotion = function() {
-		if(!this.isPromotion()) { throw new exception$1.IllegalArgument('MoveDescriptor#promotion()'); }
+		if(!this.isPromotion()) { throw new exception.IllegalArgument('MoveDescriptor#promotion()'); }
 		return basetypes.pieceToString(Math.floor(this._finalPiece / 2));
 	};
 
@@ -1236,7 +1128,7 @@
 	 * @throws {module:exception.IllegalArgument} If the current move is not a promotion (see {@link MoveDescriptor#isPromotion}).
 	 */
 	MoveDescriptor.prototype.coloredPromotion = function() {
-		if(!this.isPromotion()) { throw new exception$1.IllegalArgument('MoveDescriptor#coloredPromotion()'); }
+		if(!this.isPromotion()) { throw new exception.IllegalArgument('MoveDescriptor#coloredPromotion()'); }
 		return basetypes.coloredPieceToString(this._finalPiece);
 	};
 
@@ -1245,7 +1137,7 @@
 		makeCastling: makeCastling,
 		makeEnPassant: makeEnPassant,
 		makePromotion: makePromotion,
-		isMoveDescriptor: isMoveDescriptor$1
+		isMoveDescriptor: isMoveDescriptor
 	};
 
 	/******************************************************************************
@@ -1578,13 +1470,13 @@
 		fen = fen.replace(/^\s+|\s+$/g, '');
 		var fields = fen.split(/\s+/);
 		if(fields.length !== 6) {
-			throw new exception$1.InvalidFEN(fen, i18n$1.WRONG_NUMBER_OF_FEN_FIELDS);
+			throw new exception.InvalidFEN(fen, i18n.WRONG_NUMBER_OF_FEN_FIELDS);
 		}
 
 		// The first field (that represents the board) is split in 8 sub-fields.
 		var rankFields = fields[0].split('/');
 		if(rankFields.length !== 8) {
-			throw new exception$1.InvalidFEN(fen, i18n$1.WRONG_NUMBER_OF_SUBFIELDS_IN_BOARD_FIELD);
+			throw new exception.InvalidFEN(fen, i18n.WRONG_NUMBER_OF_SUBFIELDS_IN_BOARD_FIELD);
 		}
 
 		// Initialize the position
@@ -1613,7 +1505,7 @@
 
 				// Otherwise -> parsing error.
 				else {
-					throw new exception$1.InvalidFEN(fen, i18n$1.UNEXPECTED_CHARACTER_IN_BOARD_FIELD, s);
+					throw new exception.InvalidFEN(fen, i18n.UNEXPECTED_CHARACTER_IN_BOARD_FIELD, s);
 				}
 
 				// Increment the character counter.
@@ -1622,31 +1514,31 @@
 
 			// Ensure that the current sub-field deals with all the squares of the current rank.
 			if(i !== rankField.length || f !== 8) {
-				throw new exception$1.InvalidFEN(fen, i18n$1.UNEXPECTED_END_OF_SUBFIELD_IN_BOARD_FIELD, i18n$1.ORDINALS[7-r]);
+				throw new exception.InvalidFEN(fen, i18n.UNEXPECTED_END_OF_SUBFIELD_IN_BOARD_FIELD, i18n.ORDINALS[7-r]);
 			}
 		}
 
 		// Turn parsing
 		position.turn = basetypes.colorFromString(fields[1]);
 		if(position.turn < 0) {
-			throw new exception$1.InvalidFEN(fen, i18n$1.INVALID_TURN_FIELD);
+			throw new exception.InvalidFEN(fen, i18n.INVALID_TURN_FIELD);
 		}
 
 		// Castling rights parsing
 		position.castling = variant === basetypes.CHESS960 ? castlingFromStringXFEN(fields[2], strict, position.board) :
 			castlingFromStringFEN(fields[2], strict);
 		if(position.castling === null) {
-			throw new exception$1.InvalidFEN(fen, i18n$1.INVALID_CASTLING_FIELD);
+			throw new exception.InvalidFEN(fen, i18n.INVALID_CASTLING_FIELD);
 		}
 
 		// En-passant rights parsing
 		var enPassantField = fields[3];
 		if(enPassantField !== '-') {
 			if(!/^[a-h][36]$/.test(enPassantField)) {
-				throw new exception$1.InvalidFEN(fen, i18n$1.INVALID_EN_PASSANT_FIELD);
+				throw new exception.InvalidFEN(fen, i18n.INVALID_EN_PASSANT_FIELD);
 			}
 			if(strict && ((enPassantField[1]==='3' && position.turn===basetypes.WHITE) || (enPassantField[1]==='6' && position.turn===basetypes.BLACK))) {
-				throw new exception$1.InvalidFEN(fen, i18n$1.WRONG_RANK_IN_EN_PASSANT_FIELD);
+				throw new exception.InvalidFEN(fen, i18n.WRONG_RANK_IN_EN_PASSANT_FIELD);
 			}
 			position.enPassant = basetypes.fileFromString(enPassantField[0]);
 		}
@@ -1654,10 +1546,10 @@
 		// Move counting flags parsing
 		var moveCountingRegExp = strict ? /^(?:0|[1-9][0-9]*)$/ : /^[0-9]+$/;
 		if(!moveCountingRegExp.test(fields[4])) {
-			throw new exception$1.InvalidFEN(fen, i18n$1.INVALID_MOVE_COUNTING_FIELD, i18n$1.ORDINALS[4]);
+			throw new exception.InvalidFEN(fen, i18n.INVALID_MOVE_COUNTING_FIELD, i18n.ORDINALS[4]);
 		}
 		if(!moveCountingRegExp.test(fields[5])) {
-			throw new exception$1.InvalidFEN(fen, i18n$1.INVALID_MOVE_COUNTING_FIELD, i18n$1.ORDINALS[5]);
+			throw new exception.InvalidFEN(fen, i18n.INVALID_MOVE_COUNTING_FIELD, i18n.ORDINALS[5]);
 		}
 		return { position: position, fiftyMoveClock: parseInt(fields[4], 10), fullMoveNumber: parseInt(fields[5], 10) };
 	};
@@ -2754,12 +2646,12 @@
 		// General syntax
 		var m = /^(?:(O-O-O)|(O-O)|([A-Z\u2654-\u265f])([a-h])?([1-8])?(x)?([a-h][1-8])|(?:([a-h])(x)?)?([a-h][1-8])(?:(=)?([A-Z\u2654-\u265f]))?)([+#])?$/.exec(notation);
 		if(m === null) {
-			throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.INVALID_MOVE_NOTATION_SYNTAX);
+			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_MOVE_NOTATION_SYNTAX);
 		}
 
 		// Ensure that the position is legal.
 		if(!legality.isLegal(position)) {
-			throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.ILLEGAL_POSITION);
+			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_POSITION);
 		}
 
 		// CASTLING
@@ -2789,14 +2681,14 @@
 		if(m[1] || m[2]) {
 			var from = position.king[position.turn];
 			if(from < 0) {
-				throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.ILLEGAL_NO_KING_CASTLING);
+				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_NO_KING_CASTLING);
 			}
 
 			var to = (m[2] ? 6 : 2) + position.turn*112;
 			descriptor = movegeneration.isCastlingLegal(position, from, to);
 			if(!descriptor) {
-				var message = m[2] ? i18n$1.ILLEGAL_KING_SIDE_CASTLING : i18n$1.ILLEGAL_QUEEN_SIDE_CASTLING;
-				throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, message);
+				var message = m[2] ? i18n.ILLEGAL_KING_SIDE_CASTLING : i18n.ILLEGAL_QUEEN_SIDE_CASTLING;
+				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, message);
 			}
 		}
 
@@ -2808,7 +2700,7 @@
 
 			// Cannot take your own pieces!
 			if(toContent >= 0 && toContent % 2 === position.turn) {
-				throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.TRYING_TO_CAPTURE_YOUR_OWN_PIECES);
+				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.TRYING_TO_CAPTURE_YOUR_OWN_PIECES);
 			}
 
 			// Find the "from"-square candidates
@@ -2824,8 +2716,8 @@
 				attackers = attackers.filter(function(sq) { return Math.floor(sq/16) === rankFrom; });
 			}
 			if(attackers.length===0) {
-				var message = (m[4] || m[5]) ? i18n$1.NO_PIECE_CAN_MOVE_TO_DISAMBIGUATION : i18n$1.NO_PIECE_CAN_MOVE_TO;
-				throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, message, m[3], m[7]);
+				var message = (m[4] || m[5]) ? i18n.NO_PIECE_CAN_MOVE_TO_DISAMBIGUATION : i18n.NO_PIECE_CAN_MOVE_TO;
+				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, message, m[3], m[7]);
 			}
 
 			// Compute the move descriptor for each remaining "from"-square candidate
@@ -2833,14 +2725,14 @@
 				var currentDescriptor = movegeneration.isKingSafeAfterMove(position, attackers[i], to, -1);
 				if(currentDescriptor) {
 					if(descriptor !== null) {
-						throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.REQUIRE_DISAMBIGUATION, m[3], m[7]);
+						throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.REQUIRE_DISAMBIGUATION, m[3], m[7]);
 					}
 					descriptor = currentDescriptor;
 				}
 			}
 			if(descriptor === null) {
-				var message = position.turn===basetypes.WHITE ? i18n$1.NOT_SAFE_FOR_WHITE_KING : i18n$1.NOT_SAFE_FOR_BLACK_KING;
-				throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, message);
+				var message = position.turn===basetypes.WHITE ? i18n.NOT_SAFE_FOR_WHITE_KING : i18n.NOT_SAFE_FOR_BLACK_KING;
+				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, message);
 			}
 
 			// STRICT-MODE -> check the disambiguation symbol.
@@ -2848,7 +2740,7 @@
 				var expectedDS = getDisambiguationSymbol(position, descriptor._from, to);
 				var observedDS = (m[4] ? m[4] : '') + (m[5] ? m[5] : '');
 				if(expectedDS !== observedDS) {
-					throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.WRONG_DISAMBIGUATION_SYMBOL, expectedDS, observedDS);
+					throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.WRONG_DISAMBIGUATION_SYMBOL, expectedDS, observedDS);
 				}
 			}
 		}
@@ -2865,43 +2757,43 @@
 
 			// Ensure that the pawn move do not let a king in check.
 			if(!descriptor) {
-				var message = position.turn===basetypes.WHITE ? i18n$1.NOT_SAFE_FOR_WHITE_KING : i18n$1.NOT_SAFE_FOR_BLACK_KING;
-				throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, message);
+				var message = position.turn===basetypes.WHITE ? i18n.NOT_SAFE_FOR_WHITE_KING : i18n.NOT_SAFE_FOR_BLACK_KING;
+				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, message);
 			}
 
 			// Detect promotions
 			if(to<8 || to>=112) {
 				if(!m[12]) {
-					throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.MISSING_PROMOTION);
+					throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.MISSING_PROMOTION);
 				}
 				var promotion = parsePieceSymbol(position, notation, m[12], strict, pieceStyle);
 				if(promotion === basetypes.PAWN || promotion === basetypes.KING) {
-					throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.INVALID_PROMOTED_PIECE, m[12]);
+					throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_PROMOTED_PIECE, m[12]);
 				}
 				descriptor = movedescriptor.makePromotion(descriptor._from, descriptor._to, descriptor._movingPiece % 2, promotion, descriptor._optionalPiece);
 
 				// STRICT MODE -> do not forget the `=` character!
 				if(strict && !m[11]) {
-					throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.MISSING_PROMOTION_SYMBOL);
+					throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.MISSING_PROMOTION_SYMBOL);
 				}
 			}
 
 			// Detect illegal promotion attempts!
 			else if(m[12]) {
-				throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.ILLEGAL_PROMOTION);
+				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_PROMOTION);
 			}
 		}
 
 		// STRICT MODE
 		if(strict) {
 			if(descriptor.isCapture() !== (m[6] || m[9])) {
-				var message = descriptor.isCapture() ? i18n$1.MISSING_CAPTURE_SYMBOL : i18n$1.INVALID_CAPTURE_SYMBOL;
-				throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, message);
+				var message = descriptor.isCapture() ? i18n.MISSING_CAPTURE_SYMBOL : i18n.INVALID_CAPTURE_SYMBOL;
+				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, message);
 			}
 			var expectedCCS = getCheckCheckmateSymbol(position, descriptor);
 			var observedCCS = m[13] ? m[13] : '';
 			if(expectedCCS !== observedCCS) {
-				throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.WRONG_CHECK_CHECKMATE_SYMBOL, expectedCCS, observedCCS);
+				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.WRONG_CHECK_CHECKMATE_SYMBOL, expectedCCS, observedCCS);
 			}
 		}
 
@@ -2919,10 +2811,10 @@
 			case 'figurine':
 				var coloredPiece = basetypes.figurineFromString(coloredPiece);
 				if(piece < 0) {
-					throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.INVALID_PIECE_SYMBOL, coloredPiece);
+					throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_PIECE_SYMBOL, coloredPiece);
 				}
 				if(strict && coloredPiece % 2 !== position.turn) {
-					throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.INVALID_PIECE_SYMBOL_COLOR, coloredPiece);
+					throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_PIECE_SYMBOL_COLOR, coloredPiece);
 				}
 				return Math.floor(coloredPiece / 2);
 
@@ -2930,7 +2822,7 @@
 			default:
 				var piece = basetypes.pieceFromString(coloredPiece.toLowerCase());
 				if(piece < 0) {
-					throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.INVALID_PIECE_SYMBOL, coloredPiece);
+					throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_PIECE_SYMBOL, coloredPiece);
 				}
 				return piece;
 		}
@@ -2947,7 +2839,7 @@
 		// Ensure that `to` is not on the 1st row.
 		var from = to - 16 + position.turn*32;
 		if((from & 0x88) !== 0) {
-			throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.INVALID_CAPTURING_PAWN_MOVE);
+			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_CAPTURING_PAWN_MOVE);
 		}
 
 		// Compute the "from"-square.
@@ -2955,12 +2847,12 @@
 		if(columnTo - columnFrom === 1) { from -= 1; }
 		else if(columnTo - columnFrom === -1) { from += 1; }
 		else {
-			throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.INVALID_CAPTURING_PAWN_MOVE);
+			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_CAPTURING_PAWN_MOVE);
 		}
 
 		// Check the content of the "from"-square
 		if(position.board[from] !== basetypes.PAWN*2+position.turn) {
-			throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.INVALID_CAPTURING_PAWN_MOVE);
+			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_CAPTURING_PAWN_MOVE);
 		}
 
 		// Check the content of the "to"-square
@@ -2974,7 +2866,7 @@
 			return movegeneration.isKingSafeAfterMove(position, from, to, -1);
 		}
 
-		throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.INVALID_CAPTURING_PAWN_MOVE);
+		throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_CAPTURING_PAWN_MOVE);
 	}
 
 
@@ -2989,12 +2881,12 @@
 		var offset = 16 - position.turn*32;
 		var from = to - offset;
 		if((from & 0x88) !== 0) {
-			throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.INVALID_NON_CAPTURING_PAWN_MOVE);
+			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_NON_CAPTURING_PAWN_MOVE);
 		}
 
 		// Check the content of the "to"-square
 		if(position.board[to] >= 0) {
-			throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.INVALID_NON_CAPTURING_PAWN_MOVE);
+			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_NON_CAPTURING_PAWN_MOVE);
 		}
 
 		// Check the content of the "from"-square
@@ -3012,7 +2904,7 @@
 			}
 		}
 
-		throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.INVALID_NON_CAPTURING_PAWN_MOVE);
+		throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_NON_CAPTURING_PAWN_MOVE);
 	}
 
 	var notation = {
@@ -3082,13 +2974,13 @@
 		// General syntax
 		var m = /^([a-h][1-8])([a-h][1-8])([qrbn]?)$/.exec(notation);
 		if(m === null) {
-			throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.INVALID_UCI_NOTATION_SYNTAX);
+			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_UCI_NOTATION_SYNTAX);
 		}
 
 		// Ensure that the position is legal (this is also done in `moveGeneration.isMoveLegal(..)`, but performing this check beforehand
 		// allows to fill the exception with an error message that is more explicit).
 		if(!legality.isLegal(position)) {
-			throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.ILLEGAL_POSITION);
+			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_POSITION);
 		}
 
 		// m[1] - from
@@ -3116,18 +3008,18 @@
 
 		// No legal move.
 		if(!result) {
-			throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.ILLEGAL_UCI_MOVE);
+			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_UCI_MOVE);
 		}
 
 		// Manage promotion.
 		if(result.type === 'promotion') {
 			if(m[3] === '') { // A promotion piece must be provided in case of promotion move.
-				throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.ILLEGAL_UCI_MOVE);
+				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_UCI_MOVE);
 			}
 			result = result.build(basetypes.pieceFromString(m[3]));
 		}
 		else if(m[3] !== '') { // Throw if a promotion piece is provided while no promotion happens.
-			throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.ILLEGAL_UCI_MOVE);
+			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_UCI_MOVE);
 		}
 
 		// Manage the castling-move ambiguity that could arise in chess960.
@@ -3138,14 +3030,14 @@
 		// Manage KxR substitution.
 		if(result.isCastling()) {
 			if(position.variant === basetypes.CHESS960 && !kxrSubstitutionApplied) { // KxR substitution is mandatory for castling moves in Chess960.
-				throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.ILLEGAL_UCI_MOVE);
+				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_UCI_MOVE);
 			}
 			if(kxrSubstitutionApplied && expectedRookFrom !== result._optionalSquare1) { // If KxR substitution has been applied, ensure that the rook-from square is what it is supposed to be.
-				throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.ILLEGAL_UCI_MOVE);
+				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_UCI_MOVE);
 			}
 		}
 		else if(kxrSubstitutionApplied) { // If KxR substitution has been applied, a castling move must be found.
-			throw new exception$1.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n$1.ILLEGAL_UCI_MOVE);
+			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_UCI_MOVE);
 		}
 
 		return result;
@@ -3280,7 +3172,7 @@
 					this._impl = fen.parseFEN(variant, arguments[1], false).position;
 				}
 				else {
-					throw new exception$1.IllegalArgument('Position()');
+					throw new exception.IllegalArgument('Position()');
 				}
 			}
 
@@ -3291,7 +3183,7 @@
 					this._impl = fen.parseFEN(variant, arguments[0].substring(separatorIndex + 1), false).position;
 				}
 				else {
-					throw new exception$1.InvalidFEN(arguments[0], i18n$1.INVALID_VARIANT_PREFIX, arguments[0].substring(0, separatorIndex));
+					throw new exception.InvalidFEN(arguments[0], i18n.INVALID_VARIANT_PREFIX, arguments[0].substring(0, separatorIndex));
 				}
 			}
 
@@ -3303,7 +3195,7 @@
 
 		// Wrong argument scheme
 		else {
-			throw new exception$1.IllegalArgument('Position()');
+			throw new exception.IllegalArgument('Position()');
 		}
 	};
 
@@ -3320,7 +3212,7 @@
 		else {
 			var v = basetypes.variantFromString(variant);
 			if(v < 0) {
-				throw new exception$1.IllegalArgument('Position#clear()');
+				throw new exception.IllegalArgument('Position#clear()');
 			}
 			this._impl = impl.makeEmpty(v);
 		}
@@ -3400,7 +3292,7 @@
 			return { fiftyMoveClock: result.fiftyMoveClock, fullMoveNumber: result.fullMoveNumber };
 		}
 		else {
-			throw new exception$1.IllegalArgument('Position#fen()');
+			throw new exception.IllegalArgument('Position#fen()');
 		}
 	};
 
@@ -3437,7 +3329,7 @@
 	Position.prototype.square = function(square, value) {
 		square = basetypes.squareFromString(square);
 		if(square < 0) {
-			throw new exception$1.IllegalArgument('Position#square()');
+			throw new exception.IllegalArgument('Position#square()');
 		}
 
 		if(arguments.length === 1) {
@@ -3451,7 +3343,7 @@
 		else {
 			var cp = basetypes.coloredPieceFromString(value);
 			if(cp < 0) {
-				throw new exception$1.IllegalArgument('Position#square()');
+				throw new exception.IllegalArgument('Position#square()');
 			}
 			this._impl.board[square] = cp;
 			this._impl.legal = null;
@@ -3477,7 +3369,7 @@
 		else {
 			var turn = basetypes.colorFromString(value);
 			if(turn < 0) {
-				throw new exception$1.IllegalArgument('Position#turn()');
+				throw new exception.IllegalArgument('Position#turn()');
 			}
 			this._impl.turn = turn;
 			this._impl.legal = null;
@@ -3500,7 +3392,7 @@
 	 */
 	Position.prototype.castling = function(castle, value) {
 		if(!(this._impl.variant === basetypes.CHESS960 ? /^[wb][a-h]$/ : /^[wb][qk]$/).test(castle)) {
-			throw new exception$1.IllegalArgument('Position#castling()');
+			throw new exception.IllegalArgument('Position#castling()');
 		}
 		var color = basetypes.colorFromString(castle[0]);
 		var file = this._impl.variant === basetypes.CHESS960 ? basetypes.fileFromString(castle[1]) : castle[1]==='k' ? 7 : 0;
@@ -3541,7 +3433,7 @@
 		else {
 			var enPassant = basetypes.fileFromString(value);
 			if(enPassant < 0) {
-				throw new exception$1.IllegalArgument('Position#enPassant()');
+				throw new exception.IllegalArgument('Position#enPassant()');
 			}
 			this._impl.enPassant = enPassant;
 			this._impl.legal = null;
@@ -3566,7 +3458,7 @@
 		square = basetypes.squareFromString(square);
 		byWho = basetypes.colorFromString(byWho);
 		if(square < 0 || byWho < 0) {
-			throw new exception$1.IllegalArgument('Position#isAttacked()');
+			throw new exception.IllegalArgument('Position#isAttacked()');
 		}
 		return attacks.isAttacked(this._impl, square, byWho);
 	};
@@ -3583,7 +3475,7 @@
 		square = basetypes.squareFromString(square);
 		byWho = basetypes.colorFromString(byWho);
 		if(square < 0 || byWho < 0) {
-			throw new exception$1.IllegalArgument('Position#getAttacks()');
+			throw new exception.IllegalArgument('Position#getAttacks()');
 		}
 		return attacks.getAttacks(this._impl, square, byWho).map(basetypes.squareToString);
 	};
@@ -3626,7 +3518,7 @@
 	Position.prototype.kingSquare = function(color) {
 		color = basetypes.colorFromString(color);
 		if(color < 0) {
-			throw new exception$1.IllegalArgument('Position#kingSquare()');
+			throw new exception.IllegalArgument('Position#kingSquare()');
 		}
 		legality.refreshLegalFlagAndKingSquares(this._impl);
 		var square = this._impl.king[color];
@@ -3748,7 +3640,7 @@
 		from = basetypes.squareFromString(from);
 		to = basetypes.squareFromString(to);
 		if(from < 0 || to < 0) {
-			throw new exception$1.IllegalArgument('Position#isMoveLegal()');
+			throw new exception.IllegalArgument('Position#isMoveLegal()');
 		}
 		var result = movegeneration.isMoveLegal(this._impl, from, to);
 
@@ -3775,7 +3667,7 @@
 								return builtMoveDescriptor;
 							}
 						}
-						throw new exception$1.IllegalArgument('Position#isMoveLegal()');
+						throw new exception.IllegalArgument('Position#isMoveLegal()');
 					});
 
 				case 'castle960':
@@ -3783,12 +3675,12 @@
 						switch(type) {
 							case 'king': return result.build(false);
 							case 'castle': return result.build(true);
-							default: throw new exception$1.IllegalArgument('Position#isMoveLegal()');
+							default: throw new exception.IllegalArgument('Position#isMoveLegal()');
 						}
 					});
 
 				default: // This case is not supposed to happen.
-					throw new exception$1.IllegalArgument('Position#isMoveLegal()');
+					throw new exception.IllegalArgument('Position#isMoveLegal()');
 			}
 		}
 	};
@@ -3819,7 +3711,7 @@
 				return true;
 			}
 			catch(err) {
-				if(err instanceof exception$1.InvalidNotation) {
+				if(err instanceof exception.InvalidNotation) {
 					return false;
 				}
 				else {
@@ -3832,7 +3724,7 @@
 			return true;
 		}
 		else {
-			throw new exception$1.IllegalArgument('Position#play()');
+			throw new exception.IllegalArgument('Position#play()');
 		}
 	};
 
@@ -3892,7 +3784,7 @@
 			return notation.parseNotation(this._impl, arguments[0], arguments[1], 'standard');
 		}
 		else {
-			throw new exception$1.IllegalArgument('Position#notation()');
+			throw new exception.IllegalArgument('Position#notation()');
 		}
 	};
 
@@ -3926,7 +3818,7 @@
 			return notation.parseNotation(this._impl, arguments[0], arguments[1], 'figurine');
 		}
 		else {
-			throw new exception$1.IllegalArgument('Position#figurineNotation()');
+			throw new exception.IllegalArgument('Position#figurineNotation()');
 		}
 	};
 
@@ -3976,7 +3868,7 @@
 			return uci.parseNotation(this._impl, arguments[0], arguments[1]);
 		}
 		else {
-			throw new exception$1.IllegalArgument('Position#uci()');
+			throw new exception.IllegalArgument('Position#uci()');
 		}
 	};
 	});
@@ -4056,7 +3948,7 @@
 	 */
 	Game.prototype.playerName = function(color, value) {
 		color = basetypes.colorFromString(color);
-		if(color < 0) { throw new exception$1.IllegalArgument('Game#playerName()'); }
+		if(color < 0) { throw new exception.IllegalArgument('Game#playerName()'); }
 		if(arguments.length === 1) { return this._playerName[color]; }
 		else { this._playerName[color] = value; }
 	};
@@ -4077,7 +3969,7 @@
 	 */
 	Game.prototype.playerElo = function(color, value) {
 		color = basetypes.colorFromString(color);
-		if(color < 0) { throw new exception$1.IllegalArgument('Game#playerElo()'); }
+		if(color < 0) { throw new exception.IllegalArgument('Game#playerElo()'); }
 		if(arguments.length === 1) { return this._playerElo[color]; }
 		else { this._playerElo[color] = value; }
 	};
@@ -4098,7 +3990,7 @@
 	 */
 	Game.prototype.playerTitle = function(color, value) {
 		color = basetypes.colorFromString(color);
-		if(color < 0) { throw new exception$1.IllegalArgument('Game#playerTitle()'); }
+		if(color < 0) { throw new exception.IllegalArgument('Game#playerTitle()'); }
 		if(arguments.length === 1) { return this._playerTitle[color]; }
 		else { this._playerTitle[color] = value; }
 	};
@@ -4167,7 +4059,7 @@
 			this._date = { year: value.year };
 		}
 		else {
-			throw new exception$1.IllegalArgument('Game#date()');
+			throw new exception.IllegalArgument('Game#date()');
 		}
 	};
 
@@ -4224,7 +4116,7 @@
 		else {
 			var result = basetypes.resultFromString(value);
 			if(result < 0) {
-				throw new exception$1.IllegalArgument('Game#result()');
+				throw new exception.IllegalArgument('Game#result()');
 			}
 			this._result = result;
 		}
@@ -4261,13 +4153,13 @@
 		}
 		else {
 			if(!(initialPosition instanceof Position)) {
-				throw new exception$1.IllegalArgument('Game#initialPosition()');
+				throw new exception.IllegalArgument('Game#initialPosition()');
 			}
 			if(arguments.length === 1) {
 				fullMoveNumber = 1;
 			}
 			else if(typeof fullMoveNumber !== 'number') {
-				throw new exception$1.IllegalArgument('Game#initialPosition()');
+				throw new exception.IllegalArgument('Game#initialPosition()');
 			}
 			this._initialPosition = initialPosition;
 			this._fullMoveNumber = fullMoveNumber;
@@ -4360,7 +4252,7 @@
 			var currentInfo = node._parentVariation._info.first;
 			while(currentInfo !== node._info) {
 				if(currentInfo === undefined) {
-					throw new exception$1.IllegalArgument('The current node is invalid.');
+					throw new exception.IllegalArgument('The current node is invalid.');
 				}
 				applyMoveDescriptor(node._positionBefore, currentInfo);
 				currentInfo = currentInfo.next;
@@ -4618,7 +4510,7 @@
 	function computeMoveDescriptor(position, move) {
 		if(move === '--') {
 			if(!position.isNullMoveLegal()) {
-				throw new exception$1.InvalidNotation(position, '--', i18n$1.ILLEGAL_NULL_MOVE);
+				throw new exception.InvalidNotation(position, '--', i18n.ILLEGAL_NULL_MOVE);
 			}
 			return undefined;
 		}
@@ -5198,7 +5090,7 @@
 		// Match a comment
 		else if(testAtPos(this, this._matchEnterComment)) {
 			if(!testAtPos(this, this._commentMode)) {
-				throw new exception$1.InvalidPGN(this._text, this._pos, this._lineIndex, i18n$1.INVALID_PGN_TOKEN);
+				throw new exception.InvalidPGN(this._text, this._pos, this._lineIndex, i18n.INVALID_PGN_TOKEN);
 			}
 			this._token      = TOKEN_COMMENT;
 			this._tokenValue = parseCommentValue(this._commentMode.matched[1]);
@@ -5243,7 +5135,7 @@
 		// Match the value of a game header
 		else if(testAtPos(this, this._matchEnterHeaderValue)) {
 			if(!testAtPos(this, this._headerValueMode)) {
-				throw new exception$1.InvalidPGN(this._text, this._pos, this._lineIndex, i18n$1.INVALID_PGN_TOKEN);
+				throw new exception.InvalidPGN(this._text, this._pos, this._lineIndex, i18n.INVALID_PGN_TOKEN);
 			}
 			this._token      = TOKEN_HEADER_VALUE;
 			this._tokenValue = parseHeaderValue(this._headerValueMode.matched[1]);
@@ -5251,7 +5143,7 @@
 
 		// Otherwise, the string is badly formatted with respect to the PGN syntax
 		else {
-			throw new exception$1.InvalidPGN(this._text, this._pos, this._lineIndex, i18n$1.INVALID_PGN_TOKEN);
+			throw new exception.InvalidPGN(this._text, this._pos, this._lineIndex, i18n.INVALID_PGN_TOKEN);
 		}
 
 		return true;
@@ -5284,14 +5176,14 @@
 			// Skip comments.
 			if(testAtPos(this, this._matchEnterComment)) {
 				if(!testAtPos(this, this._commentMode)) {
-					throw new exception$1.InvalidPGN(this._text, this._pos, this._lineIndex, i18n$1.INVALID_PGN_TOKEN);
+					throw new exception.InvalidPGN(this._text, this._pos, this._lineIndex, i18n.INVALID_PGN_TOKEN);
 				}
 			}
 
 			// Skip header values.
 			else if(testAtPos(this, this._matchEnterHeaderValue)) {
 				if(!testAtPos(this, this._headerValueMode) && !testAtPos(this, this._headerValueDegradedMode)) {
-					throw new exception$1.InvalidPGN(this._text, this._pos, this._lineIndex, i18n$1.INVALID_PGN_TOKEN);
+					throw new exception.InvalidPGN(this._text, this._pos, this._lineIndex, i18n.INVALID_PGN_TOKEN);
 				}
 			}
 
@@ -5304,7 +5196,7 @@
 
 			// Skip everything else until the next space or comment/header-value beginning.
 			else if(!testAtPos(this, this._matchFastAdvance)) {
-				throw new exception$1.InvalidPGN(this._text, this._pos, this._lineIndex, i18n$1.INVALID_PGN_TOKEN);
+				throw new exception.InvalidPGN(this._text, this._pos, this._lineIndex, i18n.INVALID_PGN_TOKEN);
 			}
 		}
 	};
@@ -5399,325 +5291,10 @@
 
 
 
-	var Position$1 = position$1.Position;
-	var Game$1 = game.Game;
-	var Database = database.Database;
-	var TokenStream = tokenstream.TokenStream;
-
-
-	function parseNullableHeader(value) {
-		return value === '?' ? undefined : value;
-	}
-
-
-	function parseDateHeader(value) {
-		if(/^([0-9]{4})\.([0-9]{2})\.([0-9]{2})$/.test(value)) {
-			var year = RegExp.$1;
-			var month = RegExp.$2;
-			var day = RegExp.$3;
-			year = parseInt(year, 10);
-			month = parseInt(month, 10);
-			day = parseInt(day, 10);
-			if(month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-				return new Date(year, month - 1, day);
-			}
-		}
-		else if(/^([0-9]{4})\.([0-9]{2})\.\?\?$/.test(value)) {
-			var year = RegExp.$1;
-			var month = parseInt(RegExp.$2, 10);
-			if(month >= 1 && month <= 12) {
-				return { year: parseInt(year, 10), month: month };
-			}
-		}
-		else if(/^([0-9]{4})(?:\.\?\?\.\?\?)?$/.test(value)) {
-			return { year: parseInt(RegExp.$1, 10) };
-		}
-		return undefined;
-	}
-
-
-	function parseVariant(value) {
-		value = value.toLowerCase();
-		if(value === 'regular' || value === 'standard') {
-			return 'regular';
-		}
-		else if(value === 'fischerandom' || /^chess[ -]?960$/.test(value)) {
-			return 'chess960';
-		}
-		else if(/^no[ -]king$/.test(value)) {
-			return 'no-king';
-		}
-		else if(/^white[ -]king[ -]only$/.test(value)) {
-			return 'white-king-only';
-		}
-		else if(/^black[ -]king[ -]only$/.test(value)) {
-			return 'black-king-only';
-		}
-		else {
-			return undefined;
-		}
-	}
-
-
-	function processHeader(stream, game, initialPositionFactory, key, value, valueCharacterIndex, valueLineIndex) {
-		value = value.trim();
-		switch(key) {
-			case 'White': game.playerName('w', parseNullableHeader(value)); break;
-			case 'Black': game.playerName('b', parseNullableHeader(value)); break;
-			case 'WhiteElo': game.playerElo('w', value); break;
-			case 'BlackElo': game.playerElo('b', value); break;
-			case 'WhiteTitle': game.playerTitle('w', value); break;
-			case 'BlackTitle': game.playerTitle('b', value); break;
-			case 'Event': game.event(parseNullableHeader(value)); break;
-			case 'Round': game.round(parseNullableHeader(value)); break;
-			case 'Date': game.date(parseDateHeader(value)); break;
-			case 'Site': game.site(parseNullableHeader(value)); break;
-			case 'Annotator': game.annotator(value); break;
-
-			// The header 'FEN' has a special meaning, in that it is used to define a custom
-			// initial position, that may be different from the usual one.
-			case 'FEN':
-				initialPositionFactory.fen = value;
-				initialPositionFactory.fenTokenCharacterIndex = valueCharacterIndex;
-				initialPositionFactory.fenTokenLineIndex = valueLineIndex;
-				break;
-
-			// The header 'Variant' indicates that this is not a regular chess game.
-			case 'Variant':
-				initialPositionFactory.variant = parseVariant(value);
-				if(!initialPositionFactory.variant) {
-					throw new exception$1.InvalidPGN(stream.text(), valueCharacterIndex, valueLineIndex, i18n$1.UNKNOWN_VARIANT, value);
-				}
-				initialPositionFactory.variantTokenCharacterIndex = valueCharacterIndex;
-				initialPositionFactory.variantTokenLineIndex = valueLineIndex;
-				break;
-		}
-	}
-
-
-	function initializeInitialPosition(stream, game, initialPositionFactory) {
-
-		// Nothing to do if no custom FEN has been defined -> let the default state.
-		if(!initialPositionFactory.fen) {
-			if(initialPositionFactory.variant && initialPositionFactory.variant !== 'regular') {
-				throw new exception$1.InvalidPGN(stream.text(), initialPositionFactory.variantTokenCharacterIndex, initialPositionFactory.variantTokenLineIndex, i18n$1.VARIANT_WITHOUT_FEN);
-			}
-			return;
-		}
-
-		try {
-			var position = new Position$1(initialPositionFactory.variant ? initialPositionFactory.variant : 'regular', 'empty');
-			var moveCounters = position.fen(initialPositionFactory.fen);
-			game.initialPosition(position, moveCounters.fullMoveNumber);
-		}
-		catch(error) {
-			if(error instanceof exception$1.InvalidFEN) {
-				throw new exception$1.InvalidPGN(stream.text(), initialPositionFactory.fenTokenCharacterIndex, initialPositionFactory.fenTokenLineIndex, i18n$1.INVALID_FEN_IN_PGN_TEXT, error.message);
-			}
-			else {
-				throw error;
-			}
-		}
-	}
-
-
-	/**
-	 * Parse exactly 1 game from the given stream.
-	 *
-	 * @param {TokenStream} stream
-	 * @returns {Game}
-	 * @throws {module:exception.InvalidPGN}
-	 * @ignore
-	 */
-	function doParseGame(stream) {
-
-		// State variable for syntactic analysis.
-		var game            = null;  // the result
-		var node            = null;  // current node (or variation) to which the next move should be appended
-		var nodeIsVariation = false; // whether the current node is a variation or not
-		var nodeStack       = [];    // when starting a variation, its parent node (btw., always a "true" node, not a variation) is stacked here
-		var initialPositionFactory = {};
-
-		// Token loop
-		while(stream.consumeToken()) {
-
-			// Create a new game if necessary
-			if(game === null) {
-				game = new Game$1();
-			}
-
-			// Set-up the root node when the first move-text token is encountered.
-			if(stream.isMoveTextSection() && node === null) {
-				initializeInitialPosition(stream, game, initialPositionFactory);
-				node = game.mainVariation();
-				nodeIsVariation = true;
-			}
-
-			// Token type switch
-			switch(stream.token()) {
-
-				// Header
-				case TokenStream.BEGIN_HEADER:
-					if(node !== null) {
-						throw new exception$1.InvalidPGN(stream.text(), stream.tokenCharacterIndex(), stream.tokenLineIndex(), i18n$1.UNEXPECTED_PGN_HEADER);
-					}
-					if(!stream.consumeToken() || stream.token() !== TokenStream.HEADER_ID) {
-						throw new exception$1.InvalidPGN(stream.text(), stream.tokenCharacterIndex(), stream.tokenLineIndex(), i18n$1.MISSING_PGN_HEADER_ID);
-					}
-					var headerId = stream.tokenValue();
-					if(!stream.consumeToken() || stream.token() !== TokenStream.HEADER_VALUE) {
-						throw new exception$1.InvalidPGN(stream.text(), stream.tokenCharacterIndex(), stream.tokenLineIndex(), i18n$1.MISSING_PGN_HEADER_VALUE);
-					}
-					var headerValue = stream.tokenValue();
-					var headerValueCharacterIndex = stream.tokenCharacterIndex();
-					var headerValueLineIndex = stream.tokenLineIndex();
-					if(!stream.consumeToken() || stream.token() !== TokenStream.END_HEADER) {
-						throw new exception$1.InvalidPGN(stream.text(), stream.tokenCharacterIndex(), stream.tokenLineIndex(), i18n$1.MISSING_END_OF_PGN_HEADER);
-					}
-					processHeader(stream, game, initialPositionFactory, headerId, headerValue, headerValueCharacterIndex, headerValueLineIndex);
-					break;
-
-				// Move number
-				case TokenStream.MOVE_NUMBER:
-					break;
-
-				// Move or null-move
-				case TokenStream.MOVE:
-					try {
-						node = node.play(stream.tokenValue());
-						nodeIsVariation = false;
-					}
-					catch(error) {
-						if(error instanceof exception$1.InvalidNotation) {
-							throw new exception$1.InvalidPGN(stream.text(), stream.tokenCharacterIndex(), stream.tokenLineIndex(), i18n$1.INVALID_MOVE_IN_PGN_TEXT, error.notation, error.message);
-						}
-						else {
-							throw error;
-						}
-					}
-					break;
-
-				// NAG
-				case TokenStream.NAG:
-					node.addNag(stream.tokenValue());
-					break;
-
-				// Comment
-				case TokenStream.COMMENT:
-					var tags = stream.tokenValue().tags;
-					for(var key in tags) {
-						node.tag(key, tags[key]);
-					}
-					if(stream.tokenValue().comment !== undefined) {
-						node.comment(stream.tokenValue().comment, stream.emptyLineFound());
-					}
-					break;
-
-				// Begin of variation
-				case TokenStream.BEGIN_VARIATION:
-					if(nodeIsVariation) {
-						throw new exception$1.InvalidPGN(stream.text(), stream.tokenCharacterIndex(), stream.tokenLineIndex(), i18n$1.UNEXPECTED_BEGIN_OF_VARIATION);
-					}
-					nodeStack.push(node);
-					node = node.addVariation(stream.emptyLineFound());
-					nodeIsVariation = true;
-					break;
-
-				// End of variation
-				case TokenStream.END_VARIATION:
-					if(nodeStack.length === 0) {
-						throw new exception$1.InvalidPGN(stream.text(), stream.tokenCharacterIndex(), stream.tokenLineIndex(), i18n$1.UNEXPECTED_END_OF_VARIATION);
-					}
-					node = nodeStack.pop();
-					nodeIsVariation = false;
-					break;
-
-				// End-of-game
-				case TokenStream.END_OF_GAME:
-					if(nodeStack.length > 0) {
-						throw new exception$1.InvalidPGN(stream.text(), stream.tokenCharacterIndex(), stream.tokenLineIndex(), i18n$1.UNEXPECTED_END_OF_GAME);
-					}
-					game.result(stream.tokenValue());
-					return game;
-
-				// Something unexpected...
-				default:
-					throw new exception$1.InvalidPGN(stream.text(), stream.tokenCharacterIndex(), stream.tokenLineIndex(), i18n$1.INVALID_PGN_TOKEN);
-
-			} // switch(stream.token())
-
-		} // while(stream.consumeToken())
-
-		throw new exception$1.InvalidPGN(stream.text(), stream.tokenCharacterIndex(), stream.tokenLineIndex(), i18n$1.UNEXPECTED_END_OF_TEXT);
-	}
-
-
-	function gameCountGetterImpl(impl) {
-		return impl.gameLocations.length;
-	}
-
-
-	function gameGetterImpl(impl, gameIndex) {
-		if(impl.currentGameIndex !== gameIndex) {
-			impl.stream = new TokenStream(impl.text, impl.gameLocations[gameIndex]);
-		}
-		impl.currentGameIndex = -1;
-		var result = doParseGame(impl.stream);
-		impl.currentGameIndex = gameIndex + 1;
-		return result;
-	}
-
-
-	/**
-	 * PGN parsing function.
-	 *
-	 * @param {string} pgnString String to parse.
-	 * @returns {Database}
-	 * @throws {module:exception.InvalidPGN}
-	 *
-	 *//**
-	 *
-	 * PGN parsing function.
-	 *
-	 * @param {string} pgnString String to parse.
-	 * @param {number} gameIndex Only the game corresponding to this index is parsed.
-	 * @returns {Game}
-	 * @throws {module:exception.InvalidPGN}
-	 */
-	var pgnRead$1 = function(pgnString, gameIndex) {
-		var stream = new TokenStream(pgnString);
-
-		// Parse all games (and return a Database object)...
-		if(arguments.length === 1) {
-			var gameLocations = [];
-			while(true) {
-				var currentLocation = stream.currentLocation();
-				if(!stream.skipGame()) {
-					break;
-				}
-				gameLocations.push(currentLocation);
-			}
-			return new Database({ text: pgnString, gameLocations: gameLocations, currentGameIndex: -1 }, gameCountGetterImpl, gameGetterImpl);
-		}
-
-		// Parse one game...
-		else {
-			var gameCounter = 0;
-			while(gameCounter < gameIndex) {
-				if(stream.skipGame()) {
-					++gameCounter;
-				}
-				else {
-					throw new exception$1.InvalidPGN(pgnString, -1, -1, i18n$1.INVALID_GAME_INDEX, gameIndex, gameCounter);
-				}
-			}
-			return doParseGame(stream);
-		}
-	};
-
-	var pgn = {
-		pgnRead: pgnRead$1
-	};
+	position$1.Position;
+	game.Game;
+	database.Database;
+	tokenstream.TokenStream;
 
 	/******************************************************************************
 	 *                                                                            *
@@ -5740,40 +5317,10 @@
 	 *                                                                            *
 	 ******************************************************************************/
 
-
-	var i18n = i18n$1;
-	var exception = exception$1;
-
-
-	var forEachSquare = util.forEachSquare;
-	var squareColor$1 = util.squareColor;
-	var squareToCoordinates = util.squareToCoordinates;
-	var coordinatesToSquare = util.coordinatesToSquare;
-	var oppositeColor = util.oppositeColor;
-
-	var isMoveDescriptor = movedescriptor.isMoveDescriptor;
-
 	var Position = position$1.Position;
-	var Game = game.Game;
+	game.Game;
 
-
-	var pgnRead = pgn.pgnRead;
-
-	var src = {
-		i18n: i18n,
-		exception: exception,
-		forEachSquare: forEachSquare,
-		squareColor: squareColor$1,
-		squareToCoordinates: squareToCoordinates,
-		coordinatesToSquare: coordinatesToSquare,
-		oppositeColor: oppositeColor,
-		isMoveDescriptor: isMoveDescriptor,
-		Position: Position,
-		Game: Game,
-		pgnRead: pgnRead
-	};
-
-	const position = new src.Position();
+	const position = new Position();
 
 	const valueMap = {
 		p: 1,
@@ -5986,6 +5533,27 @@
 		textElement.style.textShadow = '1px 1px 0px black';
 		textElement.innerText = text;
 		element.appendChild(textElement);
+	}
+
+	function drawDepthSlider(id, uid, depth) {
+		let element = document.getElementById(id);
+		let existing = document.getElementById(uid);
+		if (existing) {
+			existing.remove();
+		}
+		let inputElement = document.createElement('input');
+		inputElement.id = uid;
+		inputElement.style.position = 'absolute';
+		inputElement.style.top = `calc(${element.style.height} + 65px)`;
+		inputElement.style.left = 'calc(50% - 100px)';
+		inputElement.style.width = '200px';
+		inputElement.style.pointerEvents = 'all';
+		inputElement.type = 'range';
+		inputElement.min = '1';
+		inputElement.max = '20';
+		inputElement.value = depth.toString();
+		inputElement.padding = '0 !important';
+		element.appendChild(inputElement);
 	}
 
 	function drawArrow(overlay, move, turn, size, side) {
@@ -9455,6 +9023,7 @@
 			let fen = null;
 			let drawDebug = false;
 			let triggerUpdate = true;
+			let depth = 8;
 
 			const shortcuts = new Shortcuts();
 
@@ -9505,7 +9074,7 @@
 					}
 					// Post position to the engine only if the engine didn't trigger the update
 					if (!state.triggerUpdate) {
-						playMove(position.fen(), 8);
+						playMove(position.fen(), depth);
 					}
 
 					createOverlay('cv-overlay', overlaySelector, mySide, parser.zIndex, false, false);
@@ -9517,7 +9086,13 @@
 						drawEvalBar('cv-overlay', state.score, mySide, position.turn());
 						if (drawDebug) {
 							drawArrow(overlayElement, state.bestMove, opponentColor(position.turn(), mySide), width, mySide);
-							drawArrow(overlayElement, state.ponder, opponentColor(oppositeColor$2(position.turn()), mySide), width, mySide);
+							drawArrow(overlayElement, state.ponder, opponentColor(oppositeColor(position.turn()), mySide), width, mySide);
+							drawDepthSlider('cv-overlay', 'cv-depth', depth);
+
+							document.getElementById('cv-depth').addEventListener('change', e => {
+								depth = parseInt(e.target.value);
+								console.log(depth);
+							});
 						}
 					}
 

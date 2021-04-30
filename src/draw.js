@@ -174,6 +174,27 @@ export function drawTextBelow(id, uid, pos, text) {
 	element.appendChild(textElement);
 }
 
+export function drawDepthSlider(id, uid, depth) {
+	let element = document.getElementById(id);
+	let existing = document.getElementById(uid);
+	if (existing) {
+		existing.remove();
+	}
+	let inputElement = document.createElement('input');
+	inputElement.id = uid;
+	inputElement.style.position = 'absolute';
+	inputElement.style.top = `calc(${element.style.height} + 65px)`;
+	inputElement.style.left = 'calc(50% - 100px)';
+	inputElement.style.width = '200px';
+	inputElement.style.pointerEvents = 'all';
+	inputElement.type = 'range';
+	inputElement.min = '1';
+	inputElement.max = '20';
+	inputElement.value = depth.toString();
+	inputElement.padding = '0 !important';
+	element.appendChild(inputElement);
+}
+
 export function drawArrow(overlay, move, turn, size, side) {
 	const colors = {
 		[BLACK]: 'hsla(350, 100%, 50%, 0.66)', // BLACK

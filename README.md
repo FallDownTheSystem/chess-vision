@@ -43,7 +43,7 @@ To add sites, add another parser (see the parse folder for examples),
 add the appropriate DOM selectors and zIndex (so that the drawn overlay is on top of the board) and it'll likely work without much tweaking. Remember to add the new parser to the `siteParser` function in parser/index.js, where the key is the `window.location.host`.
 
 TODO:
-- Use vue to render everything
+- Render reactively, rather than every time
   - Fix flickering on render
 - Refactor structure
 - Add Stockfish depth setting
