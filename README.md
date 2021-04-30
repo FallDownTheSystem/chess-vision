@@ -46,4 +46,3 @@ TODO:
 - Render reactively, rather than every time
   - Fix flickering on render
 - Refactor structure
-- Add Stockfish depth setting

@@ -174,6 +174,22 @@ export function drawTextBelow(id, uid, pos, text) {
 	element.appendChild(textElement);
 }
 
+export function drawECO(element, id, text) {
+	let existing = document.getElementById(id);
+	if (existing) {
+		existing.remove();
+	}
+	let textElement = document.createElement('div');
+	textElement.id = id;
+	textElement.style.position = 'absolute';
+	textElement.style.top = '-40px';
+	textElement.style.left = '45%';
+	textElement.style.color = 'white';
+	textElement.style.textShadow = '1px 1px 0px black';
+	textElement.innerText = text;
+	element.appendChild(textElement);
+}
+
 export function drawDepthSlider(id, uid, depth) {
 	let element = document.getElementById(id);
 	let existing = document.getElementById(uid);
@@ -187,11 +203,11 @@ export function drawDepthSlider(id, uid, depth) {
 	inputElement.style.left = 'calc(50% - 100px)';
 	inputElement.style.width = '200px';
 	inputElement.style.pointerEvents = 'all';
+	inputElement.style.padding = '0px';
 	inputElement.type = 'range';
 	inputElement.min = '1';
-	inputElement.max = '20';
+	inputElement.max = '16';
 	inputElement.value = depth.toString();
-	inputElement.padding = '0 !important';
 	element.appendChild(inputElement);
 }
 

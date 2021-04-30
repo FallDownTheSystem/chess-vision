@@ -2,9 +2,10 @@ import { sleep, oppositeColor, opponentColor } from './helpers';
 import { siteParser } from './parser';
 import { position, replay, replayFen } from './game';
 import { controlledSquares, drawControlledSquares } from './vision';
-import { createOverlay, drawEvalBar, drawArrow, drawDepthSlider } from './draw';
+import { createOverlay, drawEvalBar, drawArrow, drawDepthSlider, drawECO } from './draw';
 import { playMove, state } from './engine';
 import { Shortcuts } from 'shortcuts';
+import { eco } from './eco';
 
 console.log('Script is running');
 
@@ -28,6 +29,7 @@ const main = async () => {
 		let drawDebug = false;
 		let triggerUpdate = true;
 		let depth = 8;
+		let lastKnownPosition = '';
 
 		const shortcuts = new Shortcuts();
 
@@ -82,11 +84,15 @@ const main = async () => {
 				}
 
 				createOverlay('cv-overlay', overlaySelector, mySide, parser.zIndex, false, false);
-				createOverlay('cv-overlay-text', overlaySelector, mySide, 99999, true, false);
+				let textOverlay = createOverlay('cv-overlay-text', overlaySelector, mySide, 99999, true, false);
 				let overlayElement = createOverlay('cv-overlay-svg', overlaySelector, mySide, 10000, false, true);
-
-				// Eval bar should only be rendered if the engine updated its state
+				let positionFen = position.fen().slice(0, -4);
+				if (positionFen in eco) {
+					lastKnownPosition = eco[positionFen].name;
+				}
+				drawECO(textOverlay, 'cv-eco', lastKnownPosition);
 				if (state.triggerUpdate) {
+					// Eval bar should only be rendered if the engine updated its state
 					drawEvalBar('cv-overlay', state.score, mySide, position.turn());
 					if (drawDebug) {
 						drawArrow(overlayElement, state.bestMove, opponentColor(position.turn(), mySide), width, mySide);
