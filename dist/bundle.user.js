@@ -34,9 +34,9 @@
 		return [...ranks];
 	}
 
-	const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+	const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-	const cleanse = (x) => {
+	const cleanse = x => {
 		const chars = ['↵', '✓', '1-0', '0-1', '1/2-1/2', '\n', /\[+-][0-9.]+/];
 		for (const c of chars) {
 			x = x.replace(c, '');
@@ -44,22 +44,30 @@
 		return x.trim();
 	};
 
+	function oppositeColor$2(turn) {
+		return turn == WHITE$1 ? BLACK$1 : WHITE$1;
+	}
+
+	function opponentColor(turn, side) {
+		if (side == WHITE$1) {
+			return turn == WHITE$1 ? WHITE$1 : BLACK$1;
+		}
+		return turn == WHITE$1 ? BLACK$1 : WHITE$1;
+	}
+
 	// analysisSelector: '.analyse__tools',
 
 	class LichessParser {
 		constructor() {
-			this.moveSelector =
-				'.buttons + * > *:nth-child(3n-1), .buttons + * > *:nth-child(3n), move > san, .puzzle__moves move';
+			this.moveSelector = '.buttons + * > *:nth-child(3n-1), .buttons + * > *:nth-child(3n), move > san, .puzzle__moves move';
 			this.sideSelector = '.orientation-white';
-			this.overlaySelector = '.cg-wrap';
+			this.overlaySelector = 'cg-board';
 			this.gameSelector = '.rmoves, .tview2, .ruser';
 			this.zIndex = '1';
 		}
 
 		parseMoves() {
-			const moves = [...document.querySelectorAll(this.moveSelector)]
-				.map((x) => cleanse(x.innerText))
-				.filter((x) => x !== '');
+			const moves = [...document.querySelectorAll(this.moveSelector)].map(x => cleanse(x.innerText)).filter(x => x !== '');
 
 			return moves;
 		}
@@ -346,6 +354,7 @@
 	var INVALID_EN_PASSANT_FIELD                  = 'The 4th field of a FEN string must be either `-` or a square from the 3rd or 6th rank where en-passant is allowed.';
 	var WRONG_RANK_IN_EN_PASSANT_FIELD            = 'The rank number indicated in the FEN string 4th field is inconsistent with respect to the 2nd field.';
 	var INVALID_MOVE_COUNTING_FIELD               = 'The %1$s field of a FEN string must be a number.';
+	var INVALID_VARIANT_PREFIX                    = 'Invalid variant prefix: `%1$s`.';
 
 	// Notation & UCI parsing error messages
 	var INVALID_UCI_NOTATION_SYNTAX         = 'The syntax of the UCI notation is invalid.';
@@ -402,6 +411,7 @@
 		INVALID_EN_PASSANT_FIELD: INVALID_EN_PASSANT_FIELD,
 		WRONG_RANK_IN_EN_PASSANT_FIELD: WRONG_RANK_IN_EN_PASSANT_FIELD,
 		INVALID_MOVE_COUNTING_FIELD: INVALID_MOVE_COUNTING_FIELD,
+		INVALID_VARIANT_PREFIX: INVALID_VARIANT_PREFIX,
 		INVALID_UCI_NOTATION_SYNTAX: INVALID_UCI_NOTATION_SYNTAX,
 		ILLEGAL_UCI_MOVE: ILLEGAL_UCI_MOVE,
 		INVALID_MOVE_NOTATION_SYNTAX: INVALID_MOVE_NOTATION_SYNTAX,
@@ -688,13 +698,13 @@
 	var resultToString   = function(result ) { return RESULT_SYMBOL  [result ]; };
 	var variantToString  = function(variant) { return VARIANT_SYMBOL [variant]; };
 
-	var colorFromString    = function(color  ) { return COLOR_SYMBOL   .indexOf(color  ); };
-	var pieceFromString    = function(piece  ) { return PIECE_SYMBOL   .indexOf(piece  ); };
-	var figurineFromString = function(cp     ) { return FIGURINE_SYMBOL.indexOf(cp     ); };
-	var rankFromString     = function(rank   ) { return RANK_SYMBOL    .indexOf(rank   ); };
-	var fileFromString     = function(file   ) { return FILE_SYMBOL    .indexOf(file   ); };
-	var resultFromString   = function(result ) { return RESULT_SYMBOL  .indexOf(result ); };
-	var variantFromString  = function(variant) { return VARIANT_SYMBOL .indexOf(variant); };
+	var colorFromString    = function(color  ) { return color   === '' ? -1 : COLOR_SYMBOL   .indexOf(color  ); };
+	var pieceFromString    = function(piece  ) { return piece   === '' ? -1 : PIECE_SYMBOL   .indexOf(piece  ); };
+	var figurineFromString = function(cp     ) { return cp      === '' ? -1 : FIGURINE_SYMBOL.indexOf(cp     ); };
+	var rankFromString     = function(rank   ) { return rank    === '' ? -1 : RANK_SYMBOL    .indexOf(rank   ); };
+	var fileFromString     = function(file   ) { return file    === '' ? -1 : FILE_SYMBOL    .indexOf(file   ); };
+	var resultFromString   = function(result ) { return RESULT_SYMBOL .indexOf(result ); };
+	var variantFromString  = function(variant) { return VARIANT_SYMBOL.indexOf(variant); };
 
 	var squareToString = function(square) {
 		return FILE_SYMBOL[square % 16] + RANK_SYMBOL[Math.floor(square / 16)];
@@ -3184,6 +3194,7 @@
 
 
 
+
 	// -----------------------------------------------------------------------------
 	// Constructor & reset/clear
 	// -----------------------------------------------------------------------------
@@ -3205,17 +3216,21 @@
 	 * new kokopu.Position('chess960', 'empty');        //  7 -> Empty board, configured for Chess960.
 	 * new kokopu.Position('chess960', scharnaglCode);  //  8 -> One of the Chess960 starting position (`scharnaglCode` is a number between 0 and 959 inclusive).
 	 * new kokopu.Position(variant, fenString);         //  9 -> Parse the given FEN string, assuming the given game variant.
-	 * new kokopu.Position(anotherPosition);            // 10 -> Make a copy of `anotherPosition`.
+	 * new kokopu.Position(fenStringWithVariant);       // 10 -> Parse the given FEN string, taking into account an optional game variant that may be mentioned in prefix.
+	 * new kokopu.Position(anotherPosition);            // 11 -> Make a copy of `anotherPosition`.
 	 * ```
 	 * Please note that the argument `'regular'` can be omitted in forms 1, 2, 3. In particular, the constructor can be invoked
 	 * with no argument, as in `new kokopu.Position()`: in this case, a new `Position` initialized to the usual starting position
 	 * is instantiated (as in forms 1 and 2).
 	 *
 	 * In form 9, `variant` must be one of the game variant proposed in {@link GameVariant}. The `variant` argument can be omitted,
-	 * as in `new kokopu.Position(fenString)`: in this case, the usual chess rules are assumed (as if `variant` where set to `'regular'`).
 	 * If `variant` is set to `'chess960'`, then the X-FEN syntax can be used for `fenString'`.
 	 *
-	 * In form 10, `anotherPosition` must be another {@link Position} object.
+	 * In form 10, `fenStringWithVariant` is assumed to be a string formatted as `'variant:FEN'` (e.g. `'chess960:nrkbqrbn/pppppppp/8/8/8/8/PPPPPPPP/NRKBQRBN w BFbf - 0 1'`).
+	 * The `'variant:'` prefix is optional: if omitted, the usual chess rules are assumed. For the Chess960 variant,
+	 * the X-FEN syntax can be used for the FEN part of the string.
+	 *
+	 * In form 11, `anotherPosition` must be another {@link Position} object.
 	 *
 	 * @throws {module:exception.InvalidFEN} If the input parameter is not a valid FEN string (can be thrown only in cases 6 and 7).
 	 *
@@ -3256,15 +3271,31 @@
 
 		// FEN parsing
 		else if(typeof arguments[0] === 'string') {
-			var variant = basetypes.variantFromString(arguments[0]);
-			if(variant >= 0) {
-				if(typeof arguments[1] === 'string') {
+			var separatorIndex = arguments[0].indexOf(':');
+
+			// Form (variant, FEN)
+			if(typeof arguments[1] === 'string') {
+				var variant = basetypes.variantFromString(arguments[0]);
+				if(variant >= 0) {
 					this._impl = fen.parseFEN(variant, arguments[1], false).position;
 				}
 				else {
 					throw new exception$1.IllegalArgument('Position()');
 				}
 			}
+
+			// Form (variant:FEN) (concatenated string)
+			else if(separatorIndex >= 0) {
+				var variant = basetypes.variantFromString(arguments[0].substring(0, separatorIndex));
+				if(variant >= 0) {
+					this._impl = fen.parseFEN(variant, arguments[0].substring(separatorIndex + 1), false).position;
+				}
+				else {
+					throw new exception$1.InvalidFEN(arguments[0], i18n$1.INVALID_VARIANT_PREFIX, arguments[0].substring(0, separatorIndex));
+				}
+			}
+
+			// Form (FEN)
 			else {
 				this._impl = fen.parseFEN(basetypes.REGULAR_CHESS, arguments[0], false).position;
 			}
@@ -3335,8 +3366,9 @@
 	/**
 	 * Get the FEN representation of the current {@link Position}).
 	 *
-	 * @param {{fiftyMoveClock:number, fullMoveNumber:number}} [options] If not provided the `fiftyMoveClock`
-	 *        and the `fullMoveNumber` fields of the returned FEN string are set respectively to 0 and 1.
+	 * @param {{fiftyMoveClock:number, fullMoveNumber:number, withVariant:boolean}} [options] If not provided, the `fiftyMoveClock`
+	 *        and the `fullMoveNumber` fields of the returned FEN string are set respectively to 0 and 1. If field `withVariant`
+	 *        is `true` (`false` by default), then the current game variant is appended as a colon-separated prefix.
 	 *
 	 *//**
 	 *
@@ -3354,7 +3386,8 @@
 		else if(arguments.length === 1 && typeof arguments[0] === 'object') {
 			var fiftyMoveClock = (typeof arguments[0].fiftyMoveClock === 'number') ? arguments[0].fiftyMoveClock : 0;
 			var fullMoveNumber = (typeof arguments[0].fullMoveNumber === 'number') ? arguments[0].fullMoveNumber : 1;
-			return fen.getFEN(this._impl, fiftyMoveClock, fullMoveNumber);
+			var withVariant = (typeof arguments[0].withVariant === 'boolean') ? arguments[0].withVariant : false;
+			return (withVariant ? basetypes.variantToString(this._impl.variant) + ':' : '') + fen.getFEN(this._impl, fiftyMoveClock, fullMoveNumber);
 		}
 		else if(arguments.length === 1 && typeof arguments[0] === 'string') {
 			var result = fen.parseFEN(this._impl.variant, arguments[0], false);
@@ -5803,7 +5836,7 @@
 		textElement.innerText = text;
 	}
 
-	function createOverlay(id, element, side, zIndex, addText) {
+	function createOverlay(id, element, side, zIndex, addText, svg) {
 		let overlay = document.getElementById(id);
 		if (overlay) {
 			overlay.remove();
@@ -5816,6 +5849,13 @@
 		const { width, height, top, left } = rect;
 
 		let overlayElement = document.createElement('div');
+
+		if (svg) {
+			overlayElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+			overlayElement.setAttribute('width', width);
+			overlayElement.setAttribute('height', width);
+		}
+
 		overlayElement.id = id;
 		overlayElement.style.position = 'absolute';
 		overlayElement.style.zIndex = zIndex;
@@ -5850,6 +5890,8 @@
 		overlayElement.style.gridTemplateAreas = gridSquares.join('\n');
 
 		document.body.appendChild(overlayElement);
+
+		return overlayElement;
 	}
 
 	function generateSquare(overlayElement, square, addText) {
@@ -5944,6 +5986,72 @@
 		textElement.style.textShadow = '1px 1px 0px black';
 		textElement.innerText = text;
 		element.appendChild(textElement);
+	}
+
+	function drawArrow(overlay, move, turn, size, side) {
+		const colors = {
+			[BLACK$1]: 'hsla(350, 100%, 50%, 0.66)', // BLACK
+			[WHITE$1]: 'hsla(145, 100%, 50%, 0.66)', // WHITE
+		};
+
+		const squareSize = size / 8;
+
+		let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+		marker.id = 'triangle' + turn;
+		marker.setAttribute('viewBox', '0 0 20 20');
+		marker.setAttribute('refX', '0');
+		marker.setAttribute('refY', '5');
+		marker.setAttribute('markerUnits', 'strokeWidth');
+		marker.setAttribute('markerWidth', squareSize / 12);
+		marker.setAttribute('markerHeight', squareSize / 12);
+		marker.setAttribute('orient', 'auto');
+		marker.setAttribute('fill', colors[turn]);
+
+		let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+		path.setAttribute('d', 'M 0 0 L 7.5 5 L 0 10 z');
+		marker.appendChild(path);
+
+		overlay.appendChild(marker);
+
+		let from = move.slice(0, 2);
+		let to = move.slice(-2);
+
+		let [x1, y1] = squareToPos(from, squareSize, side);
+		let [x2, y2] = squareToPos(to, squareSize, side);
+
+		const xDist = x2 - x1;
+		const yDist = y2 - y1;
+		const dist = Math.sqrt(xDist * xDist + yDist * yDist);
+		const newDist = dist - squareSize * (2 / 5);
+		const scale = newDist / dist;
+
+		x2 = x1 + xDist * scale;
+		y2 = y1 + yDist * scale;
+
+		let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+		line.setAttribute('x1', x1);
+		line.setAttribute('y1', y1);
+		line.setAttribute('x2', x2);
+		line.setAttribute('y2', y2);
+		line.setAttribute('marker-end', `url(#triangle${turn})`);
+		line.setAttribute('stroke', colors[turn]);
+		line.setAttribute('stroke-width', squareSize / 6);
+		overlay.appendChild(line);
+	}
+
+	function squareToPos(square, squareSize, side) {
+		const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+		const ranks = range(1, 8);
+
+		side == WHITE$1 ? ranks.reverse() : files.reverse();
+
+		let [file, rank] = square.split('');
+		rank = parseInt(rank);
+
+		const x = files.indexOf(file);
+		const y = ranks.indexOf(rank);
+
+		return [squareSize * x + squareSize / 2, squareSize * y + squareSize / 2];
 	}
 
 	/** Detect free variable `global` from Node.js. */
@@ -7970,6 +8078,7 @@
 		score: 0,
 		bestMove: null,
 		bestMoveSAN: null,
+		ponder: null,
 		evalPercent: 50.0,
 		mate: null,
 		triggerUpdate: false,
@@ -8003,6 +8112,17 @@
 			// console.log(state.bestMove, state.bestMoveSAN, state.score, state.mate);
 			state.triggerUpdate = true;
 		}
+
+		if (event.includes('ponder')) {
+			let index = args.findIndex(x => x == 'ponder');
+			let value = args[index + 1];
+			if (value.includes('none') || !value) {
+				return;
+			}
+			state.ponder = value;
+			state.triggerUpdate = true;
+		}
+
 		if (event.includes('score')) {
 			if (event.includes('cp')) {
 				state.score = parseInt(args[args.findIndex(x => x == 'cp') + 1]);
@@ -9330,8 +9450,8 @@
 
 			let numOfMoves = -1;
 			let mySide = parser.getSide();
-			let boardSize = 0;
-			let overlayElement = parser.getOverlay();
+			let boardWidth = 0;
+			let overlaySelector = parser.getOverlay();
 			let fen = null;
 			let drawDebug = false;
 			let triggerUpdate = true;
@@ -9358,10 +9478,10 @@
 				if (typeof parser.getFen !== 'undefined') {
 					newFen = parser.getFen(parsedSide);
 				}
-				const width = overlayElement.clientWidth;
+				const width = overlaySelector.clientWidth;
 
 				if (width === 0) {
-					overlayElement = parser.getOverlay();
+					overlaySelector = parser.getOverlay();
 				}
 
 				// If the number of moves, the mySide or the size of the board changes, redraw all the things!
@@ -9369,14 +9489,14 @@
 					triggerUpdate ||
 					moves.length !== numOfMoves ||
 					mySide !== parsedSide ||
-					boardSize !== width ||
+					boardWidth !== width ||
 					fen !== newFen ||
 					state.triggerUpdate
 				) {
 					triggerUpdate = false;
 					numOfMoves = moves.length;
 					mySide = parsedSide;
-					boardSize = width;
+					boardWidth = width;
 					fen = newFen;
 					if (numOfMoves) {
 						replay(moves);
@@ -9388,12 +9508,17 @@
 						playMove(position.fen(), 8);
 					}
 
-					createOverlay('cv-overlay', overlayElement, mySide, parser.zIndex, false);
-					createOverlay('cv-overlay-text', overlayElement, mySide, 99999, true);
+					createOverlay('cv-overlay', overlaySelector, mySide, parser.zIndex, false, false);
+					createOverlay('cv-overlay-text', overlaySelector, mySide, 99999, true, false);
+					let overlayElement = createOverlay('cv-overlay-svg', overlaySelector, mySide, 10000, false, true);
 
 					// Eval bar should only be rendered if the engine updated its state
 					if (state.triggerUpdate) {
 						drawEvalBar('cv-overlay', state.score, mySide, position.turn());
+						if (drawDebug) {
+							drawArrow(overlayElement, state.bestMove, opponentColor(position.turn(), mySide), width, mySide);
+							drawArrow(overlayElement, state.ponder, opponentColor(oppositeColor$2(position.turn()), mySide), width, mySide);
+						}
 					}
 
 					state.triggerUpdate = false;

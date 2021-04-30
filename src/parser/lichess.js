@@ -4,18 +4,15 @@ import { WHITE, BLACK, cleanse } from '../helpers';
 
 export class LichessParser {
 	constructor() {
-		this.moveSelector =
-			'.buttons + * > *:nth-child(3n-1), .buttons + * > *:nth-child(3n), move > san, .puzzle__moves move';
+		this.moveSelector = '.buttons + * > *:nth-child(3n-1), .buttons + * > *:nth-child(3n), move > san, .puzzle__moves move';
 		this.sideSelector = '.orientation-white';
-		this.overlaySelector = '.cg-wrap';
+		this.overlaySelector = 'cg-board';
 		this.gameSelector = '.rmoves, .tview2, .ruser';
 		this.zIndex = '1';
 	}
 
 	parseMoves() {
-		const moves = [...document.querySelectorAll(this.moveSelector)]
-			.map((x) => cleanse(x.innerText))
-			.filter((x) => x !== '');
+		const moves = [...document.querySelectorAll(this.moveSelector)].map(x => cleanse(x.innerText)).filter(x => x !== '');
 
 		return moves;
 	}

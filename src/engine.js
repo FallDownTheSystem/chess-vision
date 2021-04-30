@@ -8,6 +8,7 @@ export let state = {
 	score: 0,
 	bestMove: null,
 	bestMoveSAN: null,
+	ponder: null,
 	evalPercent: 50.0,
 	mate: null,
 	triggerUpdate: false,
@@ -41,6 +42,17 @@ stockfish.onmessage = async function (event) {
 		// console.log(state.bestMove, state.bestMoveSAN, state.score, state.mate);
 		state.triggerUpdate = true;
 	}
+
+	if (event.includes('ponder')) {
+		let index = args.findIndex(x => x == 'ponder');
+		let value = args[index + 1];
+		if (value.includes('none') || !value) {
+			return;
+		}
+		state.ponder = value;
+		state.triggerUpdate = true;
+	}
+
 	if (event.includes('score')) {
 		if (event.includes('cp')) {
 			state.score = parseInt(args[args.findIndex(x => x == 'cp') + 1]);

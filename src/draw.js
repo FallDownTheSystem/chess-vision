@@ -1,4 +1,4 @@
-import { WHITE, BLACK, getFiles, getRanks } from './helpers';
+import { WHITE, BLACK, getFiles, getRanks, range } from './helpers';
 
 export function drawSquare(square, { background, border }) {
 	const squareElement = document.querySelector(`.cv-${square}`);
@@ -22,7 +22,7 @@ export function drawText(square, position, text) {
 	textElement.innerText = text;
 }
 
-export function createOverlay(id, element, side, zIndex, addText) {
+export function createOverlay(id, element, side, zIndex, addText, svg) {
 	let overlay = document.getElementById(id);
 	if (overlay) {
 		overlay.remove();
@@ -35,6 +35,13 @@ export function createOverlay(id, element, side, zIndex, addText) {
 	const { width, height, top, left } = rect;
 
 	let overlayElement = document.createElement('div');
+
+	if (svg) {
+		overlayElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		overlayElement.setAttribute('width', width);
+		overlayElement.setAttribute('height', width);
+	}
+
 	overlayElement.id = id;
 	overlayElement.style.position = 'absolute';
 	overlayElement.style.zIndex = zIndex;
@@ -69,6 +76,8 @@ export function createOverlay(id, element, side, zIndex, addText) {
 	overlayElement.style.gridTemplateAreas = gridSquares.join('\n');
 
 	document.body.appendChild(overlayElement);
+
+	return overlayElement;
 }
 
 function generateSquare(overlayElement, square, addText) {
@@ -163,4 +172,70 @@ export function drawTextBelow(id, uid, pos, text) {
 	textElement.style.textShadow = '1px 1px 0px black';
 	textElement.innerText = text;
 	element.appendChild(textElement);
+}
+
+export function drawArrow(overlay, move, turn, size, side) {
+	const colors = {
+		[BLACK]: 'hsla(350, 100%, 50%, 0.66)', // BLACK
+		[WHITE]: 'hsla(145, 100%, 50%, 0.66)', // WHITE
+	};
+
+	const squareSize = size / 8;
+
+	let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+	marker.id = 'triangle' + turn;
+	marker.setAttribute('viewBox', '0 0 20 20');
+	marker.setAttribute('refX', '0');
+	marker.setAttribute('refY', '5');
+	marker.setAttribute('markerUnits', 'strokeWidth');
+	marker.setAttribute('markerWidth', squareSize / 12);
+	marker.setAttribute('markerHeight', squareSize / 12);
+	marker.setAttribute('orient', 'auto');
+	marker.setAttribute('fill', colors[turn]);
+
+	let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+	path.setAttribute('d', 'M 0 0 L 7.5 5 L 0 10 z');
+	marker.appendChild(path);
+
+	overlay.appendChild(marker);
+
+	let from = move.slice(0, 2);
+	let to = move.slice(-2);
+
+	let [x1, y1] = squareToPos(from, squareSize, side);
+	let [x2, y2] = squareToPos(to, squareSize, side);
+
+	const xDist = x2 - x1;
+	const yDist = y2 - y1;
+	const dist = Math.sqrt(xDist * xDist + yDist * yDist);
+	const newDist = dist - squareSize * (2 / 5);
+	const scale = newDist / dist;
+
+	x2 = x1 + xDist * scale;
+	y2 = y1 + yDist * scale;
+
+	let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+	line.setAttribute('x1', x1);
+	line.setAttribute('y1', y1);
+	line.setAttribute('x2', x2);
+	line.setAttribute('y2', y2);
+	line.setAttribute('marker-end', `url(#triangle${turn})`);
+	line.setAttribute('stroke', colors[turn]);
+	line.setAttribute('stroke-width', squareSize / 6);
+	overlay.appendChild(line);
+}
+
+function squareToPos(square, squareSize, side) {
+	const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+	const ranks = range(1, 8);
+
+	side == WHITE ? ranks.reverse() : files.reverse();
+
+	let [file, rank] = square.split('');
+	rank = parseInt(rank);
+
+	const x = files.indexOf(file);
+	const y = ranks.indexOf(rank);
+
+	return [squareSize * x + squareSize / 2, squareSize * y + squareSize / 2];
 }

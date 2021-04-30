@@ -1,8 +1,8 @@
-import { sleep } from './helpers';
+import { sleep, oppositeColor, opponentColor } from './helpers';
 import { siteParser } from './parser';
 import { position, replay, replayFen } from './game';
 import { controlledSquares, drawControlledSquares } from './vision';
-import { createOverlay, drawEvalBar } from './draw';
+import { createOverlay, drawEvalBar, drawArrow } from './draw';
 import { playMove, state } from './engine';
 import { Shortcuts } from 'shortcuts';
 
@@ -22,8 +22,8 @@ const main = async () => {
 
 		let numOfMoves = -1;
 		let mySide = parser.getSide();
-		let boardSize = 0;
-		let overlayElement = parser.getOverlay();
+		let boardWidth = 0;
+		let overlaySelector = parser.getOverlay();
 		let fen = null;
 		let drawDebug = false;
 		let triggerUpdate = true;
@@ -50,10 +50,10 @@ const main = async () => {
 			if (typeof parser.getFen !== 'undefined') {
 				newFen = parser.getFen(parsedSide);
 			}
-			const width = overlayElement.clientWidth;
+			const width = overlaySelector.clientWidth;
 
 			if (width === 0) {
-				overlayElement = parser.getOverlay();
+				overlaySelector = parser.getOverlay();
 			}
 
 			// If the number of moves, the mySide or the size of the board changes, redraw all the things!
@@ -61,14 +61,14 @@ const main = async () => {
 				triggerUpdate ||
 				moves.length !== numOfMoves ||
 				mySide !== parsedSide ||
-				boardSize !== width ||
+				boardWidth !== width ||
 				fen !== newFen ||
 				state.triggerUpdate
 			) {
 				triggerUpdate = false;
 				numOfMoves = moves.length;
 				mySide = parsedSide;
-				boardSize = width;
+				boardWidth = width;
 				fen = newFen;
 				if (numOfMoves) {
 					replay(moves);
@@ -80,12 +80,17 @@ const main = async () => {
 					playMove(position.fen(), 8);
 				}
 
-				createOverlay('cv-overlay', overlayElement, mySide, parser.zIndex, false);
-				createOverlay('cv-overlay-text', overlayElement, mySide, 99999, true);
+				createOverlay('cv-overlay', overlaySelector, mySide, parser.zIndex, false, false);
+				createOverlay('cv-overlay-text', overlaySelector, mySide, 99999, true, false);
+				let overlayElement = createOverlay('cv-overlay-svg', overlaySelector, mySide, 10000, false, true);
 
 				// Eval bar should only be rendered if the engine updated its state
 				if (state.triggerUpdate) {
 					drawEvalBar('cv-overlay', state.score, mySide, position.turn());
+					if (drawDebug) {
+						drawArrow(overlayElement, state.bestMove, opponentColor(position.turn(), mySide), width, mySide);
+						drawArrow(overlayElement, state.ponder, opponentColor(oppositeColor(position.turn()), mySide), width, mySide);
+					}
 				}
 
 				state.triggerUpdate = false;
