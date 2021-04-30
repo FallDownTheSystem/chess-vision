@@ -11,6 +11,18 @@ export const valueMap = {
 	k: 100,
 };
 
+export let gameState = {
+	numOfMoves: -1,
+	mySide: WHITE,
+	boardWidth: 0,
+	overlaySelector: null,
+	fen: null,
+	drawDebug: false,
+	triggerUpdate: true,
+	depth: 8,
+	lastKnownPosition: '',
+};
+
 export function replay(moves) {
 	position.reset();
 	for (const move of moves) {

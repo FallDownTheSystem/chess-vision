@@ -15,7 +15,7 @@
 	'use strict';
 
 	const BLACK$1 = 'b';
-	const WHITE$1 = 'w';
+	const WHITE$2 = 'w';
 
 	function range(start, end) {
 		return Array(end - start + 1)
@@ -37,7 +37,7 @@
 	const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 	const cleanse = x => {
-		const chars = ['↵', '✓', '1-0', '0-1', '1/2-1/2', '\n', /\[+-][0-9.]+/];
+		const chars = ['↵', '✓', '1-0', '0-1', '1/2-1/2', '½', '?', '\n', /\[+-][0-9.]+/];
 		for (const c of chars) {
 			x = x.replace(c, '');
 		}
@@ -45,14 +45,14 @@
 	};
 
 	function oppositeColor(turn) {
-		return turn == WHITE$1 ? BLACK$1 : WHITE$1;
+		return turn == WHITE$2 ? BLACK$1 : WHITE$2;
 	}
 
 	function opponentColor(turn, side) {
-		if (side == WHITE$1) {
-			return turn == WHITE$1 ? WHITE$1 : BLACK$1;
+		if (side == WHITE$2) {
+			return turn == WHITE$2 ? WHITE$2 : BLACK$1;
 		}
-		return turn == WHITE$1 ? BLACK$1 : WHITE$1;
+		return turn == WHITE$2 ? BLACK$1 : WHITE$2;
 	}
 
 	// analysisSelector: '.analyse__tools',
@@ -73,7 +73,7 @@
 		}
 
 		getSide() {
-			return document.querySelector(this.sideSelector) !== null ? WHITE$1 : BLACK$1;
+			return document.querySelector(this.sideSelector) !== null ? WHITE$2 : BLACK$1;
 		}
 
 		getOverlay() {
@@ -103,7 +103,7 @@
 		getSide() {
 			return document.querySelector('.clock-black .main-clock-bottom, .layout-bottom-player .move-time-dark, .board.flipped') !== null
 				? BLACK$1
-				: WHITE$1;
+				: WHITE$2;
 		}
 
 		getOverlay() {
@@ -212,7 +212,7 @@
 		}
 
 		getSide() {
-			return document.querySelector(this.sideSelector) !== null ? BLACK$1 : WHITE$1;
+			return document.querySelector(this.sideSelector) !== null ? BLACK$1 : WHITE$2;
 		}
 
 		getOverlay() {
@@ -258,7 +258,7 @@
 		}
 
 		getSide() {
-			return document.querySelector(this.sideSelector) !== null ? WHITE$1 : BLACK$1;
+			return document.querySelector(this.sideSelector) !== null ? WHITE$2 : BLACK$1;
 		}
 
 		getOverlay() {
@@ -641,7 +641,7 @@
 
 
 	// Colors
-	var WHITE = 0;
+	var WHITE$1 = 0;
 	var BLACK = 1;
 
 	// Pieces
@@ -804,7 +804,7 @@
 	 */
 
 	var basetypes = {
-		WHITE: WHITE,
+		WHITE: WHITE$1,
 		BLACK: BLACK,
 		KING: KING,
 		QUEEN: QUEEN,
@@ -5331,6 +5331,18 @@
 		k: 100,
 	};
 
+	let gameState = {
+		numOfMoves: -1,
+		mySide: WHITE,
+		boardWidth: 0,
+		overlaySelector: null,
+		fen: null,
+		drawDebug: false,
+		triggerUpdate: true,
+		depth: 8,
+		lastKnownPosition: '',
+	};
+
 	function replay(moves) {
 		position.reset();
 		for (const move of moves) {
@@ -5417,7 +5429,7 @@
 		overlayElement.style.display = 'grid';
 		overlayElement.style.gridTemplate = `repeat(8, 1fr) / repeat(8, 1fr)`;
 
-		if (side === WHITE$1) {
+		if (side === WHITE$2) {
 			ranks.reverse();
 		} else {
 			files.reverse();
@@ -5501,7 +5513,7 @@
 		evalBarElement.style.height = element.style.height;
 		evalBarElement.style.width = '12px';
 		evalBarElement.style.left = '-14px';
-		evalBarElement.style.backgroundColor = side === WHITE$1 ? 'hsla(0, 0%, 0%, 0.5)' : 'hsla(0, 0%, 100%, 1.0)';
+		evalBarElement.style.backgroundColor = side === WHITE$2 ? 'hsla(0, 0%, 0%, 0.5)' : 'hsla(0, 0%, 100%, 1.0)';
 
 		let evalBarLevel = document.createElement('div');
 		evalBarLevel.id = `cv-evalbar-level`;
@@ -5510,7 +5522,7 @@
 		evalBarLevel.style.width = '12px';
 		evalBarLevel.style.bottom = '0';
 
-		evalBarLevel.style.backgroundColor = side === WHITE$1 ? 'white' : 'black';
+		evalBarLevel.style.backgroundColor = side === WHITE$2 ? 'white' : 'black';
 
 		evalBarElement.appendChild(evalBarLevel);
 
@@ -5575,7 +5587,7 @@
 	function drawArrow(overlay, move, turn, size, side) {
 		const colors = {
 			[BLACK$1]: 'hsla(350, 100%, 50%, 0.66)', // BLACK
-			[WHITE$1]: 'hsla(145, 100%, 50%, 0.66)', // WHITE
+			[WHITE$2]: 'hsla(145, 100%, 50%, 0.66)', // WHITE
 		};
 
 		const squareSize = size / 8;
@@ -5627,7 +5639,7 @@
 		const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 		const ranks = range(1, 8);
 
-		side == WHITE$1 ? ranks.reverse() : files.reverse();
+		side == WHITE$2 ? ranks.reverse() : files.reverse();
 
 		let [file, rank] = square.split('');
 		rank = parseInt(rank);
@@ -7712,7 +7724,7 @@
 				state.score = parseInt(args[args.findIndex(x => x == 'cp') + 1]);
 				state.mate = null;
 			} else if (event.includes('mate')) {
-				state.score = position.turn() == WHITE$1 ? 9999 : -9999;
+				state.score = position.turn() == WHITE$2 ? 9999 : -9999;
 				state.mate = parseInt(args[args.findIndex(x => x == 'mate') + 1]);
 			}
 		}
@@ -7729,11 +7741,11 @@
 				const square = f + r;
 				// Initialize the square
 				squares[square] = {
-					[WHITE$1]: [],
+					[WHITE$2]: [],
 					[BLACK$1]: [],
 				};
 
-				findAttackers(position, squares, square, WHITE$1);
+				findAttackers(position, squares, square, WHITE$2);
 				findAttackers(position, squares, square, BLACK$1);
 			}
 		}
@@ -7741,7 +7753,7 @@
 	}
 
 	function drawControlledSquares(squares, mySide, debug) {
-		const opSide = mySide === WHITE$1 ? BLACK$1 : WHITE$1;
+		const opSide = mySide === WHITE$2 ? BLACK$1 : WHITE$2;
 
 		for (const [square, attackers] of Object.entries(squares)) {
 			let myAttackers = attackers[mySide];
@@ -7799,7 +7811,7 @@
 		let attackedSquareColor = squareColor(square);
 
 		const mySide = side;
-		const opSide = mySide === WHITE$1 ? BLACK$1 : WHITE$1;
+		const opSide = mySide === WHITE$2 ? BLACK$1 : WHITE$2;
 		let myPieces = [...myAttackers];
 		let opPieces = [...opAttackers];
 		let myTotalCost = 0;
@@ -7885,7 +7897,7 @@
 		}
 		position.square(to, fromPiece);
 
-		const isKingChecked = position.isAttacked(position.kingSquare(side), side === WHITE$1 ? BLACK$1 : WHITE$1);
+		const isKingChecked = position.isAttacked(position.kingSquare(side), side === WHITE$2 ? BLACK$1 : WHITE$2);
 
 		position.square(from, fromPiece);
 		position.square(to, toPiece);
@@ -26051,8 +26063,6 @@
 		},
 	};
 
-	console.log('Script is running');
-
 	const main = async () => {
 		try {
 			const parser = siteParser(window.location.host);
@@ -26065,15 +26075,8 @@
 				await sleep(500);
 			}
 
-			let numOfMoves = -1;
-			let mySide = parser.getSide();
-			let boardWidth = 0;
-			let overlaySelector = parser.getOverlay();
-			let fen = null;
-			let drawDebug = false;
-			let triggerUpdate = true;
-			let depth = 8;
-			let lastKnownPosition = '';
+			gameState.overlaySelector = parser.getOverlay();
+			gameState.mySide = parser.getSide();
 
 			const shortcuts = new Shortcuts();
 
@@ -26100,61 +26103,52 @@
 				const width = overlaySelector.clientWidth;
 
 				if (width === 0) {
-					overlaySelector = parser.getOverlay();
+					gameState.overlaySelector = parser.getOverlay();
 				}
 
 				// If the number of moves, the mySide or the size of the board changes, redraw all the things!
 				if (
-					triggerUpdate ||
-					moves.length !== numOfMoves ||
-					mySide !== parsedSide ||
-					boardWidth !== width ||
-					fen !== newFen ||
+					gameState.triggerUpdate ||
+					moves.length !== gameState.numOfMoves ||
+					gameState.mySide !== parsedSide ||
+					gameState.boardWidth !== width ||
+					gameState.fen !== newFen ||
 					state.triggerUpdate
 				) {
-					triggerUpdate = false;
-					numOfMoves = moves.length;
-					mySide = parsedSide;
-					boardWidth = width;
-					fen = newFen;
-					if (numOfMoves) {
+					gameState.triggerUpdate = false;
+					gameState.numOfMoves = moves.length;
+					gameState.mySide = parsedSide;
+					gameState.boardWidth = width;
+					gameState.fen = newFen;
+					if (gameState.numOfMoves) {
 						replay(moves);
-					} else if (fen) {
-						replayFen(fen);
+					} else if (gameState.fen) {
+						replayFen(gameState.fen);
 					}
 					// Post position to the engine only if the engine didn't trigger the update
 					if (!state.triggerUpdate) {
 						playMove(position.fen(), depth);
 					}
 
-					createOverlay('cv-overlay', overlaySelector, mySide, parser.zIndex, false, false);
-					let textOverlay = createOverlay('cv-overlay-text', overlaySelector, mySide, 99999, true, false);
-					let overlayElement = createOverlay('cv-overlay-svg', overlaySelector, mySide, 10000, false, true);
+					createOverlay('cv-overlay', gameState.overlaySelector, gameState.mySide, parser.zIndex, false, false);
+					let textOverlay = createOverlay('cv-overlay-text', gameState.overlaySelector, gameState.mySide, 99999, true, false);
+					let overlayElement = createOverlay('cv-overlay-svg', gameState.overlaySelector, gameState.mySide, 10000, false, true);
 					let positionFen = position.fen().slice(0, -4);
 					if (positionFen in eco) {
-						lastKnownPosition = eco[positionFen].name;
+						gameState.lastKnownPosition = eco[positionFen].name;
 					}
-					drawECO(textOverlay, 'cv-eco', lastKnownPosition);
+					drawECO(textOverlay, 'cv-eco', gameState.lastKnownPosition);
 					if (state.triggerUpdate) {
 						// Eval bar should only be rendered if the engine updated its state
-						drawEvalBar('cv-overlay', state.score, mySide, position.turn());
-						if (drawDebug) {
-							drawArrow(overlayElement, state.bestMove, opponentColor(position.turn(), mySide), width, mySide);
-							drawArrow(overlayElement, state.ponder, opponentColor(oppositeColor(position.turn()), mySide), width, mySide);
-							drawDepthSlider('cv-overlay', 'cv-depth', depth);
-
-							document.getElementById('cv-depth').addEventListener('change', e => {
-								depth = parseInt(e.target.value);
-								console.log(depth);
-							});
-						}
+						drawEvalBar('cv-overlay', state.score, gameState.mySide, position.turn());
+						if (gameState.drawDebug) ;
 					}
 
 					state.triggerUpdate = false;
 
-					if (numOfMoves || fen) {
+					if (gameState.numOfMoves || gameState.fen) {
 						const squares = controlledSquares(position);
-						drawControlledSquares(squares, mySide, drawDebug);
+						drawControlledSquares(squares, gameState.mySide, gameState.drawDebug);
 					} else {
 						document.querySelector('#cv-overlay').style.border = '1px dashed hsl(140, 100%, 50%)';
 					}
