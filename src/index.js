@@ -28,8 +28,8 @@ const main = async () => {
 			{
 				shortcut: 'D E B U G',
 				handler: () => {
-					drawDebug = !drawDebug;
-					triggerUpdate = true;
+					gameState.drawDebug = !gameState.drawDebug;
+					gameState.triggerUpdate = true;
 				},
 			},
 		]);
@@ -44,7 +44,7 @@ const main = async () => {
 			if (typeof parser.getFen !== 'undefined') {
 				newFen = parser.getFen(parsedSide);
 			}
-			const width = overlaySelector.clientWidth;
+			const width = gameState.overlaySelector.clientWidth;
 
 			if (width === 0) {
 				gameState.overlaySelector = parser.getOverlay();
@@ -71,7 +71,7 @@ const main = async () => {
 				}
 				// Post position to the engine only if the engine didn't trigger the update
 				if (!state.triggerUpdate) {
-					playMove(position.fen(), depth);
+					playMove(position.fen(), gameState.depth);
 				}
 
 				createOverlay('cv-overlay', gameState.overlaySelector, gameState.mySide, parser.zIndex, false, false);
@@ -103,8 +103,7 @@ const main = async () => {
 						drawDepthSlider('cv-overlay', 'cv-depth', gameState.depth);
 
 						document.getElementById('cv-depth').addEventListener('change', e => {
-							depth = parseInt(e.target.value);
-							console.log(gameState.depth);
+							gameState.depth = parseInt(e.target.value);
 						});
 					}
 				}

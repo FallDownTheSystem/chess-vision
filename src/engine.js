@@ -1,4 +1,4 @@
-import { position } from './game';
+import { position, gameState } from './game';
 import { WHITE, BLACK } from './helpers';
 
 // eslint-disable-next-line no-undef
@@ -38,7 +38,11 @@ stockfish.onmessage = async function (event) {
 			return;
 		}
 		state.bestMove = value;
-		state.bestMoveSAN = position.notation(position.uci(state.bestMove));
+		try {
+			state.bestMoveSAN = position.notation(position.uci(state.bestMove));
+		} catch {
+			// Fuck it
+		}
 		// console.log(state.bestMove, state.bestMoveSAN, state.score, state.mate);
 		state.triggerUpdate = true;
 	}
@@ -58,7 +62,7 @@ stockfish.onmessage = async function (event) {
 			state.score = parseInt(args[args.findIndex(x => x == 'cp') + 1]);
 			state.mate = null;
 		} else if (event.includes('mate')) {
-			state.score = position.turn() == WHITE ? 9999 : -9999;
+			state.score = position.turn() == gameState.mySide ? 9999 : -9999;
 			state.mate = parseInt(args[args.findIndex(x => x == 'mate') + 1]);
 		}
 	}

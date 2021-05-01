@@ -1,7 +1,7 @@
 import { Position } from 'kokopu';
+import { WHITE } from './helpers';
 
 export const position = new Position();
-
 export const valueMap = {
 	p: 1,
 	b: 3,

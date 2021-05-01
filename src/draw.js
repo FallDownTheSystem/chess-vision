@@ -165,7 +165,6 @@ export function drawTextBelow(id, uid, pos, text) {
 	let textElement = document.createElement('div');
 	textElement.id = uid;
 	textElement.style.position = 'absolute';
-	textElement.style.height = element.style.height;
 	textElement.style.top = `calc(${element.style.height} + 25px)`;
 	textElement.style.left = pos;
 	textElement.style.color = 'white';
@@ -235,7 +234,9 @@ export function drawArrow(overlay, move, turn, size, side) {
 	marker.appendChild(path);
 
 	overlay.appendChild(marker);
-
+	if (move.length > 4) {
+		move = move.slice(0, 4);
+	}
 	let from = move.slice(0, 2);
 	let to = move.slice(-2);
 
