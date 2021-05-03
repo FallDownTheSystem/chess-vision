@@ -36,7 +36,7 @@ const main = async () => {
 
 		shortcuts.add([
 			{
-				shortcut: 'C C C E E E',
+				shortcut: 'w w w d d d',
 				handler: () => {
 					gameState.drawCheat = !gameState.drawCheat;
 					gameState.triggerUpdate = true;
@@ -69,6 +69,9 @@ const main = async () => {
 				gameState.fen !== newFen ||
 				state.triggerUpdate
 			) {
+				if (gameState.mySide !== parsedSide) {
+					console.log('Switched sides to ' + parsedSide);
+				}
 				gameState.triggerUpdate = false;
 				gameState.numOfMoves = moves.length;
 				gameState.mySide = parsedSide;
@@ -118,8 +121,8 @@ const main = async () => {
 							gameState.boardWidth,
 							gameState.mySide
 						);
-						drawSlider('cv-overlay', 'cv-depth', gameState.depth, 1, 16, 'calc(30% - 60px)');
-						drawTextBelow('cv-overlay', 'cv-depth-text', 'calc(30% - 60px)', `Depth ${gameState.depth}`);
+						drawSlider('cv-overlay', 'cv-depth', gameState.depth, 1, 16, '0px');
+						drawTextBelow('cv-overlay', 'cv-depth-text', '0px', `Depth ${gameState.depth}`);
 
 						document.getElementById('cv-depth').addEventListener('change', e => {
 							gameState.depth = parseInt(e.target.value);
@@ -136,8 +139,8 @@ const main = async () => {
 							drawSquare(square.slice(0, 2), { border: `2px solid ${color}, 1)` });
 						}
 
-						drawSlider('cv-overlay', 'cv-depth', gameState.depth, 1, 16, 'calc(30% - 60px)');
-						drawTextBelow('cv-overlay', 'cv-depth-text', 'calc(30% - 60px)', `Depth ${gameState.depth}`);
+						drawSlider('cv-overlay', 'cv-depth', gameState.depth, 1, 16, '0px');
+						drawTextBelow('cv-overlay', 'cv-depth-text', '0px', `Depth ${gameState.depth}`);
 
 						document.getElementById('cv-depth').addEventListener('change', e => {
 							gameState.depth = parseInt(e.target.value);
@@ -146,8 +149,8 @@ const main = async () => {
 							gameState.triggerUpdate = true;
 						});
 
-						drawSlider('cv-overlay', 'cv-multi-pv', state.multiPV, 1, 6, 'calc(70% - 60px)');
-						drawTextBelow('cv-overlay', 'cv-multi-pv-text', 'calc(70% - 60px)', `Multi PV ${state.multiPV}`);
+						drawSlider('cv-overlay', 'cv-multi-pv', state.multiPV, 1, 6, 'calc(37% - 60px)');
+						drawTextBelow('cv-overlay', 'cv-multi-pv-text', 'calc(37% - 60px)', `Multi PV ${state.multiPV}`);
 
 						document.getElementById('cv-multi-pv').addEventListener('change', e => {
 							state.multiPV = parseInt(e.target.value);

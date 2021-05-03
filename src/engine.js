@@ -87,7 +87,6 @@ stockfish.onmessage = async function (event) {
 			let index = args.findIndex(x => x == 'mate');
 			let value = args[index + 1];
 			state.score = gameState.mySide == position.turn() ? 9999 : -9999;
-			console.log(position.turn());
 			state.mate = parseInt(args[args.findIndex(x => x == 'mate') + 1]);
 		}
 	}
