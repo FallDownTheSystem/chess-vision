@@ -5337,8 +5337,9 @@
 		overlaySelector: null,
 		fen: null,
 		drawDebug: false,
+		drawCheat: false,
 		triggerUpdate: true,
-		depth: 8,
+		depth: localStorage.getItem('cv-depth') || 8,
 		lastKnownPosition: '',
 	};
 
@@ -5500,7 +5501,7 @@
 	}
 
 	function drawEvalBar(id, score, side, turn) {
-		if (side !== turn) {
+		if (side !== turn && Math.abs(score != 9999)) {
 			score *= -1;
 		}
 		let height = (2 / (1 + Math.exp(-0.004 * score)) - 1 + 1) * 50;
@@ -5561,7 +5562,7 @@
 		element.appendChild(textElement);
 	}
 
-	function drawDepthSlider(id, uid, depth) {
+	function drawSlider(id, uid, value, min, max, pos) {
 		let element = document.getElementById(id);
 		let existing = document.getElementById(uid);
 		if (existing) {
@@ -5570,15 +5571,15 @@
 		let inputElement = document.createElement('input');
 		inputElement.id = uid;
 		inputElement.style.position = 'absolute';
-		inputElement.style.top = `calc(${element.style.height} + 65px)`;
-		inputElement.style.left = 'calc(50% - 100px)';
-		inputElement.style.width = '200px';
+		inputElement.style.top = `calc(${element.style.height} + 45px)`;
+		inputElement.style.left = pos;
+		inputElement.style.width = '120px';
 		inputElement.style.pointerEvents = 'all';
 		inputElement.style.padding = '0px';
 		inputElement.type = 'range';
-		inputElement.min = '1';
-		inputElement.max = '16';
-		inputElement.value = depth.toString();
+		inputElement.min = min.toString();
+		inputElement.max = max.toString();
+		inputElement.value = value.toString();
 		element.appendChild(inputElement);
 	}
 
@@ -7668,7 +7669,7 @@
 	}
 
 	// eslint-disable-next-line no-undef
-	var stockfish = STOCKFISH();
+	const stockfish = STOCKFISH();
 
 	let state = {
 		score: 0,
@@ -7678,13 +7679,21 @@
 		evalPercent: 50.0,
 		mate: null,
 		triggerUpdate: false,
+		multiPVSquares: {},
+		multiPV: localStorage.getItem('cv-multi-pv') || 1,
 	};
 
 	stockfish.postMessage('uci');
+
+	stockfish.postMessage('setoption name MultiPV value ' + state.multiPV);
+	stockfish.postMessage('isready');
+
 	stockfish.postMessage('ucinewgame');
 
 	function playMove(fen, depth) {
 		if (fen) {
+			state.multiPVSquares = {};
+			state.score = null;
 			stockfish.postMessage(`position fen ${fen}`);
 			stockfish.postMessage(`go depth ${depth}`);
 		}
@@ -7723,12 +7732,29 @@
 			state.triggerUpdate = true;
 		}
 
+		if (event.includes('multipv')) {
+			let index = args.findIndex(x => x == 'multipv');
+			let value = args[index + 1];
+
+			let moveIndex = args.findIndex(x => x == 'pv');
+			let move = args[moveIndex + 1];
+
+			state.multiPVSquares[value] = move;
+			state.ponder = value;
+		}
+
 		if (event.includes('score')) {
 			if (event.includes('cp')) {
-				state.score = parseInt(args[args.findIndex(x => x == 'cp') + 1]);
+				let score = parseInt(args[args.findIndex(x => x == 'cp') + 1]);
+				if (state.score === null || score > state.score) {
+					state.score = score;
+				}
 				state.mate = null;
 			} else if (event.includes('mate')) {
-				state.score = position.turn() == gameState.mySide ? 9999 : -9999;
+				let index = args.findIndex(x => x == 'mate');
+				args[index + 1];
+				state.score = gameState.mySide == position.turn() ? 9999 : -9999;
+				console.log(position.turn());
 				state.mate = parseInt(args[args.findIndex(x => x == 'mate') + 1]);
 			}
 		}
@@ -26094,6 +26120,16 @@
 				},
 			]);
 
+			shortcuts.add([
+				{
+					shortcut: 'C C C E E E',
+					handler: () => {
+						gameState.drawCheat = !gameState.drawCheat;
+						gameState.triggerUpdate = true;
+					},
+				},
+			]);
+
 			console.log('Starting main loop');
 
 			while (true) {
@@ -26142,6 +26178,14 @@
 						gameState.lastKnownPosition = eco[positionFen].name;
 					}
 					drawECO(textOverlay, 'cv-eco', gameState.lastKnownPosition);
+
+					if (gameState.numOfMoves || gameState.fen) {
+						const squares = controlledSquares(position);
+						drawControlledSquares(squares, gameState.mySide, gameState.drawDebug);
+					} else {
+						document.querySelector('#cv-overlay').style.border = '1px dashed hsl(140, 100%, 50%)';
+					}
+
 					if (state.triggerUpdate) {
 						// Eval bar should only be rendered if the engine updated its state
 						drawEvalBar('cv-overlay', state.score, gameState.mySide, position.turn());
@@ -26160,22 +26204,49 @@
 								gameState.boardWidth,
 								gameState.mySide
 							);
-							drawDepthSlider('cv-overlay', 'cv-depth', gameState.depth);
+							drawSlider('cv-overlay', 'cv-depth', gameState.depth, 1, 16, 'calc(30% - 60px)');
+							drawTextBelow('cv-overlay', 'cv-depth-text', 'calc(30% - 60px)', `Depth ${gameState.depth}`);
 
 							document.getElementById('cv-depth').addEventListener('change', e => {
 								gameState.depth = parseInt(e.target.value);
+								console.log('Depth: ' + gameState.depth);
+								localStorage.setItem('cv-depth', gameState.depth.toString());
+								gameState.triggerUpdate = true;
+							});
+						}
+
+						if (gameState.drawCheat) {
+							for (var square of Object.values(state.multiPVSquares)) {
+								//hsl(280, 100%, 50%)
+								let color = 'hsl(280, 100%, 50%';
+								drawSquare(square.slice(0, 2), { border: `2px solid ${color}, 1)` });
+							}
+
+							drawSlider('cv-overlay', 'cv-depth', gameState.depth, 1, 16, 'calc(30% - 60px)');
+							drawTextBelow('cv-overlay', 'cv-depth-text', 'calc(30% - 60px)', `Depth ${gameState.depth}`);
+
+							document.getElementById('cv-depth').addEventListener('change', e => {
+								gameState.depth = parseInt(e.target.value);
+								console.log('Depth: ' + gameState.depth);
+								localStorage.setItem('cv-depth', gameState.depth.toString());
+								gameState.triggerUpdate = true;
+							});
+
+							drawSlider('cv-overlay', 'cv-multi-pv', state.multiPV, 1, 6, 'calc(70% - 60px)');
+							drawTextBelow('cv-overlay', 'cv-multi-pv-text', 'calc(70% - 60px)', `Multi PV ${state.multiPV}`);
+
+							document.getElementById('cv-multi-pv').addEventListener('change', e => {
+								state.multiPV = parseInt(e.target.value);
+								stockfish.postMessage('setoption name MultiPV value ' + state.multiPV);
+								stockfish.postMessage('isready');
+								console.log('MultiPV: ' + state.multiPV);
+								localStorage.setItem('cv-multi-pv', state.multiPV.toString());
+								gameState.triggerUpdate = true;
 							});
 						}
 					}
 
 					state.triggerUpdate = false;
-
-					if (gameState.numOfMoves || gameState.fen) {
-						const squares = controlledSquares(position);
-						drawControlledSquares(squares, gameState.mySide, gameState.drawDebug);
-					} else {
-						document.querySelector('#cv-overlay').style.border = '1px dashed hsl(140, 100%, 50%)';
-					}
 				}
 			}
 		} catch (e) {

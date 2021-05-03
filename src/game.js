@@ -18,8 +18,9 @@ export let gameState = {
 	overlaySelector: null,
 	fen: null,
 	drawDebug: false,
+	drawCheat: false,
 	triggerUpdate: true,
-	depth: 8,
+	depth: localStorage.getItem('cv-depth') || 8,
 	lastKnownPosition: '',
 };
 

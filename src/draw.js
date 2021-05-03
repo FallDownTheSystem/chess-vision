@@ -128,7 +128,7 @@ function generateText(squareElement, position) {
 }
 
 export function drawEvalBar(id, score, side, turn) {
-	if (side !== turn) {
+	if (side !== turn && Math.abs(score != 9999)) {
 		score *= -1;
 	}
 	let height = (2 / (1 + Math.exp(-0.004 * score)) - 1 + 1) * 50;
@@ -189,7 +189,7 @@ export function drawECO(element, id, text) {
 	element.appendChild(textElement);
 }
 
-export function drawDepthSlider(id, uid, depth) {
+export function drawSlider(id, uid, value, min, max, pos) {
 	let element = document.getElementById(id);
 	let existing = document.getElementById(uid);
 	if (existing) {
@@ -198,15 +198,15 @@ export function drawDepthSlider(id, uid, depth) {
 	let inputElement = document.createElement('input');
 	inputElement.id = uid;
 	inputElement.style.position = 'absolute';
-	inputElement.style.top = `calc(${element.style.height} + 65px)`;
-	inputElement.style.left = 'calc(50% - 100px)';
-	inputElement.style.width = '200px';
+	inputElement.style.top = `calc(${element.style.height} + 45px)`;
+	inputElement.style.left = pos;
+	inputElement.style.width = '120px';
 	inputElement.style.pointerEvents = 'all';
 	inputElement.style.padding = '0px';
 	inputElement.type = 'range';
-	inputElement.min = '1';
-	inputElement.max = '16';
-	inputElement.value = depth.toString();
+	inputElement.min = min.toString();
+	inputElement.max = max.toString();
+	inputElement.value = value.toString();
 	element.appendChild(inputElement);
 }
 

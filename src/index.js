@@ -2,8 +2,8 @@ import { sleep, oppositeColor, opponentColor } from './helpers';
 import { siteParser } from './parser';
 import { position, replay, replayFen, gameState } from './game';
 import { controlledSquares, drawControlledSquares } from './vision';
-import { createOverlay, drawEvalBar, drawArrow, drawDepthSlider, drawECO } from './draw';
-import { playMove, state } from './engine';
+import { createOverlay, drawEvalBar, drawArrow, drawSlider, drawECO, drawSquare, drawTextBelow } from './draw';
+import { playMove, state, stockfish } from './engine';
 import { Shortcuts } from 'shortcuts';
 import { eco } from './eco';
 
@@ -29,6 +29,16 @@ const main = async () => {
 				shortcut: 'D E B U G',
 				handler: () => {
 					gameState.drawDebug = !gameState.drawDebug;
+					gameState.triggerUpdate = true;
+				},
+			},
+		]);
+
+		shortcuts.add([
+			{
+				shortcut: 'C C C E E E',
+				handler: () => {
+					gameState.drawCheat = !gameState.drawCheat;
 					gameState.triggerUpdate = true;
 				},
 			},
@@ -82,6 +92,14 @@ const main = async () => {
 					gameState.lastKnownPosition = eco[positionFen].name;
 				}
 				drawECO(textOverlay, 'cv-eco', gameState.lastKnownPosition);
+
+				if (gameState.numOfMoves || gameState.fen) {
+					const squares = controlledSquares(position);
+					drawControlledSquares(squares, gameState.mySide, gameState.drawDebug);
+				} else {
+					document.querySelector('#cv-overlay').style.border = '1px dashed hsl(140, 100%, 50%)';
+				}
+
 				if (state.triggerUpdate) {
 					// Eval bar should only be rendered if the engine updated its state
 					drawEvalBar('cv-overlay', state.score, gameState.mySide, position.turn());
@@ -100,22 +118,49 @@ const main = async () => {
 							gameState.boardWidth,
 							gameState.mySide
 						);
-						drawDepthSlider('cv-overlay', 'cv-depth', gameState.depth);
+						drawSlider('cv-overlay', 'cv-depth', gameState.depth, 1, 16, 'calc(30% - 60px)');
+						drawTextBelow('cv-overlay', 'cv-depth-text', 'calc(30% - 60px)', `Depth ${gameState.depth}`);
 
 						document.getElementById('cv-depth').addEventListener('change', e => {
 							gameState.depth = parseInt(e.target.value);
+							console.log('Depth: ' + gameState.depth);
+							localStorage.setItem('cv-depth', gameState.depth.toString());
+							gameState.triggerUpdate = true;
+						});
+					}
+
+					if (gameState.drawCheat) {
+						for (var square of Object.values(state.multiPVSquares)) {
+							//hsl(280, 100%, 50%)
+							let color = 'hsl(280, 100%, 50%';
+							drawSquare(square.slice(0, 2), { border: `2px solid ${color}, 1)` });
+						}
+
+						drawSlider('cv-overlay', 'cv-depth', gameState.depth, 1, 16, 'calc(30% - 60px)');
+						drawTextBelow('cv-overlay', 'cv-depth-text', 'calc(30% - 60px)', `Depth ${gameState.depth}`);
+
+						document.getElementById('cv-depth').addEventListener('change', e => {
+							gameState.depth = parseInt(e.target.value);
+							console.log('Depth: ' + gameState.depth);
+							localStorage.setItem('cv-depth', gameState.depth.toString());
+							gameState.triggerUpdate = true;
+						});
+
+						drawSlider('cv-overlay', 'cv-multi-pv', state.multiPV, 1, 6, 'calc(70% - 60px)');
+						drawTextBelow('cv-overlay', 'cv-multi-pv-text', 'calc(70% - 60px)', `Multi PV ${state.multiPV}`);
+
+						document.getElementById('cv-multi-pv').addEventListener('change', e => {
+							state.multiPV = parseInt(e.target.value);
+							stockfish.postMessage('setoption name MultiPV value ' + state.multiPV);
+							stockfish.postMessage('isready');
+							console.log('MultiPV: ' + state.multiPV);
+							localStorage.setItem('cv-multi-pv', state.multiPV.toString());
+							gameState.triggerUpdate = true;
 						});
 					}
 				}
 
 				state.triggerUpdate = false;
-
-				if (gameState.numOfMoves || gameState.fen) {
-					const squares = controlledSquares(position);
-					drawControlledSquares(squares, gameState.mySide, gameState.drawDebug);
-				} else {
-					document.querySelector('#cv-overlay').style.border = '1px dashed hsl(140, 100%, 50%)';
-				}
 			}
 		}
 	} catch (e) {
