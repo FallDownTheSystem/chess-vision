@@ -17,6 +17,7 @@ export let gameState = {
 	boardWidth: 0,
 	overlaySelector: null,
 	fen: null,
+	parsedFen: null,
 	drawDebug: false,
 	drawCheat: false,
 	triggerUpdate: true,

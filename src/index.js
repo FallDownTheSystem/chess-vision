@@ -50,9 +50,11 @@ const main = async () => {
 			await sleep(16.667);
 			const parsedSide = parser.getSide();
 			const moves = parser.parseMoves();
-			let newFen = null;
 			if (typeof parser.getFen !== 'undefined') {
-				newFen = parser.getFen(parsedSide);
+				var parsedFen = parser.getFen(parsedSide);
+				if (parsedFen != null) {
+					gameState.parsedFen = parsedFen;
+				}
 			}
 			const width = gameState.overlaySelector.clientWidth;
 
@@ -66,7 +68,7 @@ const main = async () => {
 				moves.length !== gameState.numOfMoves ||
 				gameState.mySide !== parsedSide ||
 				gameState.boardWidth !== width ||
-				gameState.fen !== newFen ||
+				gameState.fen !== gameState.parsedFen ||
 				state.triggerUpdate
 			) {
 				if (gameState.mySide !== parsedSide) {
@@ -76,7 +78,8 @@ const main = async () => {
 				gameState.numOfMoves = moves.length;
 				gameState.mySide = parsedSide;
 				gameState.boardWidth = width;
-				gameState.fen = newFen;
+				gameState.fen = gameState.parsedFen;
+				console.log(gameState.mySide, position.turn());
 				if (gameState.numOfMoves) {
 					replay(moves);
 				} else if (gameState.fen) {
@@ -102,7 +105,6 @@ const main = async () => {
 				} else {
 					document.querySelector('#cv-overlay').style.border = '1px dashed hsl(140, 100%, 50%)';
 				}
-
 				if (state.triggerUpdate) {
 					// Eval bar should only be rendered if the engine updated its state
 					drawEvalBar('cv-overlay', state.score, gameState.mySide, position.turn());
