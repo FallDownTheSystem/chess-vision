@@ -5606,7 +5606,7 @@
 	}
 
 	function drawEvalBar(id, score, side, turn) {
-		if (side !== turn && Math.abs(score != 9999)) {
+		if (side != turn) {
 			score *= -1;
 		}
 		let height = (2 / (1 + Math.exp(-0.004 * score)) - 1 + 1) * 50;
@@ -5618,7 +5618,7 @@
 		evalBarElement.style.height = element.style.height;
 		evalBarElement.style.width = '12px';
 		evalBarElement.style.left = '-14px';
-		evalBarElement.style.backgroundColor = side === WHITE$1 ? 'hsla(0, 0%, 0%, 0.5)' : 'hsla(0, 0%, 100%, 1.0)';
+		evalBarElement.style.backgroundColor = side === WHITE$1 ? 'black' : 'white';
 
 		let evalBarLevel = document.createElement('div');
 		evalBarLevel.id = `cv-evalbar-level`;
@@ -7782,7 +7782,6 @@
 		bestMoveSAN: null,
 		ponder: null,
 		evalPercent: 50.0,
-		mate: null,
 		triggerUpdate: false,
 		multiPVSquares: {},
 		multiPV: localStorage.getItem('cv-multi-pv') || 1,
@@ -7798,7 +7797,6 @@
 	function playMove(fen, depth) {
 		if (fen) {
 			state.multiPVSquares = {};
-			state.score = null;
 			stockfish.postMessage(`position fen ${fen}`);
 			stockfish.postMessage(`go depth ${depth}`);
 		}
@@ -7806,6 +7804,8 @@
 
 	stockfish.onmessage = async function (event) {
 		// console.log(event);
+		// console.log('Turn: ' + position.turn());
+		// console.log('Side: ' + gameState.mySide);
 		if (!event) {
 			return;
 		}
@@ -7823,7 +7823,6 @@
 			} catch {
 				// Fuck it
 			}
-			// console.log(state.bestMove, state.bestMoveSAN, state.score, state.mate);
 			state.triggerUpdate = true;
 		}
 
@@ -7849,17 +7848,13 @@
 		}
 
 		if (event.includes('score')) {
-			if (event.includes('cp')) {
+			if (event.includes('cp') && event.includes('multipv 1')) {
 				let score = parseInt(args[args.findIndex(x => x == 'cp') + 1]);
-				if (state.score === null || score > state.score) {
-					state.score = score;
-				}
-				state.mate = null;
+				state.score = score;
 			} else if (event.includes('mate')) {
 				let index = args.findIndex(x => x == 'mate');
-				args[index + 1];
-				state.score = gameState.mySide == position.turn() ? 9999 : -9999;
-				state.mate = parseInt(args[args.findIndex(x => x == 'mate') + 1]);
+				let value = args[index + 1];
+				state.score = value * 9999;
 			}
 		}
 	};
@@ -26269,7 +26264,6 @@
 					gameState.mySide = parsedSide;
 					gameState.boardWidth = width;
 					gameState.fen = gameState.parsedFen;
-					console.log(gameState.mySide, position.turn());
 					if (gameState.numOfMoves) {
 						replay(moves);
 					} else if (gameState.fen) {

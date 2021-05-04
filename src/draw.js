@@ -128,7 +128,7 @@ function generateText(squareElement, position) {
 }
 
 export function drawEvalBar(id, score, side, turn) {
-	if (side !== turn && Math.abs(score != 9999)) {
+	if (side != turn) {
 		score *= -1;
 	}
 	let height = (2 / (1 + Math.exp(-0.004 * score)) - 1 + 1) * 50;
@@ -140,7 +140,7 @@ export function drawEvalBar(id, score, side, turn) {
 	evalBarElement.style.height = element.style.height;
 	evalBarElement.style.width = '12px';
 	evalBarElement.style.left = '-14px';
-	evalBarElement.style.backgroundColor = side === WHITE ? 'hsla(0, 0%, 0%, 0.5)' : 'hsla(0, 0%, 100%, 1.0)';
+	evalBarElement.style.backgroundColor = side === WHITE ? 'black' : 'white';
 
 	let evalBarLevel = document.createElement('div');
 	evalBarLevel.id = `cv-evalbar-level`;

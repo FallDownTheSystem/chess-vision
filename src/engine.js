@@ -10,7 +10,6 @@ export let state = {
 	bestMoveSAN: null,
 	ponder: null,
 	evalPercent: 50.0,
-	mate: null,
 	triggerUpdate: false,
 	multiPVSquares: {},
 	multiPV: localStorage.getItem('cv-multi-pv') || 1,
@@ -26,7 +25,6 @@ stockfish.postMessage('ucinewgame');
 export function playMove(fen, depth) {
 	if (fen) {
 		state.multiPVSquares = {};
-		state.score = null;
 		stockfish.postMessage(`position fen ${fen}`);
 		stockfish.postMessage(`go depth ${depth}`);
 	}
@@ -34,6 +32,8 @@ export function playMove(fen, depth) {
 
 stockfish.onmessage = async function (event) {
 	// console.log(event);
+	// console.log('Turn: ' + position.turn());
+	// console.log('Side: ' + gameState.mySide);
 	if (!event) {
 		return;
 	}
@@ -51,7 +51,6 @@ stockfish.onmessage = async function (event) {
 		} catch {
 			// Fuck it
 		}
-		// console.log(state.bestMove, state.bestMoveSAN, state.score, state.mate);
 		state.triggerUpdate = true;
 	}
 
@@ -77,17 +76,13 @@ stockfish.onmessage = async function (event) {
 	}
 
 	if (event.includes('score')) {
-		if (event.includes('cp')) {
+		if (event.includes('cp') && event.includes('multipv 1')) {
 			let score = parseInt(args[args.findIndex(x => x == 'cp') + 1]);
-			if (state.score === null || score > state.score) {
-				state.score = score;
-			}
-			state.mate = null;
+			state.score = score;
 		} else if (event.includes('mate')) {
 			let index = args.findIndex(x => x == 'mate');
 			let value = args[index + 1];
-			state.score = gameState.mySide == position.turn() ? 9999 : -9999;
-			state.mate = parseInt(args[args.findIndex(x => x == 'mate') + 1]);
+			state.score = value * 9999;
 		}
 	}
 };

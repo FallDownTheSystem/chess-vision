@@ -79,7 +79,6 @@ const main = async () => {
 				gameState.mySide = parsedSide;
 				gameState.boardWidth = width;
 				gameState.fen = gameState.parsedFen;
-				console.log(gameState.mySide, position.turn());
 				if (gameState.numOfMoves) {
 					replay(moves);
 				} else if (gameState.fen) {
