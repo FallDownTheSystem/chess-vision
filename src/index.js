@@ -105,20 +105,21 @@ const main = async () => {
 					document.querySelector('#cv-overlay').style.border = '1px dashed hsl(140, 100%, 50%)';
 				}
 				if (state.triggerUpdate) {
+					// console.log('Engine update');
 					// Eval bar should only be rendered if the engine updated its state
-					drawEvalBar('cv-overlay', state.score, gameState.mySide, position.turn());
+					drawEvalBar('cv-overlay', state.score, gameState.mySide, state.turn);
 					if (gameState.drawDebug) {
 						drawArrow(
 							overlayElement,
 							state.bestMove,
-							opponentColor(position.turn(), gameState.mySide),
+							opponentColor(state.turn, gameState.mySide),
 							gameState.boardWidth,
 							gameState.mySide
 						);
 						drawArrow(
 							overlayElement,
 							state.ponder,
-							opponentColor(oppositeColor(position.turn()), gameState.mySide),
+							opponentColor(oppositeColor(state.turn), gameState.mySide),
 							gameState.boardWidth,
 							gameState.mySide
 						);
@@ -139,6 +140,7 @@ const main = async () => {
 							let color = 'hsl(280, 100%, 50%';
 							drawSquare(square.slice(0, 2), { border: `2px solid ${color}, 1)` });
 						}
+						state.multiPVSquares = {};
 
 						drawSlider('cv-overlay', 'cv-depth', gameState.depth, 1, 16, '0px');
 						drawTextBelow('cv-overlay', 'cv-depth-text', '0px', `Depth ${gameState.depth}`);

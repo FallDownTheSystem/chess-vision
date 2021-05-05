@@ -9,8 +9,10 @@ export let state = {
 	bestMove: null,
 	bestMoveSAN: null,
 	ponder: null,
+	lastEvent: '',
 	evalPercent: 50.0,
 	triggerUpdate: false,
+	turn: WHITE,
 	multiPVSquares: {},
 	multiPV: localStorage.getItem('cv-multi-pv') || 1,
 };
@@ -24,13 +26,18 @@ stockfish.postMessage('ucinewgame');
 
 export function playMove(fen, depth) {
 	if (fen) {
-		state.multiPVSquares = {};
 		stockfish.postMessage(`position fen ${fen}`);
 		stockfish.postMessage(`go depth ${depth}`);
 	}
 }
 
 stockfish.onmessage = async function (event) {
+	if (event.includes('bestmove') && state.lastEvent.includes('bestmove')) {
+		return;
+	}
+
+	state.lastEvent = event;
+
 	// console.log(event);
 	// console.log('Turn: ' + position.turn());
 	// console.log('Side: ' + gameState.mySide);
@@ -48,9 +55,11 @@ stockfish.onmessage = async function (event) {
 		state.bestMove = value;
 		try {
 			state.bestMoveSAN = position.notation(position.uci(state.bestMove));
-		} catch {
+		} catch (err) {
+			console.log(err);
 			// Fuck it
 		}
+		state.turn = position.turn();
 		state.triggerUpdate = true;
 	}
 
