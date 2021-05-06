@@ -26,20 +26,24 @@ const main = async () => {
 
 		shortcuts.add([
 			{
-				shortcut: 'D E B U G',
+				shortcut: 'q q e e',
 				handler: () => {
-					gameState.drawDebug = !gameState.drawDebug;
+					gameState.enableArrow = !gameState.enableArrow;
 					gameState.triggerUpdate = true;
+					gameState.depth = 4;
+					state.multiPV = 1;
 				},
 			},
 		]);
 
 		shortcuts.add([
 			{
-				shortcut: 'w w w d d d',
+				shortcut: 'w w d d',
 				handler: () => {
-					gameState.drawCheat = !gameState.drawCheat;
+					gameState.enableMultiPV = !gameState.enableMultiPV;
 					gameState.triggerUpdate = true;
+					gameState.depth = 9;
+					state.multiPV = 3;
 				},
 			},
 		]);
@@ -100,7 +104,7 @@ const main = async () => {
 
 				if (gameState.numOfMoves || gameState.fen) {
 					const squares = controlledSquares(position);
-					drawControlledSquares(squares, gameState.mySide, gameState.drawDebug);
+					drawControlledSquares(squares, gameState.mySide, gameState.enableArrow);
 				} else {
 					document.querySelector('#cv-overlay').style.border = '1px dashed hsl(140, 100%, 50%)';
 				}
@@ -108,7 +112,30 @@ const main = async () => {
 					// console.log('Engine update');
 					// Eval bar should only be rendered if the engine updated its state
 					drawEvalBar('cv-overlay', state.score, gameState.mySide, state.turn);
-					if (gameState.drawDebug) {
+
+					if (gameState.enableArrow || gameState.enableMultiPV) {
+						drawSlider('cv-overlay', 'cv-depth', gameState.depth, 1, 16, '0px');
+						drawTextBelow('cv-overlay', 'cv-depth-text', '0px', `Depth ${gameState.depth}`);
+						document.getElementById('cv-depth').addEventListener('change', e => {
+							gameState.depth = parseInt(e.target.value);
+							console.log('Depth: ' + gameState.depth);
+							localStorage.setItem('cv-depth', gameState.depth.toString());
+							gameState.triggerUpdate = true;
+						});
+
+						drawSlider('cv-overlay', 'cv-multi-pv', state.multiPV, 1, 6, 'calc(37% - 60px)');
+						drawTextBelow('cv-overlay', 'cv-multi-pv-text', 'calc(37% - 60px)', `Multi PV ${state.multiPV}`);
+						document.getElementById('cv-multi-pv').addEventListener('change', e => {
+							state.multiPV = parseInt(e.target.value);
+							stockfish.postMessage('setoption name MultiPV value ' + state.multiPV);
+							stockfish.postMessage('isready');
+							console.log('MultiPV: ' + state.multiPV);
+							localStorage.setItem('cv-multi-pv', state.multiPV.toString());
+							gameState.triggerUpdate = true;
+						});
+					}
+
+					if (gameState.enableArrow) {
 						drawArrow(
 							overlayElement,
 							state.bestMove,
@@ -123,49 +150,15 @@ const main = async () => {
 							gameState.boardWidth,
 							gameState.mySide
 						);
-						drawSlider('cv-overlay', 'cv-depth', gameState.depth, 1, 16, '0px');
-						drawTextBelow('cv-overlay', 'cv-depth-text', '0px', `Depth ${gameState.depth}`);
-
-						document.getElementById('cv-depth').addEventListener('change', e => {
-							gameState.depth = parseInt(e.target.value);
-							console.log('Depth: ' + gameState.depth);
-							localStorage.setItem('cv-depth', gameState.depth.toString());
-							gameState.triggerUpdate = true;
-						});
 					}
 
-					if (gameState.drawCheat) {
+					if (gameState.enableMultiPV) {
 						for (var square of Object.values(state.multiPVSquares)) {
-							//hsl(280, 100%, 50%)
-							let color = 'hsl(280, 100%, 50%';
-							drawSquare(square.slice(0, 2), { border: `2px solid ${color}, 1)` });
+							drawSquare(square.slice(0, 2), { border: `2px solid hsl(280, 100%, 50%)` });
 						}
 						state.multiPVSquares = {};
-
-						drawSlider('cv-overlay', 'cv-depth', gameState.depth, 1, 16, '0px');
-						drawTextBelow('cv-overlay', 'cv-depth-text', '0px', `Depth ${gameState.depth}`);
-
-						document.getElementById('cv-depth').addEventListener('change', e => {
-							gameState.depth = parseInt(e.target.value);
-							console.log('Depth: ' + gameState.depth);
-							localStorage.setItem('cv-depth', gameState.depth.toString());
-							gameState.triggerUpdate = true;
-						});
-
-						drawSlider('cv-overlay', 'cv-multi-pv', state.multiPV, 1, 6, 'calc(37% - 60px)');
-						drawTextBelow('cv-overlay', 'cv-multi-pv-text', 'calc(37% - 60px)', `Multi PV ${state.multiPV}`);
-
-						document.getElementById('cv-multi-pv').addEventListener('change', e => {
-							state.multiPV = parseInt(e.target.value);
-							stockfish.postMessage('setoption name MultiPV value ' + state.multiPV);
-							stockfish.postMessage('isready');
-							console.log('MultiPV: ' + state.multiPV);
-							localStorage.setItem('cv-multi-pv', state.multiPV.toString());
-							gameState.triggerUpdate = true;
-						});
 					}
 				}
-
 				state.triggerUpdate = false;
 			}
 		}

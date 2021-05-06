@@ -69,15 +69,7 @@ export function drawControlledSquares(squares, mySide, debug) {
 
 			drawSquare(square, { background: `${color}, 0.25)`, border: `1px solid ${color}, 1)` });
 		}
-
-		if (debug) {
-			drawText(square, 'tl', myAttackers.length);
-			drawText(square, 'bl', myTotalValue);
-			drawText(square, 'tr', opAttackers.length);
-			drawText(square, 'br', opponentTotalValue);
-			drawTextBelow('cv-overlay', 'best-move', '50%', state.bestMoveSAN);
-			drawTextBelow('cv-overlay', 'score', '-30px', state.score);
-		}
+		drawTextBelow('cv-overlay', 'score', '-35px', state.score);
 	}
 }
 
