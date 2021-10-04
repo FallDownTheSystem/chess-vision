@@ -1,21 +1,21 @@
 // ==UserScript==
 // @name        Chess vision
 // @namespace   FallDownTheSystem
-// @version     0.4.1
+// @version     0.6.0
 // @author      FallDownTheSystem
 // @match       *://lichess.org/*
 // @match       *://www.chess.com/*
 // @match       *://chess24.com/*
 // @match       *://arena.myfide.net/*
 // @inject-into content
-// @require     https://raw.githubusercontent.com/nmrugg/stockfish.js/master/src/stockfish.asm.js
+// @require     https://raw.githubusercontent.com/nmrugg/stockfish.js/Stockfish11/src/stockfish.asm.js
 // @grant       none
 // ==/UserScript==
 (function () {
 	'use strict';
 
-	const BLACK$1 = 'b';
-	const WHITE$1 = 'w';
+	const BLACK = 'b';
+	const WHITE = 'w';
 
 	function range(start, end) {
 		return Array(end - start + 1)
@@ -45,14 +45,14 @@
 	};
 
 	function oppositeColor(turn) {
-		return turn == WHITE$1 ? BLACK$1 : WHITE$1;
+		return turn == WHITE ? BLACK : WHITE;
 	}
 
 	function opponentColor(turn, side) {
-		if (side == WHITE$1) {
-			return turn == WHITE$1 ? WHITE$1 : BLACK$1;
+		if (side == WHITE) {
+			return turn == WHITE ? WHITE : BLACK;
 		}
-		return turn == WHITE$1 ? BLACK$1 : WHITE$1;
+		return turn == WHITE ? BLACK : WHITE;
 	}
 
 	// analysisSelector: '.analyse__tools',
@@ -73,7 +73,7 @@
 		}
 
 		getSide() {
-			return document.querySelector(this.sideSelector) !== null ? WHITE$1 : BLACK$1;
+			return document.querySelector(this.sideSelector) !== null ? WHITE : BLACK;
 		}
 
 		getOverlay() {
@@ -88,7 +88,7 @@
 			let files = getFiles();
 			let ranks = getRanks();
 
-			if (side === WHITE$1) {
+			if (side === WHITE) {
 				ranks.reverse();
 			} else {
 				files.reverse();
@@ -117,10 +117,10 @@
 					return null;
 				}
 
-				let color = classes.includes('black') ? BLACK$1 : WHITE$1;
+				let color = classes.includes('black') ? BLACK : WHITE;
 				let piece = classes.filter(x => x != 'white' && x != 'black')[0];
 				piece = pieceMap[piece];
-				if (color === WHITE$1) {
+				if (color === WHITE) {
 					piece = piece.toUpperCase();
 				}
 
@@ -206,8 +206,8 @@
 
 		getSide() {
 			return document.querySelector('.clock-black .main-clock-bottom, .layout-bottom-player .move-time-dark, .board.flipped') !== null
-				? BLACK$1
-				: WHITE$1;
+				? BLACK
+				: WHITE;
 		}
 
 		getOverlay() {
@@ -316,7 +316,7 @@
 		}
 
 		getSide() {
-			return document.querySelector(this.sideSelector) !== null ? BLACK$1 : WHITE$1;
+			return document.querySelector(this.sideSelector) !== null ? BLACK : WHITE;
 		}
 
 		getOverlay() {
@@ -362,7 +362,7 @@
 		}
 
 		getSide() {
-			return document.querySelector(this.sideSelector) !== null ? WHITE$1 : BLACK$1;
+			return document.querySelector(this.sideSelector) !== null ? WHITE : BLACK;
 		}
 
 		getOverlay() {
@@ -416,6 +416,8 @@
 	// 	return { from: from.slice(-2), to: to.slice(0, 2) };
 	// }
 
+	var i18n$6 = {};
+
 	/******************************************************************************
 	 *                                                                            *
 	 *    This file is part of Kokopu, a JavaScript chess library.                *
@@ -445,123 +447,65 @@
 
 
 
-	// Ordinal integers (from 1 to 8).
-	var ORDINALS = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'];
-
 	// FEN parsing error messages
-	var WRONG_NUMBER_OF_FEN_FIELDS                = 'A FEN string must contain exactly 6 space-separated fields.';
-	var WRONG_NUMBER_OF_SUBFIELDS_IN_BOARD_FIELD  = 'The 1st field of a FEN string must contain exactly 8 `/`-separated subfields.';
-	var UNEXPECTED_CHARACTER_IN_BOARD_FIELD       = 'Unexpected character in the 1st field of the FEN string: `%1$s`.';
-	var UNEXPECTED_END_OF_SUBFIELD_IN_BOARD_FIELD = 'The %1$s subfield of the FEN string 1st field is unexpectedly short.';
-	var INVALID_TURN_FIELD                        = 'The 2nd field of a FEN string must be either `w` or `b`.';
-	var INVALID_CASTLING_FIELD                    = 'The 3rd field of a FEN string must be either `-` or a list of characters among `K`, `Q`, `k` and `q` (in this order).';
-	var INVALID_EN_PASSANT_FIELD                  = 'The 4th field of a FEN string must be either `-` or a square from the 3rd or 6th rank where en-passant is allowed.';
-	var WRONG_RANK_IN_EN_PASSANT_FIELD            = 'The rank number indicated in the FEN string 4th field is inconsistent with respect to the 2nd field.';
-	var INVALID_MOVE_COUNTING_FIELD               = 'The %1$s field of a FEN string must be a number.';
-	var INVALID_VARIANT_PREFIX                    = 'Invalid variant prefix: `%1$s`.';
+	i18n$6.WRONG_NUMBER_OF_FEN_FIELDS                = 'A FEN string must contain exactly 6 space-separated fields.';
+	i18n$6.WRONG_NUMBER_OF_SUBFIELDS_IN_BOARD_FIELD  = 'The 1st field of a FEN string must contain exactly 8 `/`-separated subfields.';
+	i18n$6.UNEXPECTED_CHARACTER_IN_BOARD_FIELD       = 'Unexpected character in the 1st field of the FEN string: `{0}`.';
+	i18n$6.UNEXPECTED_END_OF_SUBFIELD_IN_BOARD_FIELD = 'Subfield {0} of the FEN string 1st field is unexpectedly short.';
+	i18n$6.INVALID_TURN_FIELD                        = 'The 2nd field of a FEN string must be either `w` or `b`.';
+	i18n$6.INVALID_CASTLING_FIELD                    = 'The 3rd field of a FEN string must be either `-` or a list of characters among `K`, `Q`, `k` and `q` (in this order).';
+	i18n$6.INVALID_EN_PASSANT_FIELD                  = 'The 4th field of a FEN string must be either `-` or a square from the 3rd or 6th rank where en-passant is allowed.';
+	i18n$6.WRONG_RANK_IN_EN_PASSANT_FIELD            = 'The rank number indicated in the FEN string 4th field is inconsistent with respect to the 2nd field.';
+	i18n$6.INVALID_HALF_MOVE_COUNT_FIELD             = 'The 5th field of a FEN string must be a number, indicating the number of half-move since the last pawn move or capture.';
+	i18n$6.INVALID_MOVE_NUMBER_FIELD                 = 'The 6th field of a FEN string must be a number, indicating the move number of the game.';
+	i18n$6.INVALID_VARIANT_PREFIX                    = 'Invalid variant prefix: `{0}`.';
 
 	// Notation & UCI parsing error messages
-	var INVALID_UCI_NOTATION_SYNTAX         = 'The syntax of the UCI notation is invalid.';
-	var ILLEGAL_UCI_MOVE                    = 'The UCI move is not legal.';
-	var INVALID_MOVE_NOTATION_SYNTAX        = 'The syntax of the move notation is invalid.';
-	var ILLEGAL_POSITION                    = 'The position is not legal.';
-	var ILLEGAL_NO_KING_CASTLING            = 'Casting is not legal in the considered position as it has no king.';
-	var ILLEGAL_QUEEN_SIDE_CASTLING         = 'Queen-side castling is not legal in the considered position.';
-	var ILLEGAL_KING_SIDE_CASTLING          = 'King-side castling is not legal in the considered position.';
-	var NO_PIECE_CAN_MOVE_TO                = 'No %1$s can move to %2$s.';
-	var NO_PIECE_CAN_MOVE_TO_DISAMBIGUATION = 'No %1$s on the specified rank/file can move to %2$s.';
-	var REQUIRE_DISAMBIGUATION              = 'Cannot determine uniquely which %1$s is supposed to move to %2$s.';
-	var WRONG_DISAMBIGUATION_SYMBOL         = 'Wrong disambiguation symbol (expected: `%1$s`, observed: `%2$s`).';
-	var TRYING_TO_CAPTURE_YOUR_OWN_PIECES   = 'Capturing its own pieces is not legal.';
-	var INVALID_PIECE_SYMBOL                = 'Character `%1$s` is not a valid piece symbol.';
-	var INVALID_PIECE_SYMBOL_COLOR          = 'Invalid color for piece symbol `%1$s`.';
-	var INVALID_CAPTURING_PAWN_MOVE         = 'Invalid capturing pawn move.';
-	var INVALID_NON_CAPTURING_PAWN_MOVE     = 'Invalid non-capturing pawn move.';
-	var NOT_SAFE_FOR_WHITE_KING             = 'This move would put let the white king in check.';
-	var NOT_SAFE_FOR_BLACK_KING             = 'This move would put let the black king in check.';
-	var MISSING_PROMOTION                   = 'A promoted piece must be specified for this move.';
-	var MISSING_PROMOTION_SYMBOL            = 'Character `=` is required to specify a promoted piece.';
-	var INVALID_PROMOTED_PIECE              = '%1$s cannot be specified as a promoted piece.';
-	var ILLEGAL_PROMOTION                   = 'Specifying a promoted piece is illegal for this move.';
-	var ILLEGAL_NULL_MOVE                   = 'Cannot play a null-move in this position.';
-	var MISSING_CAPTURE_SYMBOL              = 'Capture symbol `x` is missing.';
-	var INVALID_CAPTURE_SYMBOL              = 'This move is not a capture move.';
-	var WRONG_CHECK_CHECKMATE_SYMBOL        = 'Wrong check/checkmate symbol (expected: `%1$s`, observed: `%2$s`).';
+	i18n$6.INVALID_UCI_NOTATION_SYNTAX         = 'The syntax of the UCI notation is invalid.';
+	i18n$6.ILLEGAL_UCI_MOVE                    = 'The UCI move is not legal.';
+	i18n$6.INVALID_MOVE_NOTATION_SYNTAX        = 'The syntax of the move notation is invalid.';
+	i18n$6.ILLEGAL_POSITION                    = 'The position is not legal.';
+	i18n$6.ILLEGAL_NO_KING_CASTLING            = 'Casting is not legal in the considered position as it has no king.';
+	i18n$6.ILLEGAL_QUEEN_SIDE_CASTLING         = 'Queen-side castling is not legal in the considered position.';
+	i18n$6.ILLEGAL_KING_SIDE_CASTLING          = 'King-side castling is not legal in the considered position.';
+	i18n$6.NO_PIECE_CAN_MOVE_TO                = 'No {0} can move to {1}.';
+	i18n$6.NO_PIECE_CAN_MOVE_TO_DISAMBIGUATION = 'No {0} on the specified rank/file can move to {1}.';
+	i18n$6.REQUIRE_DISAMBIGUATION              = 'Cannot determine uniquely which {0} is supposed to move to {1}.';
+	i18n$6.WRONG_DISAMBIGUATION_SYMBOL         = 'Wrong disambiguation symbol (expected: `{0}`, observed: `{1}`).';
+	i18n$6.TRYING_TO_CAPTURE_YOUR_OWN_PIECES   = 'Capturing its own pieces is not legal.';
+	i18n$6.CAPTURE_IS_MANDATORY                = 'Capture is mandatory.';
+	i18n$6.INVALID_PIECE_SYMBOL                = 'Character `{0}` is not a valid piece symbol.';
+	i18n$6.INVALID_PIECE_SYMBOL_COLOR          = 'Invalid color for piece symbol `{0}`.';
+	i18n$6.INVALID_CAPTURING_PAWN_MOVE         = 'Invalid capturing pawn move.';
+	i18n$6.INVALID_NON_CAPTURING_PAWN_MOVE     = 'Invalid non-capturing pawn move.';
+	i18n$6.NOT_SAFE_FOR_WHITE_KING             = 'This move would let the white king in check.';
+	i18n$6.NOT_SAFE_FOR_BLACK_KING             = 'This move would let the black king in check.';
+	i18n$6.MISSING_PROMOTION                   = 'A promoted piece must be specified for this move.';
+	i18n$6.MISSING_PROMOTION_SYMBOL            = 'Character `=` is required to specify a promoted piece.';
+	i18n$6.INVALID_PROMOTED_PIECE              = '{0} cannot be specified as a promoted piece.';
+	i18n$6.ILLEGAL_PROMOTION                   = 'Specifying a promoted piece is illegal for this move.';
+	i18n$6.ILLEGAL_NULL_MOVE                   = 'Cannot play a null-move in this position.';
+	i18n$6.MISSING_CAPTURE_SYMBOL              = 'Capture symbol `x` is missing.';
+	i18n$6.INVALID_CAPTURE_SYMBOL              = 'This move is not a capture move.';
+	i18n$6.WRONG_CHECK_CHECKMATE_SYMBOL        = 'Wrong check/checkmate symbol (expected: `{0}`, observed: `{1}`).';
 
 	// PGN parsing error messages
-	var INVALID_PGN_TOKEN               = 'Unrecognized character or group of characters.';
-	var INVALID_MOVE_IN_PGN_TEXT        = 'Invalid move (%1$s). %2$s';
-	var INVALID_FEN_IN_PGN_TEXT         = 'Invalid FEN string in the initial position header. %1$s';
-	var UNEXPECTED_PGN_HEADER           = 'Unexpected PGN game header.';
-	var MISSING_PGN_HEADER_ID           = 'Missing or invalid PGN game header ID.';
-	var MISSING_PGN_HEADER_VALUE        = 'Missing or invalid PGN game header value.';
-	var MISSING_END_OF_PGN_HEADER       = 'Missing or invalid end of PGN game header.';
-	var UNEXPECTED_BEGIN_OF_VARIATION   = 'Unexpected begin of variation.';
-	var UNEXPECTED_END_OF_VARIATION     = 'Unexpected end of variation.';
-	var UNEXPECTED_END_OF_GAME          = 'Unexpected end of game: there are pending variations.';
-	var UNEXPECTED_END_OF_TEXT          = 'Unexpected end of text: there is a pending game.';
-	var INVALID_GAME_INDEX              = 'Game index %1$s is invalid (only %2$s game(s) found in the PGN data).';
-	var UNKNOWN_VARIANT                 = 'Unknown chess game variant (%1$s).';
-	var VARIANT_WITHOUT_FEN             = 'For non-standard game variant, the FEN header is mandatory.';
+	i18n$6.INVALID_PGN_TOKEN               = 'Unrecognized character or group of characters.';
+	i18n$6.INVALID_MOVE_IN_PGN_TEXT        = 'Invalid move ({0}). {1}';
+	i18n$6.INVALID_FEN_IN_PGN_TEXT         = 'Invalid FEN string in the initial position header. {0}';
+	i18n$6.UNEXPECTED_PGN_HEADER           = 'Unexpected PGN game header.';
+	i18n$6.MISSING_PGN_HEADER_ID           = 'Missing or invalid PGN game header ID.';
+	i18n$6.MISSING_PGN_HEADER_VALUE        = 'Missing or invalid PGN game header value.';
+	i18n$6.MISSING_END_OF_PGN_HEADER       = 'Missing or invalid end of PGN game header.';
+	i18n$6.UNEXPECTED_BEGIN_OF_VARIATION   = 'Unexpected begin of variation.';
+	i18n$6.UNEXPECTED_END_OF_VARIATION     = 'Unexpected end of variation.';
+	i18n$6.UNEXPECTED_END_OF_GAME          = 'Unexpected end of game: there are pending variations.';
+	i18n$6.UNEXPECTED_END_OF_TEXT          = 'Unexpected end of text: there is a pending game.';
+	i18n$6.INVALID_GAME_INDEX              = 'Game index {0} is invalid (only {1} game(s) found in the PGN data).';
+	i18n$6.UNKNOWN_VARIANT                 = 'Unknown chess game variant ({0}).';
+	i18n$6.VARIANT_WITHOUT_FEN             = 'For game variant {0}, the FEN header is mandatory.';
 
-	var i18n = {
-		ORDINALS: ORDINALS,
-		WRONG_NUMBER_OF_FEN_FIELDS: WRONG_NUMBER_OF_FEN_FIELDS,
-		WRONG_NUMBER_OF_SUBFIELDS_IN_BOARD_FIELD: WRONG_NUMBER_OF_SUBFIELDS_IN_BOARD_FIELD,
-		UNEXPECTED_CHARACTER_IN_BOARD_FIELD: UNEXPECTED_CHARACTER_IN_BOARD_FIELD,
-		UNEXPECTED_END_OF_SUBFIELD_IN_BOARD_FIELD: UNEXPECTED_END_OF_SUBFIELD_IN_BOARD_FIELD,
-		INVALID_TURN_FIELD: INVALID_TURN_FIELD,
-		INVALID_CASTLING_FIELD: INVALID_CASTLING_FIELD,
-		INVALID_EN_PASSANT_FIELD: INVALID_EN_PASSANT_FIELD,
-		WRONG_RANK_IN_EN_PASSANT_FIELD: WRONG_RANK_IN_EN_PASSANT_FIELD,
-		INVALID_MOVE_COUNTING_FIELD: INVALID_MOVE_COUNTING_FIELD,
-		INVALID_VARIANT_PREFIX: INVALID_VARIANT_PREFIX,
-		INVALID_UCI_NOTATION_SYNTAX: INVALID_UCI_NOTATION_SYNTAX,
-		ILLEGAL_UCI_MOVE: ILLEGAL_UCI_MOVE,
-		INVALID_MOVE_NOTATION_SYNTAX: INVALID_MOVE_NOTATION_SYNTAX,
-		ILLEGAL_POSITION: ILLEGAL_POSITION,
-		ILLEGAL_NO_KING_CASTLING: ILLEGAL_NO_KING_CASTLING,
-		ILLEGAL_QUEEN_SIDE_CASTLING: ILLEGAL_QUEEN_SIDE_CASTLING,
-		ILLEGAL_KING_SIDE_CASTLING: ILLEGAL_KING_SIDE_CASTLING,
-		NO_PIECE_CAN_MOVE_TO: NO_PIECE_CAN_MOVE_TO,
-		NO_PIECE_CAN_MOVE_TO_DISAMBIGUATION: NO_PIECE_CAN_MOVE_TO_DISAMBIGUATION,
-		REQUIRE_DISAMBIGUATION: REQUIRE_DISAMBIGUATION,
-		WRONG_DISAMBIGUATION_SYMBOL: WRONG_DISAMBIGUATION_SYMBOL,
-		TRYING_TO_CAPTURE_YOUR_OWN_PIECES: TRYING_TO_CAPTURE_YOUR_OWN_PIECES,
-		INVALID_PIECE_SYMBOL: INVALID_PIECE_SYMBOL,
-		INVALID_PIECE_SYMBOL_COLOR: INVALID_PIECE_SYMBOL_COLOR,
-		INVALID_CAPTURING_PAWN_MOVE: INVALID_CAPTURING_PAWN_MOVE,
-		INVALID_NON_CAPTURING_PAWN_MOVE: INVALID_NON_CAPTURING_PAWN_MOVE,
-		NOT_SAFE_FOR_WHITE_KING: NOT_SAFE_FOR_WHITE_KING,
-		NOT_SAFE_FOR_BLACK_KING: NOT_SAFE_FOR_BLACK_KING,
-		MISSING_PROMOTION: MISSING_PROMOTION,
-		MISSING_PROMOTION_SYMBOL: MISSING_PROMOTION_SYMBOL,
-		INVALID_PROMOTED_PIECE: INVALID_PROMOTED_PIECE,
-		ILLEGAL_PROMOTION: ILLEGAL_PROMOTION,
-		ILLEGAL_NULL_MOVE: ILLEGAL_NULL_MOVE,
-		MISSING_CAPTURE_SYMBOL: MISSING_CAPTURE_SYMBOL,
-		INVALID_CAPTURE_SYMBOL: INVALID_CAPTURE_SYMBOL,
-		WRONG_CHECK_CHECKMATE_SYMBOL: WRONG_CHECK_CHECKMATE_SYMBOL,
-		INVALID_PGN_TOKEN: INVALID_PGN_TOKEN,
-		INVALID_MOVE_IN_PGN_TEXT: INVALID_MOVE_IN_PGN_TEXT,
-		INVALID_FEN_IN_PGN_TEXT: INVALID_FEN_IN_PGN_TEXT,
-		UNEXPECTED_PGN_HEADER: UNEXPECTED_PGN_HEADER,
-		MISSING_PGN_HEADER_ID: MISSING_PGN_HEADER_ID,
-		MISSING_PGN_HEADER_VALUE: MISSING_PGN_HEADER_VALUE,
-		MISSING_END_OF_PGN_HEADER: MISSING_END_OF_PGN_HEADER,
-		UNEXPECTED_BEGIN_OF_VARIATION: UNEXPECTED_BEGIN_OF_VARIATION,
-		UNEXPECTED_END_OF_VARIATION: UNEXPECTED_END_OF_VARIATION,
-		UNEXPECTED_END_OF_GAME: UNEXPECTED_END_OF_GAME,
-		UNEXPECTED_END_OF_TEXT: UNEXPECTED_END_OF_TEXT,
-		INVALID_GAME_INDEX: INVALID_GAME_INDEX,
-		UNKNOWN_VARIANT: UNKNOWN_VARIANT,
-		VARIANT_WITHOUT_FEN: VARIANT_WITHOUT_FEN
-	};
-
-	function createCommonjsModule(fn) {
-	  var module = { exports: {} };
-		return fn(module, module.exports), module.exports;
-	}
+	var exception$7 = {};
 
 	/******************************************************************************
 	 *                                                                            *
@@ -584,8 +528,6 @@
 	 *                                                                            *
 	 ******************************************************************************/
 
-	var exception = createCommonjsModule(function (module, exports) {
-
 
 	/**
 	 * @module exception
@@ -599,7 +541,7 @@
 	 * @classdesc Exception thrown when an invalid argument is passed to a function.
 	 * @static
 	 */
-	var IllegalArgument = exports.IllegalArgument = function(functionName) {
+	var IllegalArgument = exception$7.IllegalArgument = function(functionName) {
 
 		/**
 		 * Name of the function that raises the exception.
@@ -619,7 +561,7 @@
 	 * @classdesc Exception thrown by the FEN parsing functions.
 	 * @static
 	 */
-	var InvalidFEN = exports.InvalidFEN = function(fen, message) {
+	var InvalidFEN = exception$7.InvalidFEN = function(fen, message) {
 
 		/**
 		 * FEN string that causes the error.
@@ -645,7 +587,7 @@
 	 * @classdesc Exception thrown by the move notation parsing functions.
 	 * @static
 	 */
-	var InvalidNotation = exports.InvalidNotation = function(fen, notation, message) {
+	var InvalidNotation = exception$7.InvalidNotation = function(fen, notation, message) {
 
 		/**
 		 * FEN representation of the position used to interpret the move notation.
@@ -676,7 +618,7 @@
 	 * @classdesc Exception thrown by the PGN parsing functions.
 	 * @static
 	 */
-	var InvalidPGN = exports.InvalidPGN = function(pgn, index, lineNumber, message) {
+	var InvalidPGN = exception$7.InvalidPGN = function(pgn, index, lineNumber, message) {
 
 		/**
 		 * PGN string that causes the error.
@@ -709,18 +651,18 @@
 
 
 	function buildMessage(message, offset, tokens) {
-		for(var i = offset; i < tokens.length; ++i) {
-			var re = new RegExp('%' + (i - offset + 1) + '\\$s');
-			message = message.replace(re, tokens[i]);
-		}
-		return message;
+		return message.replace(/{(\d+)}/g, function(match, index) {
+			index = Number(index) + offset;
+			return index < tokens.length ? tokens[index] : match;
+		});
 	}
 
 
 	function toStringImpl(exceptionName, message) {
 		return exceptionName + ' -> ' + message;
 	}
-	});
+
+	var basetypes = {};
 
 	/******************************************************************************
 	 *                                                                            *
@@ -745,41 +687,42 @@
 
 
 	// Colors
-	var WHITE = 0;
-	var BLACK = 1;
+	basetypes.WHITE = 0;
+	basetypes.BLACK = 1;
 
 	// Pieces
-	var KING   = 0;
-	var QUEEN  = 1;
-	var ROOK   = 2;
-	var BISHOP = 3;
-	var KNIGHT = 4;
-	var PAWN   = 5;
+	basetypes.KING   = 0;
+	basetypes.QUEEN  = 1;
+	basetypes.ROOK   = 2;
+	basetypes.BISHOP = 3;
+	basetypes.KNIGHT = 4;
+	basetypes.PAWN   = 5;
 
 	// Colored pieces
-	var WK =  0; var BK =  1;
-	var WQ =  2; var BQ =  3;
-	var WR =  4; var BR =  5;
-	var WB =  6; var BB =  7;
-	var WN =  8; var BN =  9;
-	var WP = 10; var BP = 11;
+	basetypes.WK =  0; basetypes.BK =  1;
+	basetypes.WQ =  2; basetypes.BQ =  3;
+	basetypes.WR =  4; basetypes.BR =  5;
+	basetypes.WB =  6; basetypes.BB =  7;
+	basetypes.WN =  8; basetypes.BN =  9;
+	basetypes.WP = 10; basetypes.BP = 11;
 
 	// Special square values
-	var EMPTY$1 = -1;
-	var INVALID$1 = -2;
+	basetypes.EMPTY = -1;
+	basetypes.INVALID = -2;
 
 	// Game result
-	var WHITE_WINS = 0;
-	var BLACK_WINS = 1;
-	var DRAW = 2;
-	var LINE = 3;
+	basetypes.WHITE_WINS = 0;
+	basetypes.BLACK_WINS = 1;
+	basetypes.DRAW = 2;
+	basetypes.LINE = 3;
 
 	// Game variant
-	var REGULAR_CHESS = 0;
-	var CHESS960 = 1;
-	var NO_KING = 2;
-	var WHITE_KING_ONLY = 3;
-	var BLACK_KING_ONLY = 4;
+	basetypes.REGULAR_CHESS = 0;
+	basetypes.CHESS960 = 1;
+	basetypes.NO_KING = 2;
+	basetypes.WHITE_KING_ONLY = 3;
+	basetypes.BLACK_KING_ONLY = 4;
+	basetypes.ANTICHESS = 5;
 
 
 	// -----------------------------------------------------------------------------
@@ -792,29 +735,29 @@
 	var RANK_SYMBOL     = '12345678';
 	var FILE_SYMBOL     = 'abcdefgh';
 	var RESULT_SYMBOL   = ['1-0', '0-1', '1/2-1/2', '*'];
-	var VARIANT_SYMBOL  = ['regular', 'chess960', 'no-king', 'white-king-only', 'black-king-only'];
+	var VARIANT_SYMBOL  = ['regular', 'chess960', 'no-king', 'white-king-only', 'black-king-only', 'antichess'];
 
-	var colorToString    = function(color  ) { return COLOR_SYMBOL   [color  ]; };
-	var pieceToString    = function(piece  ) { return PIECE_SYMBOL   [piece  ]; };
-	var figurineToString = function(cp     ) { return FIGURINE_SYMBOL[cp     ]; };
-	var rankToString     = function(rank   ) { return RANK_SYMBOL    [rank   ]; };
-	var fileToString     = function(file   ) { return FILE_SYMBOL    [file   ]; };
-	var resultToString   = function(result ) { return RESULT_SYMBOL  [result ]; };
-	var variantToString  = function(variant) { return VARIANT_SYMBOL [variant]; };
+	basetypes.colorToString    = function(color  ) { return COLOR_SYMBOL   [color  ]; };
+	basetypes.pieceToString    = function(piece  ) { return PIECE_SYMBOL   [piece  ]; };
+	basetypes.figurineToString = function(cp     ) { return FIGURINE_SYMBOL[cp     ]; };
+	basetypes.rankToString     = function(rank   ) { return RANK_SYMBOL    [rank   ]; };
+	basetypes.fileToString     = function(file   ) { return FILE_SYMBOL    [file   ]; };
+	basetypes.resultToString   = function(result ) { return RESULT_SYMBOL  [result ]; };
+	basetypes.variantToString  = function(variant) { return VARIANT_SYMBOL [variant]; };
 
-	var colorFromString    = function(color  ) { return color   === '' ? -1 : COLOR_SYMBOL   .indexOf(color  ); };
-	var pieceFromString    = function(piece  ) { return piece   === '' ? -1 : PIECE_SYMBOL   .indexOf(piece  ); };
-	var figurineFromString = function(cp     ) { return cp      === '' ? -1 : FIGURINE_SYMBOL.indexOf(cp     ); };
-	var rankFromString     = function(rank   ) { return rank    === '' ? -1 : RANK_SYMBOL    .indexOf(rank   ); };
-	var fileFromString     = function(file   ) { return file    === '' ? -1 : FILE_SYMBOL    .indexOf(file   ); };
-	var resultFromString   = function(result ) { return RESULT_SYMBOL .indexOf(result ); };
-	var variantFromString  = function(variant) { return VARIANT_SYMBOL.indexOf(variant); };
+	basetypes.colorFromString    = function(color  ) { return color   === '' ? -1 : COLOR_SYMBOL   .indexOf(color  ); };
+	basetypes.pieceFromString    = function(piece  ) { return piece   === '' ? -1 : PIECE_SYMBOL   .indexOf(piece  ); };
+	basetypes.figurineFromString = function(cp     ) { return cp      === '' ? -1 : FIGURINE_SYMBOL.indexOf(cp     ); };
+	basetypes.rankFromString     = function(rank   ) { return rank    === '' ? -1 : RANK_SYMBOL    .indexOf(rank   ); };
+	basetypes.fileFromString     = function(file   ) { return file    === '' ? -1 : FILE_SYMBOL    .indexOf(file   ); };
+	basetypes.resultFromString   = function(result ) { return RESULT_SYMBOL .indexOf(result ); };
+	basetypes.variantFromString  = function(variant) { return VARIANT_SYMBOL.indexOf(variant); };
 
-	var squareToString = function(square) {
+	basetypes.squareToString = function(square) {
 		return FILE_SYMBOL[square % 16] + RANK_SYMBOL[Math.floor(square / 16)];
 	};
 
-	var squareFromString = function(square) {
+	basetypes.squareFromString = function(square) {
 		if(!/^[a-h][1-8]$/.test(square)) {
 			return -1;
 		}
@@ -823,11 +766,11 @@
 		return rank*16 + file;
 	};
 
-	var coloredPieceToString = function(cp) {
+	basetypes.coloredPieceToString = function(cp) {
 		return COLOR_SYMBOL[cp % 2] + PIECE_SYMBOL[Math.floor(cp / 2)];
 	};
 
-	var coloredPieceFromString = function(cp) {
+	basetypes.coloredPieceFromString = function(cp) {
 		if(!/^[wb][kqrbnp]$/.test(cp)) {
 			return -1;
 		}
@@ -836,128 +779,7 @@
 		return piece*2 + color;
 	};
 
-
-	// -----------------------------------------------------------------------------
-	// Typedefs for documentation
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Either `'w'` (white) or `'b'` (black).
-	 * @typedef {string} Color
-	 */
-
-	/**
-	 * One-character string identifying a type of piece: `'p'` (pawn), `'n'`, `'b'`, `'r'`, `'q'` or `'k'`.
-	 * @typedef {string} Piece
-	 */
-
-	/**
-	 * Two-character string identifying a colored piece: `'wk'` (white king), `'br'` (black rook), etc...
-	 * @typedef {string} ColoredPiece
-	 */
-
-	/**
-	 * `'-'` Symbol used to identify an empty square.
-	 * @typedef {string} Empty
-	 */
-
-	/**
-	 * Either a one-character string among `'a'`, `'b'`, ..., `'h'` (indicating the file on which *en-passant* is allowed),
-	 * or `'-'` (indicating that *en-passant* is not allowed).
-	 * @typedef {string} EnPassantFlag
-	 */
-
-	/**
-	 * Two-character string identifying a castle: `'wq'` (white queen-side castle), `'wk'`, `'bq'` or `'bk'`.
-	 * @typedef {string} Castle
-	 */
-
-	/**
-	 * Two-character string identifying a castle with the Chess960 rules: `'wa'` (white castle with rook initially on the a-file),
-	 * `'wb'`, `'wc'`, ..., `'bh'`.
-	 * @typedef {string} Castle960
-	 */
-
-	/**
-	 * Two-character string identifying a square: `'a1'`, `'a2'`, ..., `'h8'`.
-	 * @typedef {string} Square
-	 */
-
-	/**
-	 * Result of a chess game. Must be one of the following constant:
-	 *  - `'1-0'` (white wins),
-	 *  - `'1/2-1/2'` (draw),
-	 *  - `'0-1'` (black wins),
-	 *  - `'*'` (unfinished game, or undefined result).
-	 *
-	 * @typedef {string} GameResult
-	 */
-
-	/**
-	 * Variant of chess. Must be one of the following constant:
-	 *  - `'regular'` (regular chess rules),
-	 *  - `'chess960'` ([Chess960](https://en.wikipedia.org/wiki/Chess960), also known as Fischer Random Chess).
-	 *  - `'no-king'` (chess position without any king)
-	 *  - `'white-king-only'` (chess position with no black king)
-	 *  - `'black-king-only'` (chess position with no white king)
-	 *
-	 * Variants `'no-king'`, `'white-king-only'` and `'black-king-only'` do not correspond to "real" games. They are mainly provided
-	 * to create games explaining a particular piece scheme, concept, or sequence of moves... with a reduced number of pieces.
-	 *
-	 * @typedef {string} GameVariant
-	 */
-
-	var basetypes = {
-		WHITE: WHITE,
-		BLACK: BLACK,
-		KING: KING,
-		QUEEN: QUEEN,
-		ROOK: ROOK,
-		BISHOP: BISHOP,
-		KNIGHT: KNIGHT,
-		PAWN: PAWN,
-		WK: WK,
-		BK: BK,
-		WQ: WQ,
-		BQ: BQ,
-		WR: WR,
-		BR: BR,
-		WB: WB,
-		BB: BB,
-		WN: WN,
-		BN: BN,
-		WP: WP,
-		BP: BP,
-		EMPTY: EMPTY$1,
-		INVALID: INVALID$1,
-		WHITE_WINS: WHITE_WINS,
-		BLACK_WINS: BLACK_WINS,
-		DRAW: DRAW,
-		LINE: LINE,
-		REGULAR_CHESS: REGULAR_CHESS,
-		CHESS960: CHESS960,
-		NO_KING: NO_KING,
-		WHITE_KING_ONLY: WHITE_KING_ONLY,
-		BLACK_KING_ONLY: BLACK_KING_ONLY,
-		colorToString: colorToString,
-		pieceToString: pieceToString,
-		figurineToString: figurineToString,
-		rankToString: rankToString,
-		fileToString: fileToString,
-		resultToString: resultToString,
-		variantToString: variantToString,
-		colorFromString: colorFromString,
-		pieceFromString: pieceFromString,
-		figurineFromString: figurineFromString,
-		rankFromString: rankFromString,
-		fileFromString: fileFromString,
-		resultFromString: resultFromString,
-		variantFromString: variantFromString,
-		squareToString: squareToString,
-		squareFromString: squareFromString,
-		coloredPieceToString: coloredPieceToString,
-		coloredPieceFromString: coloredPieceFromString
-	};
+	var movedescriptor = {};
 
 	/******************************************************************************
 	 *                                                                            *
@@ -981,8 +803,8 @@
 	 ******************************************************************************/
 
 
-
-
+	var bt$9 = basetypes;
+	var exception$6 = exception$7;
 
 
 	var CASTLING_FLAG   = 0x01;
@@ -991,31 +813,31 @@
 	var PROMOTION_FLAG  = 0x08;
 
 
-	var make = function(from, to, color, movingPiece, capturedPiece) {
+	movedescriptor.make = function(from, to, color, movingPiece, capturedPiece) {
 		var flags = capturedPiece >= 0 ? CAPTURE_FLAG : 0x00;
 		var movingColoredPiece = movingPiece*2 + color;
 		return new MoveDescriptor(flags, from, to, movingColoredPiece, movingColoredPiece, capturedPiece, -1, -1);
 	};
 
 
-	var makeCastling = function(from, to, rookFrom, rookTo, color) {
-		var movingKing = basetypes.KING*2 + color;
-		var movingRook = basetypes.ROOK*2 + color;
+	movedescriptor.makeCastling = function(from, to, rookFrom, rookTo, color) {
+		var movingKing = bt$9.KING*2 + color;
+		var movingRook = bt$9.ROOK*2 + color;
 		return new MoveDescriptor(CASTLING_FLAG, from, to, movingKing, movingKing, movingRook, rookFrom, rookTo);
 	};
 
 
-	var makeEnPassant = function(from, to, enPassantSquare, color) {
+	movedescriptor.makeEnPassant = function(from, to, enPassantSquare, color) {
 		var flags = EN_PASSANT_FLAG | CAPTURE_FLAG;
-		var movingPawn = basetypes.PAWN*2 + color;
-		var capturedPawn = basetypes.PAWN*2 + 1 - color;
+		var movingPawn = bt$9.PAWN*2 + color;
+		var capturedPawn = bt$9.PAWN*2 + 1 - color;
 		return new MoveDescriptor(flags, from, to, movingPawn, movingPawn, capturedPawn, enPassantSquare, -1);
 	};
 
 
-	var makePromotion = function(from, to, color, promotion, capturedPiece) {
+	movedescriptor.makePromotion = function(from, to, color, promotion, capturedPiece) {
 		var flags = PROMOTION_FLAG | (capturedPiece >= 0 ? CAPTURE_FLAG : 0x00);
-		var movingPawn = basetypes.PAWN*2 + color;
+		var movingPawn = bt$9.PAWN*2 + color;
 		var finalPiece = promotion*2 + color;
 		return new MoveDescriptor(flags, from, to, movingPawn, finalPiece, capturedPiece, -1, -1);
 	};
@@ -1046,13 +868,13 @@
 	 * @param {Object} obj
 	 * @returns {boolean}
 	 */
-	var isMoveDescriptor = function(obj) {
+	movedescriptor.isMoveDescriptor = function(obj) {
 		return obj instanceof MoveDescriptor;
 	};
 
 
 	MoveDescriptor.prototype.toString = function() {
-		var result = basetypes.squareToString(this._from) + basetypes.squareToString(this._to);
+		var result = bt$9.squareToString(this._from) + bt$9.squareToString(this._to);
 		if(this.isPromotion()) {
 			result += this.promotion().toUpperCase();
 		}
@@ -1109,7 +931,7 @@
 	 * @returns {Square}
 	 */
 	MoveDescriptor.prototype.from = function() {
-		return basetypes.squareToString(this._from);
+		return bt$9.squareToString(this._from);
 	};
 
 
@@ -1119,7 +941,7 @@
 	 * @returns {Square}
 	 */
 	MoveDescriptor.prototype.to = function() {
-		return basetypes.squareToString(this._to);
+		return bt$9.squareToString(this._to);
 	};
 
 
@@ -1129,7 +951,7 @@
 	 * @returns {Color}
 	 */
 	MoveDescriptor.prototype.color = function() {
-		return basetypes.colorToString(this._movingPiece % 2);
+		return bt$9.colorToString(this._movingPiece % 2);
 	};
 
 
@@ -1139,7 +961,7 @@
 	 * @returns {Piece}
 	 */
 	MoveDescriptor.prototype.movingPiece = function() {
-		return basetypes.pieceToString(Math.floor(this._movingPiece / 2));
+		return bt$9.pieceToString(Math.floor(this._movingPiece / 2));
 	};
 
 
@@ -1149,7 +971,7 @@
 	 * @returns {ColoredPiece}
 	 */
 	MoveDescriptor.prototype.movingColoredPiece = function() {
-		return basetypes.coloredPieceToString(this._movingPiece);
+		return bt$9.coloredPieceToString(this._movingPiece);
 	};
 
 
@@ -1160,8 +982,8 @@
 	 * @throws {module:exception.IllegalArgument} If the current move is not a capture (see {@link MoveDescriptor#isCapture}).
 	 */
 	MoveDescriptor.prototype.capturedPiece = function() {
-		if(!this.isCapture()) { throw new exception.IllegalArgument('MoveDescriptor#capturedPiece()'); }
-		return basetypes.pieceToString(Math.floor(this._optionalPiece / 2));
+		if(!this.isCapture()) { throw new exception$6.IllegalArgument('MoveDescriptor#capturedPiece()'); }
+		return bt$9.pieceToString(Math.floor(this._optionalPiece / 2));
 	};
 
 
@@ -1172,8 +994,8 @@
 	 * @throws {module:exception.IllegalArgument} If the current move is not a capture (see {@link MoveDescriptor#isCapture}).
 	 */
 	MoveDescriptor.prototype.capturedColoredPiece = function() {
-		if(!this.isCapture()) { throw new exception.IllegalArgument('MoveDescriptor#capturedColoredPiece()'); }
-		return basetypes.coloredPieceToString(this._optionalPiece);
+		if(!this.isCapture()) { throw new exception$6.IllegalArgument('MoveDescriptor#capturedColoredPiece()'); }
+		return bt$9.coloredPieceToString(this._optionalPiece);
 	};
 
 
@@ -1184,8 +1006,8 @@
 	 * @throws {module:exception.IllegalArgument} If the current move is not a castling move (see {@link MoveDescriptor#isCastling}).
 	 */
 	MoveDescriptor.prototype.rookFrom = function() {
-		if(!this.isCastling()) { throw new exception.IllegalArgument('MoveDescriptor#rookFrom()'); }
-		return basetypes.squareToString(this._optionalSquare1);
+		if(!this.isCastling()) { throw new exception$6.IllegalArgument('MoveDescriptor#rookFrom()'); }
+		return bt$9.squareToString(this._optionalSquare1);
 	};
 
 
@@ -1196,8 +1018,8 @@
 	 * @throws {module:exception.IllegalArgument} If the current move is not a castling move (see {@link MoveDescriptor#isCastling}).
 	 */
 	MoveDescriptor.prototype.rookTo = function() {
-		if(!this.isCastling()) { throw new exception.IllegalArgument('MoveDescriptor#rookTo()'); }
-		return basetypes.squareToString(this._optionalSquare2);
+		if(!this.isCastling()) { throw new exception$6.IllegalArgument('MoveDescriptor#rookTo()'); }
+		return bt$9.squareToString(this._optionalSquare2);
 	};
 
 
@@ -1208,8 +1030,8 @@
 	 * @throws {module:exception.IllegalArgument} If the current move is not a *en-passant* move (see {@link MoveDescriptor#isEnPassant}).
 	 */
 	MoveDescriptor.prototype.enPassantSquare = function() {
-		if(!this.isEnPassant()) { throw new exception.IllegalArgument('MoveDescriptor#enPassantSquare()'); }
-		return basetypes.squareToString(this._optionalSquare1);
+		if(!this.isEnPassant()) { throw new exception$6.IllegalArgument('MoveDescriptor#enPassantSquare()'); }
+		return bt$9.squareToString(this._optionalSquare1);
 	};
 
 
@@ -1220,8 +1042,8 @@
 	 * @throws {module:exception.IllegalArgument} If the current move is not a promotion (see {@link MoveDescriptor#isPromotion}).
 	 */
 	MoveDescriptor.prototype.promotion = function() {
-		if(!this.isPromotion()) { throw new exception.IllegalArgument('MoveDescriptor#promotion()'); }
-		return basetypes.pieceToString(Math.floor(this._finalPiece / 2));
+		if(!this.isPromotion()) { throw new exception$6.IllegalArgument('MoveDescriptor#promotion()'); }
+		return bt$9.pieceToString(Math.floor(this._finalPiece / 2));
 	};
 
 
@@ -1232,17 +1054,13 @@
 	 * @throws {module:exception.IllegalArgument} If the current move is not a promotion (see {@link MoveDescriptor#isPromotion}).
 	 */
 	MoveDescriptor.prototype.coloredPromotion = function() {
-		if(!this.isPromotion()) { throw new exception.IllegalArgument('MoveDescriptor#coloredPromotion()'); }
-		return basetypes.coloredPieceToString(this._finalPiece);
+		if(!this.isPromotion()) { throw new exception$6.IllegalArgument('MoveDescriptor#coloredPromotion()'); }
+		return bt$9.coloredPieceToString(this._finalPiece);
 	};
 
-	var movedescriptor = {
-		make: make,
-		makeCastling: makeCastling,
-		makeEnPassant: makeEnPassant,
-		makePromotion: makePromotion,
-		isMoveDescriptor: isMoveDescriptor
-	};
+	var position$1 = {};
+
+	var impl$3 = {};
 
 	/******************************************************************************
 	 *                                                                            *
@@ -1266,12 +1084,12 @@
 	 ******************************************************************************/
 
 
+	var bt$8 = basetypes;
+	var EMPTY = bt$8.EMPTY;
+	var INVALID = bt$8.INVALID;
 
-	var EMPTY = basetypes.EMPTY;
-	var INVALID = basetypes.INVALID;
 
-
-	var makeEmpty = function(variant) {
+	impl$3.makeEmpty = function(variant) {
 		return {
 
 			// Board state
@@ -1287,42 +1105,42 @@
 			],
 
 			// Flags
-			turn: basetypes.WHITE,
+			turn: bt$8.WHITE,
 			castling: [0, 0],
 			enPassant: -1,
 			variant: variant,
 
 			// Computed attributes
-			legal: variant === basetypes.NO_KING,
+			legal: variant === bt$8.NO_KING,
 			king: [-1, -1]
 		};
 	};
 
 
-	var makeInitial = function() {
+	impl$3.makeInitial = function(variant) {
 		return {
 
 			// Board state
 			board: [
-				basetypes.WR, basetypes.WN, basetypes.WB, basetypes.WQ, basetypes.WK, basetypes.WB, basetypes.WN, basetypes.WR, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
-				basetypes.WP, basetypes.WP, basetypes.WP, basetypes.WP, basetypes.WP, basetypes.WP, basetypes.WP, basetypes.WP, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
+				bt$8.WR, bt$8.WN, bt$8.WB, bt$8.WQ, bt$8.WK, bt$8.WB, bt$8.WN, bt$8.WR, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
+				bt$8.WP, bt$8.WP, bt$8.WP, bt$8.WP, bt$8.WP, bt$8.WP, bt$8.WP, bt$8.WP, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
 				EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
 				EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
 				EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
 				EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
-				basetypes.BP, basetypes.BP, basetypes.BP, basetypes.BP, basetypes.BP, basetypes.BP, basetypes.BP, basetypes.BP, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
-				basetypes.BR, basetypes.BN, basetypes.BB, basetypes.BQ, basetypes.BK, basetypes.BB, basetypes.BN, basetypes.BR
+				bt$8.BP, bt$8.BP, bt$8.BP, bt$8.BP, bt$8.BP, bt$8.BP, bt$8.BP, bt$8.BP, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
+				bt$8.BR, bt$8.BN, bt$8.BB, bt$8.BQ, bt$8.BK, bt$8.BB, bt$8.BN, bt$8.BR
 			],
 
 			// Flags
-			turn: basetypes.WHITE,
-			castling: [129 /* (1 << A-file) | (1 << H-file) */, 129],
+			turn: bt$8.WHITE,
+			castling: variant === bt$8.ANTICHESS ? [0, 0] : [129 /* (1 << A-file) | (1 << H-file) */, 129],
 			enPassant: -1,
-			variant: basetypes.REGULAR_CHESS,
+			variant: variant,
 
 			// Computed attributes
 			legal: true,
-			king: [4 /* e1 */, 116 /* e8 */]
+			king: variant === bt$8.ANTICHESS ? [-1, -1] : [4 /* e1 */, 116 /* e8 */]
 		};
 	};
 
@@ -1330,29 +1148,29 @@
 	/**
 	 * Chess960 initial position, following the numbering scheme proposed by Reinhard Scharnagl (see for instance https://chess960.net/start-positions/).
 	 */
-	var make960FromScharnagl = function(scharnaglCode) {
+	impl$3.make960FromScharnagl = function(scharnaglCode) {
 		var info = decodeScharnagl(scharnaglCode);
-		var r1 = info.scheme.map(function(piece) { return piece*2 + basetypes.WHITE; });
-		var r8 = info.scheme.map(function(piece) { return piece*2 + basetypes.BLACK; });
+		var r1 = info.scheme.map(function(piece) { return piece*2 + bt$8.WHITE; });
+		var r8 = info.scheme.map(function(piece) { return piece*2 + bt$8.BLACK; });
 		return {
 
 			// Board state
 			board: [
 				r1[0], r1[1], r1[2], r1[3], r1[4], r1[5], r1[6], r1[7], INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
-				basetypes.WP, basetypes.WP, basetypes.WP, basetypes.WP, basetypes.WP, basetypes.WP, basetypes.WP, basetypes.WP, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
+				bt$8.WP, bt$8.WP, bt$8.WP, bt$8.WP, bt$8.WP, bt$8.WP, bt$8.WP, bt$8.WP, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
 				EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
 				EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
 				EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
 				EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
-				basetypes.BP, basetypes.BP, basetypes.BP, basetypes.BP, basetypes.BP, basetypes.BP, basetypes.BP, basetypes.BP, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
+				bt$8.BP, bt$8.BP, bt$8.BP, bt$8.BP, bt$8.BP, bt$8.BP, bt$8.BP, bt$8.BP, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
 				r8[0], r8[1], r8[2], r8[3], r8[4], r8[5], r8[6], r8[7]
 			],
 
 			// Flags
-			turn: basetypes.WHITE,
+			turn: bt$8.WHITE,
 			castling: [info.castling, info.castling],
 			enPassant: -1,
-			variant: basetypes.CHESS960,
+			variant: bt$8.CHESS960,
 
 			// Computed attributes
 			legal: true,
@@ -1385,39 +1203,39 @@
 		}
 
 		// Light-square bishop
-		scheme[(scharnaglCode % 4) * 2 + 1] = basetypes.BISHOP;
+		scheme[(scharnaglCode % 4) * 2 + 1] = bt$8.BISHOP;
 		scharnaglCode = Math.floor(scharnaglCode / 4);
 
 		// Dark-square bishop
-		scheme[(scharnaglCode % 4) * 2] = basetypes.BISHOP;
+		scheme[(scharnaglCode % 4) * 2] = bt$8.BISHOP;
 		scharnaglCode = Math.floor(scharnaglCode / 4);
 
 		// Queen
-		setAt(basetypes.QUEEN, scharnaglCode % 6, -1);
+		setAt(bt$8.QUEEN, scharnaglCode % 6, -1);
 		scharnaglCode = Math.floor(scharnaglCode / 6);
 
 		// Knights
 		switch(scharnaglCode) {
-			case 0: setAt(basetypes.KNIGHT, 0, 1); break;
-			case 1: setAt(basetypes.KNIGHT, 0, 2); break;
-			case 2: setAt(basetypes.KNIGHT, 0, 3); break;
-			case 3: setAt(basetypes.KNIGHT, 0, 4); break;
-			case 4: setAt(basetypes.KNIGHT, 1, 2); break;
-			case 5: setAt(basetypes.KNIGHT, 1, 3); break;
-			case 6: setAt(basetypes.KNIGHT, 1, 4); break;
-			case 7: setAt(basetypes.KNIGHT, 2, 3); break;
-			case 8: setAt(basetypes.KNIGHT, 2, 4); break;
-			case 9: setAt(basetypes.KNIGHT, 3, 4); break;
+			case 0: setAt(bt$8.KNIGHT, 0, 1); break;
+			case 1: setAt(bt$8.KNIGHT, 0, 2); break;
+			case 2: setAt(bt$8.KNIGHT, 0, 3); break;
+			case 3: setAt(bt$8.KNIGHT, 0, 4); break;
+			case 4: setAt(bt$8.KNIGHT, 1, 2); break;
+			case 5: setAt(bt$8.KNIGHT, 1, 3); break;
+			case 6: setAt(bt$8.KNIGHT, 1, 4); break;
+			case 7: setAt(bt$8.KNIGHT, 2, 3); break;
+			case 8: setAt(bt$8.KNIGHT, 2, 4); break;
+			case 9: setAt(bt$8.KNIGHT, 3, 4); break;
 		}
 
 		// Rooks and king
 		forEachEmpty(function(file, emptyIndex) {
 			if(emptyIndex === 1) {
-				scheme[file] = basetypes.KING;
+				scheme[file] = bt$8.KING;
 				kingFile = file;
 			}
 			else {
-				scheme[file] = basetypes.ROOK;
+				scheme[file] = bt$8.ROOK;
 				castling |= 1 << file;
 			}
 		});
@@ -1430,7 +1248,7 @@
 	}
 
 
-	var makeCopy = function(position) {
+	impl$3.makeCopy = function(position) {
 		return {
 			board    : position.board.slice(),
 			turn     : position.turn,
@@ -1442,12 +1260,7 @@
 		};
 	};
 
-	var impl = {
-		makeEmpty: makeEmpty,
-		makeInitial: makeInitial,
-		make960FromScharnagl: make960FromScharnagl,
-		makeCopy: makeCopy
-	};
+	var fen$3 = {};
 
 	/******************************************************************************
 	 *                                                                            *
@@ -1471,11 +1284,11 @@
 	 ******************************************************************************/
 
 
+	var bt$7 = basetypes;
+	var exception$5 = exception$7;
+	var i18n$5 = i18n$6;
 
-
-
-
-
+	var impl$2 = impl$3;
 
 	var FEN_PIECE_SYMBOL = 'KkQqRrBbNnPp';
 
@@ -1484,7 +1297,7 @@
 	 * Return a human-readable string representing the position. This string is multi-line,
 	 * and is intended to be displayed in a fixed-width font (similarly to an ASCII-art picture).
 	 */
-	var ascii = function(position) {
+	fen$3.ascii = function(position) {
 
 		// Board scanning
 		var result = '+---+---+---+---+---+---+---+---+\n';
@@ -1498,16 +1311,16 @@
 		}
 
 		// Flags
-		result += basetypes.colorToString(position.turn) + ' ' + castlingToString(position) + ' ' + enPassantToString(position);
-		if(position.variant !== basetypes.REGULAR_CHESS) {
-			result += ' (' + basetypes.variantToString(position.variant) + ')';
+		result += bt$7.colorToString(position.turn) + ' ' + castlingToString(position) + ' ' + enPassantToString(position);
+		if(position.variant !== bt$7.REGULAR_CHESS) {
+			result += ' (' + bt$7.variantToString(position.variant) + ')';
 		}
 
 		return result;
 	};
 
 
-	var getFEN = function(position, fiftyMoveClock, fullMoveNumber) {
+	fen$3.getFEN = function(position, fiftyMoveClock, fullMoveNumber) {
 		var result = '';
 
 		// Board scanning
@@ -1535,7 +1348,7 @@
 		}
 
 		// Flags + additional move counters
-		result += ' ' + basetypes.colorToString(position.turn) + ' ' + castlingToString(position) + ' ' + enPassantToString(position);
+		result += ' ' + bt$7.colorToString(position.turn) + ' ' + castlingToString(position) + ' ' + enPassantToString(position);
 		result += ' ' + fiftyMoveClock + ' ' + fullMoveNumber;
 
 		return result;
@@ -1543,48 +1356,48 @@
 
 
 	function castlingToString(position) {
-		if(position.variant === basetypes.CHESS960) {
+		if(position.variant === bt$7.CHESS960) {
 			var whiteFlags = '';
 			var blackFlags = '';
 			for(var file = 0; file < 8; ++file) {
-				if(position.castling[basetypes.WHITE] & 1 << file) { whiteFlags += basetypes.fileToString(file); }
-				if(position.castling[basetypes.BLACK] & 1 << file) { blackFlags += basetypes.fileToString(file); }
+				if(position.castling[bt$7.WHITE] & 1 << file) { whiteFlags += bt$7.fileToString(file); }
+				if(position.castling[bt$7.BLACK] & 1 << file) { blackFlags += bt$7.fileToString(file); }
 			}
 			return whiteFlags === '' && blackFlags === '' ? '-' : whiteFlags.toUpperCase() + blackFlags;
 		}
 		else {
 			var result = '';
-			if(position.castling[basetypes.WHITE] & 1<<7) { result += 'K'; }
-			if(position.castling[basetypes.WHITE] & 1<<0) { result += 'Q'; }
-			if(position.castling[basetypes.BLACK] & 1<<7) { result += 'k'; }
-			if(position.castling[basetypes.BLACK] & 1<<0) { result += 'q'; }
+			if(position.castling[bt$7.WHITE] & 1<<7) { result += 'K'; }
+			if(position.castling[bt$7.WHITE] & 1<<0) { result += 'Q'; }
+			if(position.castling[bt$7.BLACK] & 1<<7) { result += 'k'; }
+			if(position.castling[bt$7.BLACK] & 1<<0) { result += 'q'; }
 			return result === '' ? '-' : result;
 		}
 	}
 
 
 	function enPassantToString(position) {
-		return position.enPassant < 0 ? '-' : basetypes.fileToString(position.enPassant) + (position.turn===basetypes.WHITE ? '6' : '3');
+		return position.enPassant < 0 ? '-' : bt$7.fileToString(position.enPassant) + (position.turn===bt$7.WHITE ? '6' : '3');
 	}
 
 
-	var parseFEN = function(variant, fen, strict) {
+	fen$3.parseFEN = function(variant, fen, strict) {
 
 		// Trim the input string and split it into 6 fields.
 		fen = fen.replace(/^\s+|\s+$/g, '');
 		var fields = fen.split(/\s+/);
 		if(fields.length !== 6) {
-			throw new exception.InvalidFEN(fen, i18n.WRONG_NUMBER_OF_FEN_FIELDS);
+			throw new exception$5.InvalidFEN(fen, i18n$5.WRONG_NUMBER_OF_FEN_FIELDS);
 		}
 
 		// The first field (that represents the board) is split in 8 sub-fields.
 		var rankFields = fields[0].split('/');
 		if(rankFields.length !== 8) {
-			throw new exception.InvalidFEN(fen, i18n.WRONG_NUMBER_OF_SUBFIELDS_IN_BOARD_FIELD);
+			throw new exception$5.InvalidFEN(fen, i18n$5.WRONG_NUMBER_OF_SUBFIELDS_IN_BOARD_FIELD);
 		}
 
 		// Initialize the position
-		var position = impl.makeEmpty(variant);
+		var position = impl$2.makeEmpty(variant);
 		position.legal = null;
 
 		// Board parsing
@@ -1609,7 +1422,7 @@
 
 				// Otherwise -> parsing error.
 				else {
-					throw new exception.InvalidFEN(fen, i18n.UNEXPECTED_CHARACTER_IN_BOARD_FIELD, s);
+					throw new exception$5.InvalidFEN(fen, i18n$5.UNEXPECTED_CHARACTER_IN_BOARD_FIELD, s);
 				}
 
 				// Increment the character counter.
@@ -1618,42 +1431,42 @@
 
 			// Ensure that the current sub-field deals with all the squares of the current rank.
 			if(i !== rankField.length || f !== 8) {
-				throw new exception.InvalidFEN(fen, i18n.UNEXPECTED_END_OF_SUBFIELD_IN_BOARD_FIELD, i18n.ORDINALS[7-r]);
+				throw new exception$5.InvalidFEN(fen, i18n$5.UNEXPECTED_END_OF_SUBFIELD_IN_BOARD_FIELD, 8 - r);
 			}
 		}
 
 		// Turn parsing
-		position.turn = basetypes.colorFromString(fields[1]);
+		position.turn = bt$7.colorFromString(fields[1]);
 		if(position.turn < 0) {
-			throw new exception.InvalidFEN(fen, i18n.INVALID_TURN_FIELD);
+			throw new exception$5.InvalidFEN(fen, i18n$5.INVALID_TURN_FIELD);
 		}
 
 		// Castling rights parsing
-		position.castling = variant === basetypes.CHESS960 ? castlingFromStringXFEN(fields[2], strict, position.board) :
+		position.castling = variant === bt$7.CHESS960 ? castlingFromStringXFEN(fields[2], strict, position.board) :
 			castlingFromStringFEN(fields[2], strict);
 		if(position.castling === null) {
-			throw new exception.InvalidFEN(fen, i18n.INVALID_CASTLING_FIELD);
+			throw new exception$5.InvalidFEN(fen, i18n$5.INVALID_CASTLING_FIELD);
 		}
 
 		// En-passant rights parsing
 		var enPassantField = fields[3];
 		if(enPassantField !== '-') {
 			if(!/^[a-h][36]$/.test(enPassantField)) {
-				throw new exception.InvalidFEN(fen, i18n.INVALID_EN_PASSANT_FIELD);
+				throw new exception$5.InvalidFEN(fen, i18n$5.INVALID_EN_PASSANT_FIELD);
 			}
-			if(strict && ((enPassantField[1]==='3' && position.turn===basetypes.WHITE) || (enPassantField[1]==='6' && position.turn===basetypes.BLACK))) {
-				throw new exception.InvalidFEN(fen, i18n.WRONG_RANK_IN_EN_PASSANT_FIELD);
+			if(strict && ((enPassantField[1]==='3' && position.turn===bt$7.WHITE) || (enPassantField[1]==='6' && position.turn===bt$7.BLACK))) {
+				throw new exception$5.InvalidFEN(fen, i18n$5.WRONG_RANK_IN_EN_PASSANT_FIELD);
 			}
-			position.enPassant = basetypes.fileFromString(enPassantField[0]);
+			position.enPassant = bt$7.fileFromString(enPassantField[0]);
 		}
 
 		// Move counting flags parsing
 		var moveCountingRegExp = strict ? /^(?:0|[1-9][0-9]*)$/ : /^[0-9]+$/;
 		if(!moveCountingRegExp.test(fields[4])) {
-			throw new exception.InvalidFEN(fen, i18n.INVALID_MOVE_COUNTING_FIELD, i18n.ORDINALS[4]);
+			throw new exception$5.InvalidFEN(fen, i18n$5.INVALID_HALF_MOVE_COUNT_FIELD);
 		}
 		if(!moveCountingRegExp.test(fields[5])) {
-			throw new exception.InvalidFEN(fen, i18n.INVALID_MOVE_COUNTING_FIELD, i18n.ORDINALS[5]);
+			throw new exception$5.InvalidFEN(fen, i18n$5.INVALID_MOVE_NUMBER_FIELD);
 		}
 		return { position: position, fiftyMoveClock: parseInt(fields[4], 10), fullMoveNumber: parseInt(fields[5], 10) };
 	};
@@ -1667,10 +1480,10 @@
 		if(!(strict ? /^K?Q?k?q?$/ : /^[KQkq]*$/).test(castling)) {
 			return null;
 		}
-		if(castling.indexOf('K') >= 0) { res[basetypes.WHITE] |= 1<<7; }
-		if(castling.indexOf('Q') >= 0) { res[basetypes.WHITE] |= 1<<0; }
-		if(castling.indexOf('k') >= 0) { res[basetypes.BLACK] |= 1<<7; }
-		if(castling.indexOf('q') >= 0) { res[basetypes.BLACK] |= 1<<0; }
+		if(castling.indexOf('K') >= 0) { res[bt$7.WHITE] |= 1<<7; }
+		if(castling.indexOf('Q') >= 0) { res[bt$7.WHITE] |= 1<<0; }
+		if(castling.indexOf('k') >= 0) { res[bt$7.BLACK] |= 1<<7; }
+		if(castling.indexOf('q') >= 0) { res[bt$7.BLACK] |= 1<<0; }
 		return res;
 	}
 
@@ -1685,8 +1498,8 @@
 		}
 
 		function searchQueenSideRook(color) {
-			var targetRook = basetypes.ROOK * 2 + color;
-			var targetKing = basetypes.KING * 2 + color;
+			var targetRook = bt$7.ROOK * 2 + color;
+			var targetKing = bt$7.KING * 2 + color;
 			for(var sq = 112*color; sq < 112*color + 8; ++sq) {
 				if(board[sq] === targetRook) {
 					return sq % 8;
@@ -1699,8 +1512,8 @@
 		}
 
 		function searchKingSideRook(color) {
-			var targetRook = basetypes.ROOK * 2 + color;
-			var targetKing = basetypes.KING * 2 + color;
+			var targetRook = bt$7.ROOK * 2 + color;
+			var targetKing = bt$7.KING * 2 + color;
 			for(var sq = 112*color + 7; sq >= 112*color; --sq) {
 				if(board[sq] === targetRook) {
 					return sq % 8;
@@ -1712,24 +1525,20 @@
 			return 7;
 		}
 
-		if(castling.indexOf('K') >= 0) { result[basetypes.WHITE] |= 1 << searchKingSideRook (basetypes.WHITE); }
-		if(castling.indexOf('Q') >= 0) { result[basetypes.WHITE] |= 1 << searchQueenSideRook(basetypes.WHITE); }
-		if(castling.indexOf('k') >= 0) { result[basetypes.BLACK] |= 1 << searchKingSideRook (basetypes.BLACK); }
-		if(castling.indexOf('q') >= 0) { result[basetypes.BLACK] |= 1 << searchQueenSideRook(basetypes.BLACK); }
+		if(castling.indexOf('K') >= 0) { result[bt$7.WHITE] |= 1 << searchKingSideRook (bt$7.WHITE); }
+		if(castling.indexOf('Q') >= 0) { result[bt$7.WHITE] |= 1 << searchQueenSideRook(bt$7.WHITE); }
+		if(castling.indexOf('k') >= 0) { result[bt$7.BLACK] |= 1 << searchKingSideRook (bt$7.BLACK); }
+		if(castling.indexOf('q') >= 0) { result[bt$7.BLACK] |= 1 << searchQueenSideRook(bt$7.BLACK); }
 
 		for(var file = 0; file < 8; ++file) {
-			var s = basetypes.fileToString(file);
-			if(castling.indexOf(s.toUpperCase()) >= 0) { result[basetypes.WHITE] |= 1 << file; }
-			if(castling.indexOf(s              ) >= 0) { result[basetypes.BLACK] |= 1 << file; }
+			var s = bt$7.fileToString(file);
+			if(castling.indexOf(s.toUpperCase()) >= 0) { result[bt$7.WHITE] |= 1 << file; }
+			if(castling.indexOf(s              ) >= 0) { result[bt$7.BLACK] |= 1 << file; }
 		}
 		return result;
 	}
 
-	var fen = {
-		ascii: ascii,
-		getFEN: getFEN,
-		parseFEN: parseFEN
-	};
+	var attacks$4 = {};
 
 	/******************************************************************************
 	 *                                                                            *
@@ -1752,14 +1561,12 @@
 	 *                                                                            *
 	 ******************************************************************************/
 
-	var attacks = createCommonjsModule(function (module, exports) {
 
-
-
+	var bt$6 = basetypes;
 
 
 	// Attack directions per colored piece.
-	var ATTACK_DIRECTIONS = exports.ATTACK_DIRECTIONS = [
+	var ATTACK_DIRECTIONS = attacks$4.ATTACK_DIRECTIONS = [
 		[-17, -16, -15, -1, 1, 15, 16, 17], // king/queen
 		[-17, -16, -15, -1, 1, 15, 16, 17], // king/queen
 		[-17, -16, -15, -1, 1, 15, 16, 17], // king/queen
@@ -1783,12 +1590,12 @@
 	/**
 	 * Check if any piece of the given color attacks a given square.
 	 */
-	exports.isAttacked = function(position, square, attackerColor) {
-		return isAttackedByNonSliding(position, square, basetypes.KING*2 + attackerColor) ||
-			isAttackedByNonSliding(position, square, basetypes.KNIGHT*2 + attackerColor) ||
-			isAttackedByNonSliding(position, square, basetypes.PAWN*2 + attackerColor) ||
-			isAttackedBySliding(position, square, basetypes.ROOK*2 + attackerColor, basetypes.QUEEN*2 + attackerColor) ||
-			isAttackedBySliding(position, square, basetypes.BISHOP*2 + attackerColor, basetypes.QUEEN*2 + attackerColor);
+	attacks$4.isAttacked = function(position, square, attackerColor) {
+		return isAttackedByNonSliding(position, square, bt$6.KING*2 + attackerColor) ||
+			isAttackedByNonSliding(position, square, bt$6.KNIGHT*2 + attackerColor) ||
+			isAttackedByNonSliding(position, square, bt$6.PAWN*2 + attackerColor) ||
+			isAttackedBySliding(position, square, bt$6.ROOK*2 + attackerColor, bt$6.QUEEN*2 + attackerColor) ||
+			isAttackedBySliding(position, square, bt$6.BISHOP*2 + attackerColor, bt$6.QUEEN*2 + attackerColor);
 	};
 
 
@@ -1812,7 +1619,7 @@
 				sq -= directions[i];
 				if((sq & 0x88)===0) {
 					var cp = position.board[sq];
-					if(cp === basetypes.EMPTY) { continue; }
+					if(cp === bt$6.EMPTY) { continue; }
 					else if(cp === slidingAttacker || cp===queenAttacker) { return true; }
 				}
 				break;
@@ -1830,13 +1637,13 @@
 	/**
 	 * Return the squares from which a piece of the given color attacks a given square.
 	 */
-	exports.getAttacks = function(position, square, attackerColor) {
+	attacks$4.getAttacks = function(position, square, attackerColor) {
 		var result = [];
-		findNonSlidingAttacks(position, square, result, basetypes.KING*2 + attackerColor);
-		findNonSlidingAttacks(position, square, result, basetypes.KNIGHT*2 + attackerColor);
-		findNonSlidingAttacks(position, square, result, basetypes.PAWN*2 + attackerColor);
-		findSlidingAttacks(position, square, result, basetypes.ROOK*2 + attackerColor, basetypes.QUEEN*2 + attackerColor);
-		findSlidingAttacks(position, square, result, basetypes.BISHOP*2 + attackerColor, basetypes.QUEEN*2 + attackerColor);
+		findNonSlidingAttacks(position, square, result, bt$6.KING*2 + attackerColor);
+		findNonSlidingAttacks(position, square, result, bt$6.KNIGHT*2 + attackerColor);
+		findNonSlidingAttacks(position, square, result, bt$6.PAWN*2 + attackerColor);
+		findSlidingAttacks(position, square, result, bt$6.ROOK*2 + attackerColor, bt$6.QUEEN*2 + attackerColor);
+		findSlidingAttacks(position, square, result, bt$6.BISHOP*2 + attackerColor, bt$6.QUEEN*2 + attackerColor);
 		return result;
 	};
 
@@ -1860,14 +1667,15 @@
 				sq -= directions[i];
 				if((sq & 0x88) === 0) {
 					var cp = position.board[sq];
-					if(cp === basetypes.EMPTY) { continue; }
+					if(cp === bt$6.EMPTY) { continue; }
 					else if(cp === slidingAttacker || cp === queenAttacker) { result.push(sq); }
 				}
 				break;
 			}
 		}
 	}
-	});
+
+	var legality$4 = {};
 
 	/******************************************************************************
 	 *                                                                            *
@@ -1890,11 +1698,9 @@
 	 *                                                                            *
 	 ******************************************************************************/
 
-	var legality = createCommonjsModule(function (module, exports) {
 
-
-
-
+	var bt$5 = basetypes;
+	var attacks$3 = attacks$4;
 
 
 	/**
@@ -1904,15 +1710,16 @@
 	 *
 	 *  1. There is exactly one white king and one black king on the board (or more generally,
 		     the number of kings on the board matches the game variant of the position).
-	 *  2. The player that is not about to play is not check.
-	 *  3. There are no pawn on rows 1 and 8.
-	 *  4. For each colored castle flag set, there is a rook and a king on the
+	 *  2. Special check regarding positions in which one of the player (or both) has no piece.
+	 *  3. The player that is not about to play is not check (this condition is omitted for variants in which kings has no "royal power").
+	 *  4. There are no pawn on rows 1 and 8.
+	 *  5. For each colored castle flag set, there is a rook and a king on the
 	 *     corresponding initial squares.
-	 *  5. The pawn situation is consistent with the en-passant flag if it is set.
+	 *  6. The pawn situation is consistent with the en-passant flag if it is set.
 	 *     For instance, if it is set to the 'e' column and black is about to play,
 	 *     the squares e2 and e3 must be empty, and there must be a white pawn on e4.
 	 */
-	exports.isLegal = function(position) {
+	legality$4.isLegal = function(position) {
 		refreshLegalFlagAndKingSquares(position);
 		return position.legal;
 	};
@@ -1925,52 +1732,57 @@
 	 * Together with the legal flag, the reference to the squares where the white and
 	 * black kings lie is updated by this function.
 	 */
-	var refreshLegalFlagAndKingSquares = exports.refreshLegalFlagAndKingSquares = function(position) {
+	var refreshLegalFlagAndKingSquares = legality$4.refreshLegalFlagAndKingSquares = function(position) {
 		if(position.legal !== null) {
 			return;
 		}
 		position.legal = false;
 
 		// Condition (1)
-		var whiteKingOK = refreshKingSquare(position, basetypes.WHITE);
-		var blackKingOK = refreshKingSquare(position, basetypes.BLACK);
+		var whiteKingOK = refreshKingSquare(position, bt$5.WHITE);
+		var blackKingOK = refreshKingSquare(position, bt$5.BLACK);
 		if(!whiteKingOK || !blackKingOK) {
 			return;
 		}
 
 		// Condition (2)
-		if(position.king[1-position.turn] >= 0 && attacks.isAttacked(position, position.king[1-position.turn], position.turn)) {
+		if(position.variant === bt$5.ANTICHESS && !hasAtLeastOnePiece(position, 1-position.turn)) { // The player that has just played must have at least one piece in antichess.
 			return;
 		}
 
 		// Condition (3)
+		if(position.king[1-position.turn] >= 0 && attacks$3.isAttacked(position, position.king[1-position.turn], position.turn)) {
+			return;
+		}
+
+		// Condition (4)
 		for(var c=0; c<8; ++c) {
 			var cp1 = position.board[c];
 			var cp8 = position.board[112 + c];
-			if(cp1 === basetypes.WP || cp8 === basetypes.WP || cp1 === basetypes.BP || cp8 === basetypes.BP) {
+			if(cp1 === bt$5.WP || cp8 === bt$5.WP || cp1 === bt$5.BP || cp8 === bt$5.BP) {
 				return;
 			}
 		}
 
-		// Condition (4)
-		var isCastlingFlagLegalFun = position.variant === basetypes.CHESS960 ? isCastlingFlagLegalForChess960 : isCastlingFlagLegalForRegularChess;
+		// Condition (5)
+		var isCastlingFlagLegalFun = getCastlingFlagLegalityCheckFunction(position.variant);
 		for(var color=0; color<2; ++color) {
 			if(!isCastlingFlagLegalFun(position, color)) {
 				return;
 			}
 		}
 
-		// Condition (5)
+		// Condition (6)
 		if(position.enPassant >= 0) {
 			var square2 = (6-position.turn*5)*16 + position.enPassant;
 			var square3 = (5-position.turn*3)*16 + position.enPassant;
 			var square4 = (4-position.turn  )*16 + position.enPassant;
-			if(!(position.board[square2]===basetypes.EMPTY && position.board[square3]===basetypes.EMPTY && position.board[square4]===basetypes.PAWN*2+1-position.turn)) {
+			if(!(position.board[square2]===bt$5.EMPTY && position.board[square3]===bt$5.EMPTY && position.board[square4]===bt$5.PAWN*2+1-position.turn)) {
 				return;
 			}
 		}
 
-		// At this point, all the conditions (1) to (5) hold, so the position can be flagged as legal.
+		// At this point, all the conditions (1) to (6) hold, so the position can be flagged as legal.
 		position.legal = true;
 	};
 
@@ -1979,37 +1791,84 @@
 	 * Detect the kings of the given color that are present on the chess board.
 	 */
 	function refreshKingSquare(position, color) {
-		var target = basetypes.KING*2 + color;
+		var target = bt$5.KING*2 + color;
 		position.king[color] = -1;
-		for(var sq=0; sq<120; sq += (sq & 0x7)===7 ? 9 : 1) {
-			if(position.board[sq] === target) {
 
-				// If the targeted king is detected on the square sq, two situations may occur:
-				// 1) No king was detected on the previously visited squares: then the current
-				//    square is saved, and loop over the next board squares goes on.
-				if(position.king[color] < 0) {
-					position.king[color] = sq;
-				}
+		// Expectation: king may be present (even several times), and it has no royal power.
+		if (position.variant === bt$5.ANTICHESS) {
+			return true;
+		}
 
-				// 2) Another king was detected on the previously visited squares: then the buffer position.king[color]
-				//    is set to the invalid state (-1), and the loop is interrupted.
-				else {
-					position.king[color] = -1;
+		// Expectation: no king of the given color is supposed to be present on the board.
+		else if (position.variant === bt$5.NO_KING || position.variant === bt$5.BLACK_KING_ONLY - color) {
+			for(var sq=0; sq<120; sq += (sq & 0x7)===7 ? 9 : 1) {
+				if(position.board[sq] === target) {
 					return false;
 				}
 			}
+			return true;
 		}
-		return position.variant === basetypes.NO_KING || position.variant === basetypes.BLACK_KING_ONLY - color ? position.king[color] < 0 : position.king[color] >= 0;
+
+		// Expectation: exactly 1 king of the given color is supposed to be present on the board,
+		// and it has royal power.
+		else {
+			for(var sq=0; sq<120; sq += (sq & 0x7)===7 ? 9 : 1) {
+				if(position.board[sq] === target) {
+
+					// If the targeted king is detected on the square sq, two situations may occur:
+					// 1) No king was detected on the previously visited squares: then the current
+					//    square is saved, and loop over the next board squares goes on.
+					if(position.king[color] < 0) {
+						position.king[color] = sq;
+					}
+
+					// 2) Another king was detected on the previously visited squares: then the buffer position.king[color]
+					//    is set to the invalid state (-1), and the loop is interrupted.
+					else {
+						position.king[color] = -1;
+						return false;
+					}
+				}
+			}
+			return position.king[color] >= 0;
+		}
+	}
+
+
+	/**
+	 * Detect whether the player with the given color has at least one piece or not.
+	 */
+	function hasAtLeastOnePiece(position, color) {
+		for(var sq=0; sq<120; sq += (sq & 0x7)===7 ? 9 : 1) {
+			if(position.board[sq] >= 0 && position.board[sq]%2 === color) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	function getCastlingFlagLegalityCheckFunction(variant) {
+		switch(variant) {
+			case bt$5.CHESS960: return isCastlingFlagLegalForChess960;
+			case bt$5.ANTICHESS: return isCastlingFlagLegalForAntichess;
+			default: return isCastlingFlagLegalForRegularChess;
+		}
 	}
 
 
 	function isCastlingFlagLegalForRegularChess(position, color) {
 		var skipOO  = (position.castling[color] & 0x80) === 0;
 		var skipOOO = (position.castling[color] & 0x01) === 0;
-		var rookHOK = skipOO              || position.board[7 + 112*color] === basetypes.ROOK*2 + color;
-		var rookAOK = skipOOO             || position.board[0 + 112*color] === basetypes.ROOK*2 + color;
-		var kingOK  = (skipOO && skipOOO) || position.board[4 + 112*color] === basetypes.KING*2 + color;
+		var rookHOK = skipOO              || position.board[7 + 112*color] === bt$5.ROOK*2 + color;
+		var rookAOK = skipOOO             || position.board[0 + 112*color] === bt$5.ROOK*2 + color;
+		var kingOK  = (skipOO && skipOOO) || position.board[4 + 112*color] === bt$5.KING*2 + color;
 		return kingOK && rookAOK && rookHOK;
+	}
+
+
+	function isCastlingFlagLegalForAntichess(position, color) {
+		return position.castling[color] === 0;
 	}
 
 
@@ -2021,7 +1880,7 @@
 			}
 
 			// Ensure there is a rook on each square for which the corresponding file flag is set.
-			if(position.board[file + 112*color] !== basetypes.ROOK*2 + color) {
+			if(position.board[file + 112*color] !== bt$5.ROOK*2 + color) {
 				return;
 			}
 			files.push(file);
@@ -2040,7 +1899,8 @@
 			default: return false;
 		}
 	}
-	});
+
+	var movegeneration = {};
 
 	/******************************************************************************
 	 *                                                                            *
@@ -2063,13 +1923,11 @@
 	 *                                                                            *
 	 ******************************************************************************/
 
-	var movegeneration = createCommonjsModule(function (module, exports) {
 
-
-
-
-
-
+	var bt$4 = basetypes;
+	var moveDescriptor$2 = movedescriptor;
+	var attacks$2 = attacks$4;
+	var legality$3 = legality$4;
 
 
 	/* eslint-disable no-mixed-spaces-and-tabs, indent */
@@ -2116,26 +1974,26 @@
 
 
 	function isKingToMoveAttacked(position) {
-		return position.king[position.turn] >= 0 && attacks.isAttacked(position, position.king[position.turn], 1-position.turn);
+		return position.king[position.turn] >= 0 && attacks$2.isAttacked(position, position.king[position.turn], 1-position.turn);
 	}
 
 
-	exports.isCheck = function(position) {
-		return legality.isLegal(position) && isKingToMoveAttacked(position);
+	movegeneration.isCheck = function(position) {
+		return legality$3.isLegal(position) && isKingToMoveAttacked(position);
 	};
 
 
-	exports.isCheckmate = function(position) {
-		return legality.isLegal(position) && !hasMove(position) && isKingToMoveAttacked(position);
+	movegeneration.isCheckmate = function(position) {
+		return legality$3.isLegal(position) && !hasMove(position) && (position.variant === bt$4.ANTICHESS || isKingToMoveAttacked(position));
 	};
 
 
-	exports.isStalemate = function(position) {
-		return legality.isLegal(position) && !hasMove(position) && !isKingToMoveAttacked(position);
+	movegeneration.isStalemate = function(position) {
+		return legality$3.isLegal(position) && !hasMove(position) && (position.variant === bt$4.ANTICHESS || !isKingToMoveAttacked(position));
 	};
 
 
-	var hasMove = exports.hasMove = function(position) {
+	var hasMove = movegeneration.hasMove = function(position) {
 		function MoveFound() {}
 		try {
 			generateMoves(position, function(descriptor) {
@@ -2144,21 +2002,25 @@
 			return false;
 		}
 		catch(err) {
+			// istanbul ignore else
 			if(err instanceof MoveFound) { return true; }
 			else { throw err; }
 		}
 	};
 
 
-	exports.moves = function(position) {
+	movegeneration.moves = function(position) {
 		var res = [];
 		generateMoves(position, function(descriptor, generatePromotions) {
 			if(descriptor) {
 				if(generatePromotions) {
-					res.push(movedescriptor.makePromotion(descriptor._from, descriptor._to, position.turn, basetypes.QUEEN , descriptor._optionalPiece));
-					res.push(movedescriptor.makePromotion(descriptor._from, descriptor._to, position.turn, basetypes.ROOK  , descriptor._optionalPiece));
-					res.push(movedescriptor.makePromotion(descriptor._from, descriptor._to, position.turn, basetypes.BISHOP, descriptor._optionalPiece));
-					res.push(movedescriptor.makePromotion(descriptor._from, descriptor._to, position.turn, basetypes.KNIGHT, descriptor._optionalPiece));
+					res.push(moveDescriptor$2.makePromotion(descriptor._from, descriptor._to, position.turn, bt$4.QUEEN , descriptor._optionalPiece));
+					res.push(moveDescriptor$2.makePromotion(descriptor._from, descriptor._to, position.turn, bt$4.ROOK  , descriptor._optionalPiece));
+					res.push(moveDescriptor$2.makePromotion(descriptor._from, descriptor._to, position.turn, bt$4.BISHOP, descriptor._optionalPiece));
+					res.push(moveDescriptor$2.makePromotion(descriptor._from, descriptor._to, position.turn, bt$4.KNIGHT, descriptor._optionalPiece));
+					if(position.variant === bt$4.ANTICHESS) {
+						res.push(moveDescriptor$2.makePromotion(descriptor._from, descriptor._to, position.turn, bt$4.KING, descriptor._optionalPiece));
+					}
 				}
 				else {
 					res.push(descriptor);
@@ -2175,7 +2037,10 @@
 	function generateMoves(position, fun) {
 
 		// Ensure that the position is legal.
-		if(!legality.isLegal(position)) { return; }
+		if(!legality$3.isLegal(position)) { return; }
+
+		// In some variants, capture may be mandatory (typically in antichess).
+		var nonCaptureIsAllowed = !isCaptureMandatory(position);
 
 		// For all potential 'from' square...
 		for(var from=0; from<120; from += (from & 0x7)===7 ? 9 : 1) {
@@ -2188,10 +2053,10 @@
 			}
 
 			// Generate moves for pawns
-			if(movingPiece === basetypes.PAWN) {
+			if(movingPiece === bt$4.PAWN) {
 
 				// Capturing moves
-				var attackDirections = attacks.ATTACK_DIRECTIONS[fromContent];
+				var attackDirections = attacks$2.ATTACK_DIRECTIONS[fromContent];
 				for(var i=0; i<attackDirections.length; ++i) {
 					var to = from + attackDirections[i];
 					if((to & 0x88) === 0) {
@@ -2206,30 +2071,32 @@
 				}
 
 				// Non-capturing moves
-				var moveDirection = 16 - position.turn*32;
-				var to = from + moveDirection;
-				if(position.board[to] < 0) {
-					fun(isKingSafeAfterMove(position, from, to, -1), to<8 || to>=112);
+				if(nonCaptureIsAllowed) {
+					var moveDirection = 16 - position.turn*32;
+					var to = from + moveDirection;
+					if(position.board[to] < 0) {
+						fun(isKingSafeAfterMove(position, from, to, -1), to<8 || to>=112);
 
-					// 2-square pawn move
-					var firstSquareOfRow = (1 + position.turn*5) * 16;
-					if(from>=firstSquareOfRow && from<firstSquareOfRow+8) {
-						to += moveDirection;
-						if(position.board[to] < 0) {
-							fun(isKingSafeAfterMove(position, from, to, -1), false);
+						// 2-square pawn move
+						var firstSquareOfRow = (1 + position.turn*5) * 16;
+						if(from>=firstSquareOfRow && from<firstSquareOfRow+8) {
+							to += moveDirection;
+							if(position.board[to] < 0) {
+								fun(isKingSafeAfterMove(position, from, to, -1), false);
+							}
 						}
 					}
 				}
 			}
 
 			// Generate moves for non-sliding non-pawn pieces
-			else if(movingPiece===basetypes.KNIGHT || movingPiece===basetypes.KING) {
-				var directions = attacks.ATTACK_DIRECTIONS[fromContent];
+			else if(movingPiece===bt$4.KNIGHT || movingPiece===bt$4.KING) {
+				var directions = attacks$2.ATTACK_DIRECTIONS[fromContent];
 				for(var i=0; i<directions.length; ++i) {
 					var to = from + directions[i];
 					if((to & 0x88) === 0) {
 						var toContent = position.board[to];
-						if(toContent < 0 || toContent%2 !== position.turn) {
+						if(toContent < 0 ? nonCaptureIsAllowed : toContent%2 !== position.turn) {
 							fun(isKingSafeAfterMove(position, from, to, -1), false);
 						}
 					}
@@ -2238,11 +2105,11 @@
 
 			// Generate moves for sliding pieces
 			else {
-				var directions = attacks.ATTACK_DIRECTIONS[fromContent];
+				var directions = attacks$2.ATTACK_DIRECTIONS[fromContent];
 				for(var i=0; i<directions.length; ++i) {
 					for(var to = from + directions[i]; (to & 0x88) === 0; to += directions[i]) {
 						var toContent = position.board[to];
-						if(toContent < 0 || toContent%2 !== position.turn) {
+						if(toContent < 0 ? nonCaptureIsAllowed : toContent%2 !== position.turn) {
 							fun(isKingSafeAfterMove(position, from, to, -1), false);
 						}
 						if(toContent >= 0) { break; }
@@ -2251,12 +2118,42 @@
 			}
 
 			// Generate castling moves
-			if(movingPiece === basetypes.KING && position.castling[position.turn] !== 0) {
+			if(movingPiece === bt$4.KING && nonCaptureIsAllowed && position.castling[position.turn] !== 0) {
 				fun(isCastlingLegal(position, from, 2 + 112*position.turn), false);
 				fun(isCastlingLegal(position, from, 6 + 112*position.turn), false);
 			}
 		}
 	}
+
+
+	/**
+	 * For antichess, return `true` if the current player can capture something. For other variants, always returns `false`.
+	 *
+	 * Precondition: the position must be legal.
+	 */
+	var isCaptureMandatory = movegeneration.isCaptureMandatory = function(position) {
+		if(position.variant !== bt$4.ANTICHESS) {
+			return false;
+		}
+
+		// Look for regular captures
+		for(var sq=0; sq<120; sq += (sq & 0x7)===7 ? 9 : 1) {
+			var content = position.board[sq];
+			if(content >= 0 && content%2 !== position.turn && attacks$2.isAttacked(position, sq, position.turn)) {
+				return true;
+			}
+		}
+
+		// Look for "en-passant" captures
+		if(position.enPassant >= 0) {
+			var enPassantSquare = (4-position.turn)*16 + position.enPassant;
+			var pawnTarget = bt$4.PAWN*2 + position.turn;
+			if(((enPassantSquare - 1) & 0x88) === 0 && position.board[enPassantSquare - 1] === pawnTarget) { return true; }
+			if(((enPassantSquare + 1) & 0x88) === 0 && position.board[enPassantSquare + 1] === pawnTarget) { return true; }
+		}
+
+		return false;
+	};
 
 
 	/**
@@ -2267,30 +2164,29 @@
 	 * @param {number} enPassantSquare Index of the square where the "en-passant" taken pawn lies if any, `-1` otherwise.
 	 * @returns {boolean|MoveDescriptor} The move descriptor if the move is legal, `false` otherwise.
 	 */
-	var isKingSafeAfterMove = exports.isKingSafeAfterMove = function(position, from, to, enPassantSquare) {
+	var isKingSafeAfterMove = movegeneration.isKingSafeAfterMove = function(position, from, to, enPassantSquare) {
 		var fromContent   = position.board[from];
 		var toContent     = position.board[to  ];
 		var movingPiece   = Math.floor(fromContent / 2);
-		var kingSquare    = movingPiece===basetypes.KING ? to : position.king[position.turn];
 		var kingIsInCheck = false;
 
-		if(kingSquare >= 0) {
+		if(position.king[position.turn] >= 0) {
 
 			// Step (7) -> Execute the displacement (castling moves are processed separately).
 			position.board[to  ] = fromContent;
-			position.board[from] = basetypes.EMPTY;
+			position.board[from] = bt$4.EMPTY;
 			if(enPassantSquare >= 0) {
-				position.board[enPassantSquare] = basetypes.EMPTY;
+				position.board[enPassantSquare] = bt$4.EMPTY;
 			}
 
 			// Step (8) -> Is the king safe after the displacement?
-			kingIsInCheck = attacks.isAttacked(position, kingSquare, 1-position.turn);
+			kingIsInCheck = attacks$2.isAttacked(position, movingPiece===bt$4.KING ? to : position.king[position.turn], 1-position.turn);
 
 			// Step (9) -> Reverse the displacement.
 			position.board[from] = fromContent;
 			position.board[to  ] = toContent;
 			if(enPassantSquare >= 0) {
-				position.board[enPassantSquare] = basetypes.PAWN*2 + 1-position.turn;
+				position.board[enPassantSquare] = bt$4.PAWN*2 + 1-position.turn;
 			}
 		}
 
@@ -2300,10 +2196,10 @@
 		}
 		else {
 			if(enPassantSquare >= 0) {
-				return movedescriptor.makeEnPassant(from, to, enPassantSquare, position.turn);
+				return moveDescriptor$2.makeEnPassant(from, to, enPassantSquare, position.turn);
 			}
 			else {
-				return movedescriptor.make(from, to, position.turn, movingPiece, toContent);
+				return moveDescriptor$2.make(from, to, position.turn, movingPiece, toContent);
 			}
 		}
 	};
@@ -2312,17 +2208,17 @@
 	/**
 	 * Delegated method for checking whether a castling move is legal or not.
 	 */
-	var isCastlingLegal = exports.isCastlingLegal = function(position, from, to) {
+	var isCastlingLegal = movegeneration.isCastlingLegal = function(position, from, to) {
 
 		// Origin and destination squares of the rook involved in the move.
 		var castleFile = -1;
 		var rookTo = -1;
 		if(to === 2 + position.turn*112) {
-			castleFile = position.variant === basetypes.CHESS960 ? findCastleFile(position.castling[position.turn], from % 16, -1) : 0;
+			castleFile = position.variant === bt$4.CHESS960 ? findCastleFile(position.castling[position.turn], from % 16, -1) : 0;
 			rookTo = 3 + 112*position.turn;
 		}
 		else if(to === 6 + position.turn*112) {
-			castleFile = position.variant === basetypes.CHESS960 ? findCastleFile(position.castling[position.turn], from % 16, 1) : 7;
+			castleFile = position.variant === bt$4.CHESS960 ? findCastleFile(position.castling[position.turn], from % 16, 1) : 7;
 			rookTo = 5 + 112*position.turn;
 		}
 		else {
@@ -2330,7 +2226,7 @@
 		}
 
 		// Ensure that the given underlying castling is allowed.
-		if(position.variant === basetypes.CHESS960) {
+		if(position.variant === bt$4.CHESS960) {
 			if(castleFile === -1) { return false; }
 		}
 		else {
@@ -2341,17 +2237,17 @@
 
 		// Ensure that each square on the trajectory is empty.
 		for(var sq = Math.min(from, to, rookFrom, rookTo); sq <= Math.max(from, to, rookFrom, rookTo); ++sq) {
-			if(sq !== from && sq !== rookFrom && position.board[sq] !== basetypes.EMPTY) { return false; }
+			if(sq !== from && sq !== rookFrom && position.board[sq] !== bt$4.EMPTY) { return false; }
 		}
 
 		// The origin and destination squares of the king, and the square between them must not be attacked.
 		var byWho = 1 - position.turn;
 		for(var sq = Math.min(from, to); sq <= Math.max(from, to); ++sq) {
-			if(attacks.isAttacked(position, sq, byWho)) { return false; }
+			if(attacks$2.isAttacked(position, sq, byWho)) { return false; }
 		}
 
 		// The move is legal -> generate the move descriptor.
-		return movedescriptor.makeCastling(from, to, rookFrom, rookTo, position.turn);
+		return moveDescriptor$2.makeCastling(from, to, rookFrom, rookTo, position.turn);
 	};
 
 
@@ -2385,10 +2281,10 @@
 	 * Castling moves fail at step (4). They are taken out of this flow and processed
 	 * by the dedicated method `isLegalCastling()`.
 	 */
-	exports.isMoveLegal = function(position, from, to) {
+	movegeneration.isMoveLegal = function(position, from, to) {
 
 		// Step (1)
-		if(!legality.isLegal(position)) { return false; }
+		if(!legality$3.isLegal(position)) { return false; }
 
 		// Step (2)
 		var fromContent = position.board[from];
@@ -2400,17 +2296,18 @@
 		var displacement = to - from + 119;
 		var enPassantSquare = -1; // square where a pawn is taken if the move is "en-passant"
 		var isTwoSquarePawnMove = false;
-		var isPromotion = movingPiece===basetypes.PAWN && (to<8 || to>=112);
+		var isPromotion = movingPiece===bt$4.PAWN && (to<8 || to>=112);
+		var captureIsMandatory = isCaptureMandatory(position);
 
 		// Compute the move descriptor corresponding to castling, if applicable.
 		var castlingDescriptor = false;
-		if(movingPiece === basetypes.KING && position.castling[position.turn] !== 0) {
+		if(movingPiece === bt$4.KING && !captureIsMandatory && position.castling[position.turn] !== 0) {
 			castlingDescriptor = isCastlingLegal(position, from, to);
 		}
 
 		// Step (4)
 		if((DISPLACEMENT_LOOKUP[displacement] & 1 << fromContent) === 0) {
-			if(movingPiece === basetypes.PAWN && displacement === 151-position.turn*64) {
+			if(movingPiece === bt$4.PAWN && displacement === 151-position.turn*64) {
 				var firstSquareOfRow = (1 + position.turn*5) * 16;
 				if(from < firstSquareOfRow || from >= firstSquareOfRow+8) { return false; }
 				isTwoSquarePawnMove = true;
@@ -2421,11 +2318,11 @@
 		}
 
 		// Step (5) -> check the content of the destination square
-		if(movingPiece === basetypes.PAWN) {
+		if(movingPiece === bt$4.PAWN) {
 			if(displacement === 135-position.turn*32 || isTwoSquarePawnMove) { // non-capturing pawn move
-				if(toContent !== basetypes.EMPTY) { return false; }
+				if(captureIsMandatory || toContent !== bt$4.EMPTY) { return false; }
 			}
-			else if(toContent === basetypes.EMPTY) { // en-passant pawn move
+			else if(toContent === bt$4.EMPTY) { // en-passant pawn move
 				if(position.enPassant < 0 || to !== (5-position.turn*3)*16 + position.enPassant) { return false; }
 				enPassantSquare = (4-position.turn)*16 + position.enPassant;
 			}
@@ -2434,18 +2331,18 @@
 			}
 		}
 		else { // piece move
-			if(toContent >= 0 && toContent%2 === position.turn) { return castlingDescriptor; }
+			if(toContent < 0 ? captureIsMandatory : toContent%2 === position.turn) { return castlingDescriptor; }
 		}
 
 		// Step (6) -> For sliding pieces, ensure that there is nothing between the origin and the destination squares.
-		if(movingPiece === basetypes.BISHOP || movingPiece === basetypes.ROOK || movingPiece === basetypes.QUEEN) {
+		if(movingPiece === bt$4.BISHOP || movingPiece === bt$4.ROOK || movingPiece === bt$4.QUEEN) {
 			var direction = SLIDING_DIRECTION[displacement];
 			for(var sq=from + direction; sq !== to; sq += direction) {
-				if(position.board[sq] !== basetypes.EMPTY) { return false; }
+				if(position.board[sq] !== bt$4.EMPTY) { return false; }
 			}
 		}
 		else if(isTwoSquarePawnMove) { // two-square pawn moves also require this test.
-			if(position.board[(from + to) / 2] !== basetypes.EMPTY) { return false; }
+			if(position.board[(from + to) / 2] !== bt$4.EMPTY) { return false; }
 		}
 
 		// Steps (7) to (9) are delegated to `isKingSafeAfterMove`.
@@ -2454,9 +2351,8 @@
 			return {
 				type: 'promotion',
 				build: function(promotion) {
-					return promotion !== basetypes.PAWN && promotion !== basetypes.KING ?
-						movedescriptor.makePromotion(descriptor._from, descriptor._to, descriptor._movingPiece % 2, promotion, descriptor._optionalPiece) :
-						false;
+					return promotion === bt$4.PAWN || (promotion === bt$4.KING && position.variant !== bt$4.ANTICHESS) ? false :
+						moveDescriptor$2.makePromotion(descriptor._from, descriptor._to, descriptor._movingPiece % 2, promotion, descriptor._optionalPiece);
 				}
 			};
 		}
@@ -2483,15 +2379,15 @@
 	/**
 	 * Play the move corresponding to the given descriptor.
 	 */
-	exports.play = function(position, descriptor) {
+	movegeneration.play = function(position, descriptor) {
 
 		// Update the board.
-		position.board[descriptor._from] = basetypes.EMPTY; // WARNING: update `from` before `to` in case both squares are actually the same!
+		position.board[descriptor._from] = bt$4.EMPTY; // WARNING: update `from` before `to` in case both squares are actually the same!
 		if(descriptor.isEnPassant()) {
-			position.board[descriptor._optionalSquare1] = basetypes.EMPTY;
+			position.board[descriptor._optionalSquare1] = bt$4.EMPTY;
 		}
 		else if(descriptor.isCastling()) {
-			position.board[descriptor._optionalSquare1] = basetypes.EMPTY;
+			position.board[descriptor._optionalSquare1] = bt$4.EMPTY;
 			position.board[descriptor._optionalSquare2] = descriptor._optionalPiece;
 		}
 		position.board[descriptor._to] = descriptor._finalPiece;
@@ -2499,17 +2395,17 @@
 		var movingPiece = Math.floor(descriptor._movingPiece / 2);
 
 		// Update the castling flags.
-		if(movingPiece === basetypes.KING) {
+		if(movingPiece === bt$4.KING) {
 			position.castling[position.turn] = 0;
 		}
-		if(descriptor._from <    8) { position.castling[basetypes.WHITE] &= ~(1 <<  descriptor._from    ); }
-		if(descriptor._to   <    8) { position.castling[basetypes.WHITE] &= ~(1 <<  descriptor._to      ); }
-		if(descriptor._from >= 112) { position.castling[basetypes.BLACK] &= ~(1 << (descriptor._from%16)); }
-		if(descriptor._to   >= 112) { position.castling[basetypes.BLACK] &= ~(1 << (descriptor._to  %16)); }
+		if(descriptor._from <    8) { position.castling[bt$4.WHITE] &= ~(1 <<  descriptor._from    ); }
+		if(descriptor._to   <    8) { position.castling[bt$4.WHITE] &= ~(1 <<  descriptor._to      ); }
+		if(descriptor._from >= 112) { position.castling[bt$4.BLACK] &= ~(1 << (descriptor._from%16)); }
+		if(descriptor._to   >= 112) { position.castling[bt$4.BLACK] &= ~(1 << (descriptor._to  %16)); }
 
 		// Update the en-passant flag.
 		position.enPassant = -1;
-		if(movingPiece === basetypes.PAWN && Math.abs(descriptor._from - descriptor._to)===32) {
+		if(movingPiece === bt$4.PAWN && Math.abs(descriptor._from - descriptor._to)===32) {
 			var otherPawn = descriptor._movingPiece ^ 0x01;
 			var squareBefore = descriptor._to - 1;
 			var squareAfter = descriptor._to + 1;
@@ -2520,7 +2416,7 @@
 		}
 
 		// Update the computed flags.
-		if(movingPiece === basetypes.KING) {
+		if(movingPiece === bt$4.KING && position.king[position.turn] >= 0) {
 			position.king[position.turn] = descriptor._to;
 		}
 
@@ -2533,15 +2429,15 @@
 	 * Determine if a null-move (i.e. switching the player about to play) can be play in the current position.
 	 * A null-move is possible if the position is legal and if the current player about to play is not in check.
 	 */
-	var isNullMoveLegal = exports.isNullMoveLegal = function(position) {
-		return legality.isLegal(position) && !isKingToMoveAttacked(position);
+	var isNullMoveLegal = movegeneration.isNullMoveLegal = function(position) {
+		return legality$3.isLegal(position) && !isKingToMoveAttacked(position);
 	};
 
 
 	/**
 	 * Play a null-move on the current position if it is legal.
 	 */
-	exports.playNullMove = function(position) {
+	movegeneration.playNullMove = function(position) {
 		if(isNullMoveLegal(position)) {
 			position.turn = 1 - position.turn;
 			position.enPassant = -1;
@@ -2551,7 +2447,8 @@
 			return false;
 		}
 	};
-	});
+
+	var notation$1 = {};
 
 	/******************************************************************************
 	 *                                                                            *
@@ -2575,22 +2472,22 @@
 	 ******************************************************************************/
 
 
+	var bt$3 = basetypes;
+	var moveDescriptor$1 = movedescriptor;
+	var exception$4 = exception$7;
+	var i18n$4 = i18n$6;
 
-
-
-
-
-
-
-
-
-
+	var impl$1 = impl$3;
+	var fen$2 = fen$3;
+	var attacks$1 = attacks$4;
+	var legality$2 = legality$4;
+	var moveGeneration$2 = movegeneration;
 
 
 	/**
 	 * Convert the given move descriptor to standard algebraic notation.
 	 */
-	var getNotation$1 = function(position, descriptor, pieceStyle) {
+	notation$1.getNotation = function(position, descriptor, pieceStyle) {
 		var res = '';
 
 		// Castling move
@@ -2599,11 +2496,11 @@
 		}
 
 		// Pawn move
-		else if(Math.floor(descriptor._movingPiece / 2) === basetypes.PAWN) {
+		else if(Math.floor(descriptor._movingPiece / 2) === bt$3.PAWN) {
 			if(descriptor.isCapture()) {
-				res += basetypes.fileToString(descriptor._from % 16) + 'x';
+				res += bt$3.fileToString(descriptor._from % 16) + 'x';
 			}
-			res += basetypes.squareToString(descriptor._to);
+			res += bt$3.squareToString(descriptor._to);
 			if(descriptor.isPromotion()) {
 				res += '=' + getPieceSymbol(descriptor._finalPiece, pieceStyle);
 			}
@@ -2616,7 +2513,7 @@
 			if(descriptor.isCapture()) {
 				res += 'x';
 			}
-			res += basetypes.squareToString(descriptor._to);
+			res += bt$3.squareToString(descriptor._to);
 		}
 
 		// Check/checkmate detection and final result.
@@ -2631,10 +2528,10 @@
 	function getPieceSymbol(coloredPiece, pieceStyle) {
 		switch(pieceStyle) {
 			case 'figurine':
-				return basetypes.figurineToString(coloredPiece);
+				return bt$3.figurineToString(coloredPiece);
 			case 'standard':
 			default:
-				return basetypes.pieceToString(Math.floor(coloredPiece / 2)).toUpperCase();
+				return bt$3.pieceToString(Math.floor(coloredPiece / 2)).toUpperCase();
 		}
 	}
 
@@ -2643,9 +2540,9 @@
 	 * Return the check/checkmate symbol to use for a move.
 	 */
 	function getCheckCheckmateSymbol(position, descriptor) {
-		var nextPosition = impl.makeCopy(position);
-		movegeneration.play(nextPosition, descriptor);
-		return movegeneration.isCheck(nextPosition) ? (movegeneration.hasMove(nextPosition) ? '+' : '#') : '';
+		var nextPosition = impl$1.makeCopy(position);
+		moveGeneration$2.play(nextPosition, descriptor);
+		return moveGeneration$2.isCheckmate(nextPosition) ? '#' : moveGeneration$2.isCheck(nextPosition) ? '+' : '';
 	}
 
 
@@ -2653,7 +2550,7 @@
 	 * Return the disambiguation symbol to use for a move from `from` to `to`.
 	 */
 	function getDisambiguationSymbol(position, from, to) {
-		var attackers = attacks.getAttacks(position, to, position.turn).filter(function(sq) { return position.board[sq]===position.board[from]; });
+		var attackers = attacks$1.getAttacks(position, to, position.turn).filter(function(sq) { return position.board[sq]===position.board[from]; });
 
 		// Disambiguation is not necessary if there less than 2 attackers.
 		if(attackers.length < 2) {
@@ -2675,10 +2572,10 @@
 		}
 
 		if(foundOnSameFile) {
-			return foundOnSameRank ? basetypes.squareToString(from) : basetypes.rankToString(rankFrom);
+			return foundOnSameRank ? bt$3.squareToString(from) : bt$3.rankToString(rankFrom);
 		}
 		else {
-			return foundNotPined ? basetypes.fileToString(fileFrom) : '';
+			return foundNotPined ? bt$3.fileToString(fileFrom) : '';
 		}
 	}
 
@@ -2698,9 +2595,9 @@
 		}
 		var aimingAtVector = Math.abs(aimingAtSq - sq);
 
-		var pinnerQueen  = basetypes.QUEEN  * 2 + 1 - position.turn;
-		var pinnerRook   = basetypes.ROOK   * 2 + 1 - position.turn;
-		var pinnerBishop = basetypes.BISHOP * 2 + 1 - position.turn;
+		var pinnerQueen  = bt$3.QUEEN  * 2 + 1 - position.turn;
+		var pinnerRook   = bt$3.ROOK   * 2 + 1 - position.turn;
+		var pinnerBishop = bt$3.BISHOP * 2 + 1 - position.turn;
 
 		// Potential pinning on file or rank.
 		if(vector < 8) {
@@ -2726,12 +2623,12 @@
 
 	function pinningLoockup(position, kingSquare, targetSquare, direction, pinnerColoredPiece1, pinnerColoredPiece2) {
 		for(var sq = kingSquare + direction; sq !== targetSquare; sq += direction) {
-			if(position.board[sq] !== basetypes.EMPTY) {
+			if(position.board[sq] !== bt$3.EMPTY) {
 				return false;
 			}
 		}
 		for(var sq = targetSquare + direction; (sq & 0x88) === 0; sq += direction) {
-			if(position.board[sq] !== basetypes.EMPTY) {
+			if(position.board[sq] !== bt$3.EMPTY) {
 				return position.board[sq] === pinnerColoredPiece1 || position.board[sq] === pinnerColoredPiece2;
 			}
 		}
@@ -2745,17 +2642,17 @@
 	 * @returns {MoveDescriptor}
 	 * @throws InvalidNotation
 	 */
-	var parseNotation$1 = function(position, notation, strict, pieceStyle) {
+	notation$1.parseNotation = function(position, notation, strict, pieceStyle) {
 
 		// General syntax
-		var m = /^(?:(O-O-O)|(O-O)|([A-Z\u2654-\u265f])([a-h])?([1-8])?(x)?([a-h][1-8])|(?:([a-h])(x)?)?([a-h][1-8])(?:(=)?([A-Z\u2654-\u265f]))?)([+#])?$/.exec(notation);
+		var m = /^(?:(O-O-O|0-0-0)|(O-O|0-0)|([A-Z\u2654-\u265f])([a-h])?([1-8])?(x)?([a-h][1-8])|(?:([a-h])(x)?)?([a-h][1-8])(?:(=)?([A-Z\u2654-\u265f]))?)([+#])?$/.exec(notation);
 		if(m === null) {
-			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_MOVE_NOTATION_SYNTAX);
+			throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.INVALID_MOVE_NOTATION_SYNTAX);
 		}
 
 		// Ensure that the position is legal.
-		if(!legality.isLegal(position)) {
-			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_POSITION);
+		if(!legality$2.isLegal(position)) {
+			throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.ILLEGAL_POSITION);
 		}
 
 		// CASTLING
@@ -2785,58 +2682,63 @@
 		if(m[1] || m[2]) {
 			var from = position.king[position.turn];
 			if(from < 0) {
-				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_NO_KING_CASTLING);
+				throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.ILLEGAL_NO_KING_CASTLING);
 			}
 
 			var to = (m[2] ? 6 : 2) + position.turn*112;
-			descriptor = movegeneration.isCastlingLegal(position, from, to);
+			descriptor = moveGeneration$2.isCastlingLegal(position, from, to);
 			if(!descriptor) {
-				var message = m[2] ? i18n.ILLEGAL_KING_SIDE_CASTLING : i18n.ILLEGAL_QUEEN_SIDE_CASTLING;
-				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, message);
+				var message = m[2] ? i18n$4.ILLEGAL_KING_SIDE_CASTLING : i18n$4.ILLEGAL_QUEEN_SIDE_CASTLING;
+				throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, message);
 			}
 		}
 
 		// Non-pawn move
 		else if(m[3]) {
 			var movingPiece = parsePieceSymbol(position, notation, m[3], strict, pieceStyle);
-			var to = basetypes.squareFromString(m[7]);
+			var to = bt$3.squareFromString(m[7]);
 			var toContent = position.board[to];
 
 			// Cannot take your own pieces!
 			if(toContent >= 0 && toContent % 2 === position.turn) {
-				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.TRYING_TO_CAPTURE_YOUR_OWN_PIECES);
+				throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.TRYING_TO_CAPTURE_YOUR_OWN_PIECES);
+			}
+
+			// Capture may be mandatory in some variants.
+			if(toContent < 0 && moveGeneration$2.isCaptureMandatory(position)) {
+				throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.CAPTURE_IS_MANDATORY);
 			}
 
 			// Find the "from"-square candidates
-			var attackers = attacks.getAttacks(position, to, position.turn).filter(function(sq) { return position.board[sq] === movingPiece*2 + position.turn; });
+			var attackers = attacks$1.getAttacks(position, to, position.turn).filter(function(sq) { return position.board[sq] === movingPiece*2 + position.turn; });
 
 			// Apply disambiguation
 			if(m[4]) {
-				var fileFrom = basetypes.fileFromString(m[4]);
+				var fileFrom = bt$3.fileFromString(m[4]);
 				attackers = attackers.filter(function(sq) { return sq%16 === fileFrom; });
 			}
 			if(m[5]) {
-				var rankFrom = basetypes.rankFromString(m[5]);
+				var rankFrom = bt$3.rankFromString(m[5]);
 				attackers = attackers.filter(function(sq) { return Math.floor(sq/16) === rankFrom; });
 			}
 			if(attackers.length===0) {
-				var message = (m[4] || m[5]) ? i18n.NO_PIECE_CAN_MOVE_TO_DISAMBIGUATION : i18n.NO_PIECE_CAN_MOVE_TO;
-				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, message, m[3], m[7]);
+				var message = (m[4] || m[5]) ? i18n$4.NO_PIECE_CAN_MOVE_TO_DISAMBIGUATION : i18n$4.NO_PIECE_CAN_MOVE_TO;
+				throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, message, m[3], m[7]);
 			}
 
 			// Compute the move descriptor for each remaining "from"-square candidate
 			for(var i=0; i<attackers.length; ++i) {
-				var currentDescriptor = movegeneration.isKingSafeAfterMove(position, attackers[i], to, -1);
+				var currentDescriptor = moveGeneration$2.isKingSafeAfterMove(position, attackers[i], to, -1);
 				if(currentDescriptor) {
 					if(descriptor !== null) {
-						throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.REQUIRE_DISAMBIGUATION, m[3], m[7]);
+						throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.REQUIRE_DISAMBIGUATION, m[3], m[7]);
 					}
 					descriptor = currentDescriptor;
 				}
 			}
 			if(descriptor === null) {
-				var message = position.turn===basetypes.WHITE ? i18n.NOT_SAFE_FOR_WHITE_KING : i18n.NOT_SAFE_FOR_BLACK_KING;
-				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, message);
+				var message = position.turn===bt$3.WHITE ? i18n$4.NOT_SAFE_FOR_WHITE_KING : i18n$4.NOT_SAFE_FOR_BLACK_KING;
+				throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, message);
 			}
 
 			// STRICT-MODE -> check the disambiguation symbol.
@@ -2844,16 +2746,19 @@
 				var expectedDS = getDisambiguationSymbol(position, descriptor._from, to);
 				var observedDS = (m[4] ? m[4] : '') + (m[5] ? m[5] : '');
 				if(expectedDS !== observedDS) {
-					throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.WRONG_DISAMBIGUATION_SYMBOL, expectedDS, observedDS);
+					throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.WRONG_DISAMBIGUATION_SYMBOL, expectedDS, observedDS);
 				}
 			}
 		}
 
 		// Pawn move
 		else if(m[10]) {
-			var to = basetypes.squareFromString(m[10]);
+			var to = bt$3.squareFromString(m[10]);
 			if(m[8]) {
-				descriptor = getPawnCaptureDescriptor(position, notation, basetypes.fileFromString(m[8]), to);
+				descriptor = getPawnCaptureDescriptor(position, notation, bt$3.fileFromString(m[8]), to);
+			}
+			else if(moveGeneration$2.isCaptureMandatory(position)) {
+				throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.CAPTURE_IS_MANDATORY);
 			}
 			else {
 				descriptor = getPawnAdvanceDescriptor(position, notation, to);
@@ -2861,43 +2766,43 @@
 
 			// Ensure that the pawn move do not let a king in check.
 			if(!descriptor) {
-				var message = position.turn===basetypes.WHITE ? i18n.NOT_SAFE_FOR_WHITE_KING : i18n.NOT_SAFE_FOR_BLACK_KING;
-				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, message);
+				var message = position.turn===bt$3.WHITE ? i18n$4.NOT_SAFE_FOR_WHITE_KING : i18n$4.NOT_SAFE_FOR_BLACK_KING;
+				throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, message);
 			}
 
 			// Detect promotions
 			if(to<8 || to>=112) {
 				if(!m[12]) {
-					throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.MISSING_PROMOTION);
+					throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.MISSING_PROMOTION);
 				}
 				var promotion = parsePieceSymbol(position, notation, m[12], strict, pieceStyle);
-				if(promotion === basetypes.PAWN || promotion === basetypes.KING) {
-					throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_PROMOTED_PIECE, m[12]);
+				if(promotion === bt$3.PAWN || (promotion === bt$3.KING && position.variant !== bt$3.ANTICHESS)) {
+					throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.INVALID_PROMOTED_PIECE, m[12]);
 				}
-				descriptor = movedescriptor.makePromotion(descriptor._from, descriptor._to, descriptor._movingPiece % 2, promotion, descriptor._optionalPiece);
+				descriptor = moveDescriptor$1.makePromotion(descriptor._from, descriptor._to, descriptor._movingPiece % 2, promotion, descriptor._optionalPiece);
 
 				// STRICT MODE -> do not forget the `=` character!
 				if(strict && !m[11]) {
-					throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.MISSING_PROMOTION_SYMBOL);
+					throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.MISSING_PROMOTION_SYMBOL);
 				}
 			}
 
 			// Detect illegal promotion attempts!
 			else if(m[12]) {
-				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_PROMOTION);
+				throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.ILLEGAL_PROMOTION);
 			}
 		}
 
 		// STRICT MODE
 		if(strict) {
 			if(descriptor.isCapture() !== (m[6] || m[9])) {
-				var message = descriptor.isCapture() ? i18n.MISSING_CAPTURE_SYMBOL : i18n.INVALID_CAPTURE_SYMBOL;
-				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, message);
+				var message = descriptor.isCapture() ? i18n$4.MISSING_CAPTURE_SYMBOL : i18n$4.INVALID_CAPTURE_SYMBOL;
+				throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, message);
 			}
 			var expectedCCS = getCheckCheckmateSymbol(position, descriptor);
 			var observedCCS = m[13] ? m[13] : '';
 			if(expectedCCS !== observedCCS) {
-				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.WRONG_CHECK_CHECKMATE_SYMBOL, expectedCCS, observedCCS);
+				throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.WRONG_CHECK_CHECKMATE_SYMBOL, expectedCCS, observedCCS);
 			}
 		}
 
@@ -2913,20 +2818,20 @@
 		switch(pieceStyle) {
 
 			case 'figurine':
-				var coloredPiece = basetypes.figurineFromString(coloredPiece);
+				var coloredPiece = bt$3.figurineFromString(coloredPiece);
 				if(piece < 0) {
-					throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_PIECE_SYMBOL, coloredPiece);
+					throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.INVALID_PIECE_SYMBOL, coloredPiece);
 				}
 				if(strict && coloredPiece % 2 !== position.turn) {
-					throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_PIECE_SYMBOL_COLOR, coloredPiece);
+					throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.INVALID_PIECE_SYMBOL_COLOR, coloredPiece);
 				}
 				return Math.floor(coloredPiece / 2);
 
 			case 'standard':
 			default:
-				var piece = basetypes.pieceFromString(coloredPiece.toLowerCase());
+				var piece = bt$3.pieceFromString(coloredPiece.toLowerCase());
 				if(piece < 0) {
-					throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_PIECE_SYMBOL, coloredPiece);
+					throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.INVALID_PIECE_SYMBOL, coloredPiece);
 				}
 				return piece;
 		}
@@ -2943,7 +2848,7 @@
 		// Ensure that `to` is not on the 1st row.
 		var from = to - 16 + position.turn*32;
 		if((from & 0x88) !== 0) {
-			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_CAPTURING_PAWN_MOVE);
+			throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.INVALID_CAPTURING_PAWN_MOVE);
 		}
 
 		// Compute the "from"-square.
@@ -2951,26 +2856,26 @@
 		if(columnTo - columnFrom === 1) { from -= 1; }
 		else if(columnTo - columnFrom === -1) { from += 1; }
 		else {
-			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_CAPTURING_PAWN_MOVE);
+			throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.INVALID_CAPTURING_PAWN_MOVE);
 		}
 
 		// Check the content of the "from"-square
-		if(position.board[from] !== basetypes.PAWN*2+position.turn) {
-			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_CAPTURING_PAWN_MOVE);
+		if(position.board[from] !== bt$3.PAWN*2+position.turn) {
+			throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.INVALID_CAPTURING_PAWN_MOVE);
 		}
 
 		// Check the content of the "to"-square
 		var toContent = position.board[to];
 		if(toContent < 0) {
 			if(to === (5-position.turn*3)*16 + position.enPassant) { // detecting "en-passant" captures
-				return movegeneration.isKingSafeAfterMove(position, from, to, (4-position.turn)*16 + position.enPassant);
+				return moveGeneration$2.isKingSafeAfterMove(position, from, to, (4-position.turn)*16 + position.enPassant);
 			}
 		}
 		else if(toContent % 2 !== position.turn) { // detecting regular captures
-			return movegeneration.isKingSafeAfterMove(position, from, to, -1);
+			return moveGeneration$2.isKingSafeAfterMove(position, from, to, -1);
 		}
 
-		throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_CAPTURING_PAWN_MOVE);
+		throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.INVALID_CAPTURING_PAWN_MOVE);
 	}
 
 
@@ -2985,18 +2890,18 @@
 		var offset = 16 - position.turn*32;
 		var from = to - offset;
 		if((from & 0x88) !== 0) {
-			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_NON_CAPTURING_PAWN_MOVE);
+			throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.INVALID_NON_CAPTURING_PAWN_MOVE);
 		}
 
 		// Check the content of the "to"-square
 		if(position.board[to] >= 0) {
-			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_NON_CAPTURING_PAWN_MOVE);
+			throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.INVALID_NON_CAPTURING_PAWN_MOVE);
 		}
 
 		// Check the content of the "from"-square
-		var expectedFromContent = basetypes.PAWN*2+position.turn;
+		var expectedFromContent = bt$3.PAWN*2+position.turn;
 		if(position.board[from] === expectedFromContent) {
-			return movegeneration.isKingSafeAfterMove(position, from, to, -1);
+			return moveGeneration$2.isKingSafeAfterMove(position, from, to, -1);
 		}
 
 		// Look for two-square pawn moves
@@ -3004,17 +2909,14 @@
 			from -= offset;
 			var firstSquareOfRow = (1 + position.turn*5) * 16;
 			if(from >= firstSquareOfRow && from < firstSquareOfRow+8 && position.board[from] === expectedFromContent) {
-				return movegeneration.isKingSafeAfterMove(position, from, to, -1);
+				return moveGeneration$2.isKingSafeAfterMove(position, from, to, -1);
 			}
 		}
 
-		throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_NON_CAPTURING_PAWN_MOVE);
+		throw new exception$4.InvalidNotation(fen$2.getFEN(position, 0, 1), notation, i18n$4.INVALID_NON_CAPTURING_PAWN_MOVE);
 	}
 
-	var notation = {
-		getNotation: getNotation$1,
-		parseNotation: parseNotation$1
-	};
+	var uci$1 = {};
 
 	/******************************************************************************
 	 *                                                                            *
@@ -3038,22 +2940,22 @@
 	 ******************************************************************************/
 
 
-
-
-
-
-
-
+	var bt$2 = basetypes;
+	var exception$3 = exception$7;
+	var i18n$3 = i18n$6;
+	var fen$1 = fen$3;
+	var legality$1 = legality$4;
+	var moveGeneration$1 = movegeneration;
 
 
 	/**
 	 * Convert the given move descriptor to UCI notation.
 	 */
-	var getNotation = function(position, descriptor, forceKxR) {
+	uci$1.getNotation = function(position, descriptor, forceKxR) {
 		var res = descriptor.from();
 
 		if(descriptor.isCastling()) {
-			res += forceKxR || position.variant === basetypes.CHESS960 ? descriptor.rookFrom() : descriptor.to();
+			res += forceKxR || position.variant === bt$2.CHESS960 ? descriptor.rookFrom() : descriptor.to();
 		}
 		else {
 			res += descriptor.to();
@@ -3073,34 +2975,34 @@
 	 * @returns {MoveDescriptor}
 	 * @throws InvalidNotation
 	 */
-	var parseNotation = function(position, notation, strict) {
+	uci$1.parseNotation = function(position, notation, strict) {
 
 		// General syntax
-		var m = /^([a-h][1-8])([a-h][1-8])([qrbn]?)$/.exec(notation);
+		var m = /^([a-h][1-8])([a-h][1-8])([kqrbnp]?)$/.exec(notation);
 		if(m === null) {
-			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.INVALID_UCI_NOTATION_SYNTAX);
+			throw new exception$3.InvalidNotation(fen$1.getFEN(position, 0, 1), notation, i18n$3.INVALID_UCI_NOTATION_SYNTAX);
 		}
 
 		// Ensure that the position is legal (this is also done in `moveGeneration.isMoveLegal(..)`, but performing this check beforehand
 		// allows to fill the exception with an error message that is more explicit).
-		if(!legality.isLegal(position)) {
-			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_POSITION);
+		if(!legality$1.isLegal(position)) {
+			throw new exception$3.InvalidNotation(fen$1.getFEN(position, 0, 1), notation, i18n$3.ILLEGAL_POSITION);
 		}
 
 		// m[1] - from
 		// m[2] - to
 		// m[3] - promotion piece
 
-		var from = basetypes.squareFromString(m[1]);
-		var to = basetypes.squareFromString(m[2]);
+		var from = bt$2.squareFromString(m[1]);
+		var to = bt$2.squareFromString(m[2]);
 		var kxrSubstitutionApplied = false;
 		var expectedRookFrom = null; // non-null only if KxR substitution has been applied.
 
 		// If KxR is detected (and allowed), try to replace
-		if((position.variant === basetypes.CHESS960 || !strict) && position.board[from] !== basetypes.EMPTY && position.board[to] !== basetypes.EMPTY && position.board[from]%2 === position.board[to]%2) {
+		if((position.variant === bt$2.CHESS960 || !strict) && position.board[from] !== bt$2.EMPTY && position.board[to] !== bt$2.EMPTY && position.board[from]%2 === position.board[to]%2) {
 			var fromPiece = Math.floor(position.board[from] / 2);
 			var toPiece = Math.floor(position.board[to] / 2);
-			if(fromPiece === basetypes.KING && toPiece === basetypes.ROOK) {
+			if(fromPiece === bt$2.KING && toPiece === bt$2.ROOK) {
 				kxrSubstitutionApplied = true;
 				expectedRookFrom = to;
 				to = position.turn * 112 + (from < to ? 6 : 2);
@@ -3108,22 +3010,23 @@
 		}
 
 		// Perform move analysis.
-		var result = movegeneration.isMoveLegal(position, from, to);
+		var result = moveGeneration$1.isMoveLegal(position, from, to);
 
 		// No legal move.
 		if(!result) {
-			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_UCI_MOVE);
+			throw new exception$3.InvalidNotation(fen$1.getFEN(position, 0, 1), notation, i18n$3.ILLEGAL_UCI_MOVE);
 		}
 
 		// Manage promotion.
 		if(result.type === 'promotion') {
-			if(m[3] === '') { // A promotion piece must be provided in case of promotion move.
-				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_UCI_MOVE);
+			var promotion = bt$2.pieceFromString(m[3]);
+			if(promotion < 0 || promotion === bt$2.PAWN || (promotion === bt$2.KING && position.variant !== bt$2.ANTICHESS)) {
+				throw new exception$3.InvalidNotation(fen$1.getFEN(position, 0, 1), notation, i18n$3.ILLEGAL_UCI_MOVE);
 			}
-			result = result.build(basetypes.pieceFromString(m[3]));
+			result = result.build(promotion);
 		}
 		else if(m[3] !== '') { // Throw if a promotion piece is provided while no promotion happens.
-			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_UCI_MOVE);
+			throw new exception$3.InvalidNotation(fen$1.getFEN(position, 0, 1), notation, i18n$3.ILLEGAL_UCI_MOVE);
 		}
 
 		// Manage the castling-move ambiguity that could arise in chess960.
@@ -3133,23 +3036,18 @@
 
 		// Manage KxR substitution.
 		if(result.isCastling()) {
-			if(position.variant === basetypes.CHESS960 && !kxrSubstitutionApplied) { // KxR substitution is mandatory for castling moves in Chess960.
-				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_UCI_MOVE);
+			if(position.variant === bt$2.CHESS960 && !kxrSubstitutionApplied) { // KxR substitution is mandatory for castling moves in Chess960.
+				throw new exception$3.InvalidNotation(fen$1.getFEN(position, 0, 1), notation, i18n$3.ILLEGAL_UCI_MOVE);
 			}
 			if(kxrSubstitutionApplied && expectedRookFrom !== result._optionalSquare1) { // If KxR substitution has been applied, ensure that the rook-from square is what it is supposed to be.
-				throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_UCI_MOVE);
+				throw new exception$3.InvalidNotation(fen$1.getFEN(position, 0, 1), notation, i18n$3.ILLEGAL_UCI_MOVE);
 			}
 		}
 		else if(kxrSubstitutionApplied) { // If KxR substitution has been applied, a castling move must be found.
-			throw new exception.InvalidNotation(fen.getFEN(position, 0, 1), notation, i18n.ILLEGAL_UCI_MOVE);
+			throw new exception$3.InvalidNotation(fen$1.getFEN(position, 0, 1), notation, i18n$3.ILLEGAL_UCI_MOVE);
 		}
 
 		return result;
-	};
-
-	var uci = {
-		getNotation: getNotation,
-		parseNotation: parseNotation
 	};
 
 	/******************************************************************************
@@ -3173,21 +3071,19 @@
 	 *                                                                            *
 	 ******************************************************************************/
 
-	var position$1 = createCommonjsModule(function (module, exports) {
 
+	var bt$1 = basetypes;
+	var moveDescriptor = movedescriptor;
+	var exception$2 = exception$7;
+	var i18n$2 = i18n$6;
 
-
-
-
-
-
-
-
-
-
-
-
-
+	var impl = impl$3;
+	var fen = fen$3;
+	var attacks = attacks$4;
+	var legality = legality$4;
+	var moveGeneration = movegeneration;
+	var notation = notation$1;
+	var uci = uci$1;
 
 
 
@@ -3211,22 +3107,26 @@
 	 * new kokopu.Position('black-king-only', 'empty'); //  6 -> Empty board, configured to be considered as legal with no white king.
 	 * new kokopu.Position('chess960', 'empty');        //  7 -> Empty board, configured for Chess960.
 	 * new kokopu.Position('chess960', scharnaglCode);  //  8 -> One of the Chess960 starting position (`scharnaglCode` is a number between 0 and 959 inclusive).
-	 * new kokopu.Position(variant, fenString);         //  9 -> Parse the given FEN string, assuming the given game variant.
-	 * new kokopu.Position(fenStringWithVariant);       // 10 -> Parse the given FEN string, taking into account an optional game variant that may be mentioned in prefix.
-	 * new kokopu.Position(anotherPosition);            // 11 -> Make a copy of `anotherPosition`.
+	 * new kokopu.Position('antichess');                //  9 -> Usual starting position, configured for antichess.
+	 * new kokopu.Position('antichess', 'start');       // 10 -> Same as 9.
+	 * new kokopu.Position('antichess', 'empty');       // 11 -> Empty board, configured for antichess.
+	 * new kokopu.Position(variant, fenString);         // 12 -> Parse the given FEN string, assuming the given game variant.
+	 * new kokopu.Position(fenStringWithVariant);       // 13 -> Parse the given FEN string, taking into account an optional game variant that may be mentioned in prefix.
+	 * new kokopu.Position(anotherPosition);            // 14 -> Make a copy of `anotherPosition`.
 	 * ```
 	 * Please note that the argument `'regular'` can be omitted in forms 1, 2, 3. In particular, the constructor can be invoked
 	 * with no argument, as in `new kokopu.Position()`: in this case, a new `Position` initialized to the usual starting position
 	 * is instantiated (as in forms 1 and 2).
 	 *
-	 * In form 9, `variant` must be one of the game variant proposed in {@link GameVariant}. The `variant` argument can be omitted,
+	 * In form 12, `variant` must be one of the game variant proposed in {@link GameVariant}. The `variant` argument can be omitted if it is set to `'regular'`
+	 * (i.e. if the usual chess rules are used).
 	 * If `variant` is set to `'chess960'`, then the X-FEN syntax can be used for `fenString'`.
 	 *
-	 * In form 10, `fenStringWithVariant` is assumed to be a string formatted as `'variant:FEN'` (e.g. `'chess960:nrkbqrbn/pppppppp/8/8/8/8/PPPPPPPP/NRKBQRBN w BFbf - 0 1'`).
-	 * The `'variant:'` prefix is optional: if omitted, the usual chess rules are assumed. For the Chess960 variant,
+	 * In form 13, `fenStringWithVariant` is assumed to be a string formatted as `'variant:FEN'` (e.g. `'chess960:nrkbqrbn/pppppppp/8/8/8/8/PPPPPPPP/NRKBQRBN w BFbf - 0 1'`).
+	 * The `'variant:'` prefix is optional: if omitted, the usual chess rules are used. For the Chess960 variant,
 	 * the X-FEN syntax can be used for the FEN part of the string.
 	 *
-	 * In form 11, `anotherPosition` must be another {@link Position} object.
+	 * In form 14, `anotherPosition` must be another {@link Position} object.
 	 *
 	 * @throws {module:exception.InvalidFEN} If the input parameter is not a valid FEN string (can be thrown only in cases 6 and 7).
 	 *
@@ -3235,34 +3135,40 @@
 	 * @see Chess960 starting positions: {@link https://chess960.net/start-positions/}
 	 * @see X-FEN notation: {@link https://en.wikipedia.org/wiki/X-FEN}
 	 */
-	var Position = exports.Position = function() {
+	var Position$2 = position$1.Position = function() {
 
 		// Copy constructor
-		if(arguments[0] instanceof Position) {
+		if(arguments[0] instanceof Position$2) {
 			this._impl = impl.makeCopy(arguments[0]._impl);
 		}
 
 		// Special constructor codes
 		else if(arguments.length === 0 || arguments[0] === 'start' || (arguments[0] === 'regular' && (arguments.length === 1 || arguments[1] === 'start'))) {
-			this._impl = impl.makeInitial();
+			this._impl = impl.makeInitial(bt$1.REGULAR_CHESS);
 		}
 		else if(arguments[0] === 'empty' || (arguments[0] === 'regular' && arguments[1] === 'empty')) {
-			this._impl = impl.makeEmpty(basetypes.REGULAR_CHESS);
+			this._impl = impl.makeEmpty(bt$1.REGULAR_CHESS);
 		}
 		else if(arguments[0] === 'chess960' && arguments[1] === 'empty') {
-			this._impl = impl.makeEmpty(basetypes.CHESS960);
+			this._impl = impl.makeEmpty(bt$1.CHESS960);
 		}
 		else if(arguments[0] === 'chess960' && typeof arguments[1] === 'number' && arguments[1] >= 0 && arguments[1] <= 959) {
 			this._impl = impl.make960FromScharnagl(arguments[1]);
 		}
 		else if(arguments[0] === 'no-king' && arguments[1] === 'empty') {
-			this._impl = impl.makeEmpty(basetypes.NO_KING);
+			this._impl = impl.makeEmpty(bt$1.NO_KING);
 		}
 		else if(arguments[0] === 'white-king-only' && arguments[1] === 'empty') {
-			this._impl = impl.makeEmpty(basetypes.WHITE_KING_ONLY);
+			this._impl = impl.makeEmpty(bt$1.WHITE_KING_ONLY);
 		}
 		else if(arguments[0] === 'black-king-only' && arguments[1] === 'empty') {
-			this._impl = impl.makeEmpty(basetypes.BLACK_KING_ONLY);
+			this._impl = impl.makeEmpty(bt$1.BLACK_KING_ONLY);
+		}
+		else if(arguments[0] === 'antichess' && (arguments.length === 1 || arguments[1] === 'start')) {
+			this._impl = impl.makeInitial(bt$1.ANTICHESS);
+		}
+		else if(arguments[0] === 'antichess' && arguments[1] === 'empty') {
+			this._impl = impl.makeEmpty(bt$1.ANTICHESS);
 		}
 
 		// FEN parsing
@@ -3271,35 +3177,35 @@
 
 			// Form (variant, FEN)
 			if(typeof arguments[1] === 'string') {
-				var variant = basetypes.variantFromString(arguments[0]);
+				var variant = bt$1.variantFromString(arguments[0]);
 				if(variant >= 0) {
 					this._impl = fen.parseFEN(variant, arguments[1], false).position;
 				}
 				else {
-					throw new exception.IllegalArgument('Position()');
+					throw new exception$2.IllegalArgument('Position()');
 				}
 			}
 
 			// Form (variant:FEN) (concatenated string)
 			else if(separatorIndex >= 0) {
-				var variant = basetypes.variantFromString(arguments[0].substring(0, separatorIndex));
+				var variant = bt$1.variantFromString(arguments[0].substring(0, separatorIndex));
 				if(variant >= 0) {
 					this._impl = fen.parseFEN(variant, arguments[0].substring(separatorIndex + 1), false).position;
 				}
 				else {
-					throw new exception.InvalidFEN(arguments[0], i18n.INVALID_VARIANT_PREFIX, arguments[0].substring(0, separatorIndex));
+					throw new exception$2.InvalidFEN(arguments[0], i18n$2.INVALID_VARIANT_PREFIX, arguments[0].substring(0, separatorIndex));
 				}
 			}
 
 			// Form (FEN)
 			else {
-				this._impl = fen.parseFEN(basetypes.REGULAR_CHESS, arguments[0], false).position;
+				this._impl = fen.parseFEN(bt$1.REGULAR_CHESS, arguments[0], false).position;
 			}
 		}
 
 		// Wrong argument scheme
 		else {
-			throw new exception.IllegalArgument('Position()');
+			throw new exception$2.IllegalArgument('Position()');
 		}
 	};
 
@@ -3309,14 +3215,14 @@
 	 *
 	 * @param {GameVariant} [variant=`'regular'`] Chess game variant to use.
 	 */
-	Position.prototype.clear = function(variant) {
+	Position$2.prototype.clear = function(variant) {
 		if(arguments.length === 0) {
-			this._impl = impl.makeEmpty(basetypes.REGULAR_CHESS);
+			this._impl = impl.makeEmpty(bt$1.REGULAR_CHESS);
 		}
 		else {
-			var v = basetypes.variantFromString(variant);
+			var v = bt$1.variantFromString(variant);
 			if(v < 0) {
-				throw new exception.IllegalArgument('Position#clear()');
+				throw new exception$2.IllegalArgument('Position#clear()');
 			}
 			this._impl = impl.makeEmpty(v);
 		}
@@ -3324,10 +3230,10 @@
 
 
 	/**
-	 * Set the position to the starting state.
+	 * Set the position to the starting state (in the regular chess variant).
 	 */
-	Position.prototype.reset = function() {
-		this._impl = impl.makeInitial();
+	Position$2.prototype.reset = function() {
+		this._impl = impl.makeInitial(bt$1.REGULAR_CHESS);
 	};
 
 
@@ -3337,8 +3243,16 @@
 	 * @param {number} scharnaglCode Must be between 0 and 959 inclusive (see {@link https://chess960.net/start-positions/}
 	 *        or {@link https://www.chessprogramming.org/Reinhard_Scharnagl} for more details).
 	 */
-	Position.prototype.reset960 = function(scharnaglCode) {
+	Position$2.prototype.reset960 = function(scharnaglCode) {
 		this._impl = impl.make960FromScharnagl(scharnaglCode);
+	};
+
+
+	/**
+	 * Set the position to the starting state of the antichess variant.
+	 */
+	Position$2.prototype.resetAntichess = function() {
+		this._impl = impl.makeInitial(bt$1.ANTICHESS);
 	};
 
 
@@ -3354,7 +3268,7 @@
 	 *
 	 * @returns {string} Human-readable representation of the position.
 	 */
-	Position.prototype.ascii = function() {
+	Position$2.prototype.ascii = function() {
 		return fen.ascii(this._impl);
 	};
 
@@ -3375,7 +3289,7 @@
 	 * @returns {{fiftyMoveClock:number, fullMoveNumber:number}}
 	 * @throws {module:exception.InvalidFEN} If the given string cannot be parsed as a valid FEN string.
 	 */
-	Position.prototype.fen = function() {
+	Position$2.prototype.fen = function() {
 		if(arguments.length === 0) {
 			return fen.getFEN(this._impl, 0, 1);
 		}
@@ -3383,7 +3297,7 @@
 			var fiftyMoveClock = (typeof arguments[0].fiftyMoveClock === 'number') ? arguments[0].fiftyMoveClock : 0;
 			var fullMoveNumber = (typeof arguments[0].fullMoveNumber === 'number') ? arguments[0].fullMoveNumber : 1;
 			var withVariant = (typeof arguments[0].withVariant === 'boolean') ? arguments[0].withVariant : false;
-			return (withVariant ? basetypes.variantToString(this._impl.variant) + ':' : '') + fen.getFEN(this._impl, fiftyMoveClock, fullMoveNumber);
+			return (withVariant ? bt$1.variantToString(this._impl.variant) + ':' : '') + fen.getFEN(this._impl, fiftyMoveClock, fullMoveNumber);
 		}
 		else if(arguments.length === 1 && typeof arguments[0] === 'string') {
 			var result = fen.parseFEN(this._impl.variant, arguments[0], false);
@@ -3396,7 +3310,7 @@
 			return { fiftyMoveClock: result.fiftyMoveClock, fullMoveNumber: result.fullMoveNumber };
 		}
 		else {
-			throw new exception.IllegalArgument('Position#fen()');
+			throw new exception$2.IllegalArgument('Position#fen()');
 		}
 	};
 
@@ -3412,8 +3326,8 @@
 	 *
 	 * @returns {GameVariant}
 	 */
-	Position.prototype.variant = function() {
-		return basetypes.variantToString(this._impl.variant);
+	Position$2.prototype.variant = function() {
+		return bt$1.variantToString(this._impl.variant);
 	};
 
 
@@ -3430,24 +3344,24 @@
 	 * @param {Square} square
 	 * @param {ColoredPiece|Empty} value
 	 */
-	Position.prototype.square = function(square, value) {
-		square = basetypes.squareFromString(square);
+	Position$2.prototype.square = function(square, value) {
+		square = bt$1.squareFromString(square);
 		if(square < 0) {
-			throw new exception.IllegalArgument('Position#square()');
+			throw new exception$2.IllegalArgument('Position#square()');
 		}
 
 		if(arguments.length === 1) {
 			var cp = this._impl.board[square];
-			return cp < 0 ? '-' : basetypes.coloredPieceToString(cp);
+			return cp < 0 ? '-' : bt$1.coloredPieceToString(cp);
 		}
 		else if(value === '-') {
-			this._impl.board[square] = basetypes.EMPTY;
+			this._impl.board[square] = bt$1.EMPTY;
 			this._impl.legal = null;
 		}
 		else {
-			var cp = basetypes.coloredPieceFromString(value);
+			var cp = bt$1.coloredPieceFromString(value);
 			if(cp < 0) {
-				throw new exception.IllegalArgument('Position#square()');
+				throw new exception$2.IllegalArgument('Position#square()');
 			}
 			this._impl.board[square] = cp;
 			this._impl.legal = null;
@@ -3466,14 +3380,14 @@
 	 *
 	 * @param {Color} value
 	 */
-	Position.prototype.turn = function(value) {
+	Position$2.prototype.turn = function(value) {
 		if(arguments.length === 0) {
-			return basetypes.colorToString(this._impl.turn);
+			return bt$1.colorToString(this._impl.turn);
 		}
 		else {
-			var turn = basetypes.colorFromString(value);
+			var turn = bt$1.colorFromString(value);
 			if(turn < 0) {
-				throw new exception.IllegalArgument('Position#turn()');
+				throw new exception$2.IllegalArgument('Position#turn()');
 			}
 			this._impl.turn = turn;
 			this._impl.legal = null;
@@ -3494,12 +3408,12 @@
 	 * @param {Castle|Castle960} castle Must be {@link Castle960} if the {@link Position} is configured for Chess960, or {@link Castle} otherwise.
 	 * @param {boolean} value
 	 */
-	Position.prototype.castling = function(castle, value) {
-		if(!(this._impl.variant === basetypes.CHESS960 ? /^[wb][a-h]$/ : /^[wb][qk]$/).test(castle)) {
-			throw new exception.IllegalArgument('Position#castling()');
+	Position$2.prototype.castling = function(castle, value) {
+		if(!(this._impl.variant === bt$1.CHESS960 ? /^[wb][a-h]$/ : /^[wb][qk]$/).test(castle)) {
+			throw new exception$2.IllegalArgument('Position#castling()');
 		}
-		var color = basetypes.colorFromString(castle[0]);
-		var file = this._impl.variant === basetypes.CHESS960 ? basetypes.fileFromString(castle[1]) : castle[1]==='k' ? 7 : 0;
+		var color = bt$1.colorFromString(castle[0]);
+		var file = this._impl.variant === bt$1.CHESS960 ? bt$1.fileFromString(castle[1]) : castle[1]==='k' ? 7 : 0;
 
 		if(arguments.length === 1) {
 			return (this._impl.castling[color] & 1 << file) !== 0;
@@ -3526,18 +3440,18 @@
 	 *
 	 * @param {EnPassantFlag} value
 	 */
-	Position.prototype.enPassant = function(value) {
+	Position$2.prototype.enPassant = function(value) {
 		if(arguments.length === 0) {
-			return this._impl.enPassant < 0 ? '-' : basetypes.fileToString(this._impl.enPassant);
+			return this._impl.enPassant < 0 ? '-' : bt$1.fileToString(this._impl.enPassant);
 		}
 		else if(value === '-') {
 			this._impl.enPassant = -1;
 			this._impl.legal = null;
 		}
 		else {
-			var enPassant = basetypes.fileFromString(value);
+			var enPassant = bt$1.fileFromString(value);
 			if(enPassant < 0) {
-				throw new exception.IllegalArgument('Position#enPassant()');
+				throw new exception$2.IllegalArgument('Position#enPassant()');
 			}
 			this._impl.enPassant = enPassant;
 			this._impl.legal = null;
@@ -3558,11 +3472,11 @@
 	 * @param {Color} byWho
 	 * @returns {boolean}
 	 */
-	Position.prototype.isAttacked = function(square, byWho) {
-		square = basetypes.squareFromString(square);
-		byWho = basetypes.colorFromString(byWho);
+	Position$2.prototype.isAttacked = function(square, byWho) {
+		square = bt$1.squareFromString(square);
+		byWho = bt$1.colorFromString(byWho);
 		if(square < 0 || byWho < 0) {
-			throw new exception.IllegalArgument('Position#isAttacked()');
+			throw new exception$2.IllegalArgument('Position#isAttacked()');
 		}
 		return attacks.isAttacked(this._impl, square, byWho);
 	};
@@ -3575,13 +3489,13 @@
 	 * @param {Color} byWho
 	 * @returns {Square[]}
 	 */
-	Position.prototype.getAttacks = function(square, byWho) {
-		square = basetypes.squareFromString(square);
-		byWho = basetypes.colorFromString(byWho);
+	Position$2.prototype.getAttacks = function(square, byWho) {
+		square = bt$1.squareFromString(square);
+		byWho = bt$1.colorFromString(byWho);
 		if(square < 0 || byWho < 0) {
-			throw new exception.IllegalArgument('Position#getAttacks()');
+			throw new exception$2.IllegalArgument('Position#getAttacks()');
 		}
-		return attacks.getAttacks(this._impl, square, byWho).map(basetypes.squareToString);
+		return attacks.getAttacks(this._impl, square, byWho).map(bt$1.squareToString);
 	};
 
 
@@ -3607,7 +3521,7 @@
 	 *
 	 * @returns {boolean}
 	 */
-	Position.prototype.isLegal = function() {
+	Position$2.prototype.isLegal = function() {
 		return legality.isLegal(this._impl);
 	};
 
@@ -3615,18 +3529,24 @@
 	/**
 	 * Return the square on which is located the king of the given color.
 	 *
+	 * For non-standard variants, the behavior of this method depends on whether king has "royal power" in the current variant or not
+	 * (i.e. whether it can be put in check or not). For instance:
+	 *  - in antichess, the king has no royal power, thus `false` is always returned,
+	 *  - in chess960, the king has royal power (as in the usual chess rules), thus the method does returns the square on which the king is located.
+	 *
 	 * @param {Color} color
 	 * @returns {Square|boolean} Square where is located the searched king. `false` is returned
-	 *          if there is no king of the given color, or if the are 2 such kings or more.
+	 *          if there is no king of the given color, if the are 2 such kings or more,
+	 *          or if king has no "royal power".
 	 */
-	Position.prototype.kingSquare = function(color) {
-		color = basetypes.colorFromString(color);
+	Position$2.prototype.kingSquare = function(color) {
+		color = bt$1.colorFromString(color);
 		if(color < 0) {
-			throw new exception.IllegalArgument('Position#kingSquare()');
+			throw new exception$2.IllegalArgument('Position#kingSquare()');
 		}
 		legality.refreshLegalFlagAndKingSquares(this._impl);
 		var square = this._impl.king[color];
-		return square < 0 ? false : basetypes.squareToString(square);
+		return square < 0 ? false : bt$1.squareToString(square);
 	};
 
 
@@ -3640,10 +3560,12 @@
 	 * Return `true` if the player that is about to play is in check. If the position is not legal (see {@link Position#isLegal}),
 	 * the returned value is always `false`.
 	 *
+	 * For antichess, this method always returns `false`.
+	 *
 	 * @returns {boolean}
 	 */
-	Position.prototype.isCheck = function() {
-		return movegeneration.isCheck(this._impl);
+	Position$2.prototype.isCheck = function() {
+		return moveGeneration.isCheck(this._impl);
 	};
 
 
@@ -3651,10 +3573,13 @@
 	 * Return `true` if the player that is about to play is checkmated. If the position is not legal (see {@link Position#isLegal}),
 	 * the returned value is always `false`.
 	 *
+	 * For antichess, this method returns `true` if the player about to play has no remaining piece or pawn, or if non of his/her remaining piece can move.
+	 * (same behavior as {@link Position#isStalemate} in this case).
+	 *
 	 * @returns {boolean}
 	 */
-	Position.prototype.isCheckmate = function() {
-		return movegeneration.isCheckmate(this._impl);
+	Position$2.prototype.isCheckmate = function() {
+		return moveGeneration.isCheckmate(this._impl);
 	};
 
 
@@ -3662,10 +3587,13 @@
 	 * Return `true` if the player that is about to play is stalemated. If the position is not legal (see {@link Position#isLegal}),
 	 * the returned value is always `false`.
 	 *
+	 * For antichess, this method returns `true` if the player about to play has no remaining piece or pawn, or if non of his/her remaining piece can move.
+	 * (same behavior as {@link Position#isCheckmate} in this case).
+	 *
 	 * @returns {boolean}
 	 */
-	Position.prototype.isStalemate = function() {
-		return movegeneration.isStalemate(this._impl);
+	Position$2.prototype.isStalemate = function() {
+		return moveGeneration.isStalemate(this._impl);
 	};
 
 
@@ -3675,8 +3603,8 @@
 	 *
 	 * @returns {boolean}
 	 */
-	Position.prototype.hasMove = function() {
-		return movegeneration.hasMove(this._impl);
+	Position$2.prototype.hasMove = function() {
+		return moveGeneration.hasMove(this._impl);
 	};
 
 
@@ -3686,8 +3614,8 @@
 	 *
 	 * @returns {MoveDescriptor[]}
 	 */
-	Position.prototype.moves = function() {
-		return movegeneration.moves(this._impl);
+	Position$2.prototype.moves = function() {
+		return moveGeneration.moves(this._impl);
 	};
 
 
@@ -3740,13 +3668,13 @@
 	 * @param {Square} to
 	 * @returns {boolean|function}
 	 */
-	Position.prototype.isMoveLegal = function(from, to) {
-		from = basetypes.squareFromString(from);
-		to = basetypes.squareFromString(to);
+	Position$2.prototype.isMoveLegal = function(from, to) {
+		from = bt$1.squareFromString(from);
+		to = bt$1.squareFromString(to);
 		if(from < 0 || to < 0) {
-			throw new exception.IllegalArgument('Position#isMoveLegal()');
+			throw new exception$2.IllegalArgument('Position#isMoveLegal()');
 		}
-		var result = movegeneration.isMoveLegal(this._impl, from, to);
+		var result = moveGeneration.isMoveLegal(this._impl, from, to);
 
 		// No legal move.
 		if(!result) {
@@ -3754,7 +3682,7 @@
 		}
 
 		// Only one legal move (no ambiguity).
-		else if(movedescriptor.isMoveDescriptor(result)) {
+		else if(moveDescriptor.isMoveDescriptor(result)) {
 			return makeFactory('regular', function() { return result; });
 		}
 
@@ -3764,14 +3692,14 @@
 
 				case 'promotion':
 					return makeFactory('promotion', function(promotion) {
-						promotion = basetypes.pieceFromString(promotion);
+						promotion = bt$1.pieceFromString(promotion);
 						if(promotion >= 0) {
 							var builtMoveDescriptor = result.build(promotion);
 							if(builtMoveDescriptor) {
 								return builtMoveDescriptor;
 							}
 						}
-						throw new exception.IllegalArgument('Position#isMoveLegal()');
+						throw new exception$2.IllegalArgument('Position#isMoveLegal()');
 					});
 
 				case 'castle960':
@@ -3779,12 +3707,12 @@
 						switch(type) {
 							case 'king': return result.build(false);
 							case 'castle': return result.build(true);
-							default: throw new exception.IllegalArgument('Position#isMoveLegal()');
+							default: throw new exception$2.IllegalArgument('Position#isMoveLegal()');
 						}
 					});
 
 				default: // This case is not supposed to happen.
-					throw new exception.IllegalArgument('Position#isMoveLegal()');
+					throw new exception$2.IllegalArgument('Position#isMoveLegal()');
 			}
 		}
 	};
@@ -3808,14 +3736,15 @@
 	 * @returns {boolean} `true` if the move has been played, `false` if the move is not legal or if the string passed to the method
 	 *          cannot be interpreted as a valid SAN move notation (see {@link Position#notation}).
 	 */
-	Position.prototype.play = function(move) {
+	Position$2.prototype.play = function(move) {
 		if(typeof move === 'string') {
 			try {
-				movegeneration.play(this._impl, notation.parseNotation(this._impl, move, false));
+				moveGeneration.play(this._impl, notation.parseNotation(this._impl, move, false));
 				return true;
 			}
 			catch(err) {
-				if(err instanceof exception.InvalidNotation) {
+				// istanbul ignore else
+				if(err instanceof exception$2.InvalidNotation) {
 					return false;
 				}
 				else {
@@ -3823,12 +3752,12 @@
 				}
 			}
 		}
-		else if(movedescriptor.isMoveDescriptor(move)) {
-			movegeneration.play(this._impl, move);
+		else if(moveDescriptor.isMoveDescriptor(move)) {
+			moveGeneration.play(this._impl, move);
 			return true;
 		}
 		else {
-			throw new exception.IllegalArgument('Position#play()');
+			throw new exception$2.IllegalArgument('Position#play()');
 		}
 	};
 
@@ -3840,8 +3769,8 @@
 	 *
 	 * @returns {boolean}
 	 */
-	Position.prototype.isNullMoveLegal = function() {
-		return movegeneration.isNullMoveLegal(this._impl);
+	Position$2.prototype.isNullMoveLegal = function() {
+		return moveGeneration.isNullMoveLegal(this._impl);
 	};
 
 
@@ -3850,8 +3779,8 @@
 	 *
 	 * @returns {boolean} `true` if the move has actually been played, `false` otherwise.
 	 */
-	Position.prototype.playNullMove = function() {
-		return movegeneration.playNullMove(this._impl);
+	Position$2.prototype.playNullMove = function() {
+		return moveGeneration.playNullMove(this._impl);
 	};
 
 
@@ -3877,8 +3806,8 @@
 	 * @returns {MoveDescriptor}
 	 * @throws {module:exception.InvalidNotation} If the move parsing fails or if the parsed move would correspond to an illegal move.
 	 */
-	Position.prototype.notation = function() {
-		if(arguments.length === 1 && movedescriptor.isMoveDescriptor(arguments[0])) {
+	Position$2.prototype.notation = function() {
+		if(arguments.length === 1 && moveDescriptor.isMoveDescriptor(arguments[0])) {
 			return notation.getNotation(this._impl, arguments[0], 'standard');
 		}
 		else if(arguments.length === 1 && typeof arguments[0] === 'string') {
@@ -3888,7 +3817,7 @@
 			return notation.parseNotation(this._impl, arguments[0], arguments[1], 'standard');
 		}
 		else {
-			throw new exception.IllegalArgument('Position#notation()');
+			throw new exception$2.IllegalArgument('Position#notation()');
 		}
 	};
 
@@ -3911,8 +3840,8 @@
 	 * @returns {MoveDescriptor}
 	 * @throws {module:exception.InvalidNotation} If the move parsing fails or if the parsed move would correspond to an illegal move.
 	 */
-	Position.prototype.figurineNotation = function() {
-		if(arguments.length === 1 && movedescriptor.isMoveDescriptor(arguments[0])) {
+	Position$2.prototype.figurineNotation = function() {
+		if(arguments.length === 1 && moveDescriptor.isMoveDescriptor(arguments[0])) {
 			return notation.getNotation(this._impl, arguments[0], 'figurine');
 		}
 		else if(arguments.length === 1 && typeof arguments[0] === 'string') {
@@ -3922,7 +3851,7 @@
 			return notation.parseNotation(this._impl, arguments[0], arguments[1], 'figurine');
 		}
 		else {
-			throw new exception.IllegalArgument('Position#figurineNotation()');
+			throw new exception$2.IllegalArgument('Position#figurineNotation()');
 		}
 	};
 
@@ -3958,11 +3887,11 @@
 	 * @returns {MoveDescriptor}
 	 * @throws {module:exception.InvalidNotation} If the move parsing fails or if the parsed move would correspond to an illegal move.
 	 */
-	Position.prototype.uci = function() {
-		if(arguments.length === 1 && movedescriptor.isMoveDescriptor(arguments[0])) {
+	Position$2.prototype.uci = function() {
+		if(arguments.length === 1 && moveDescriptor.isMoveDescriptor(arguments[0])) {
 			return uci.getNotation(this._impl, arguments[0], false);
 		}
-		else if(arguments.length === 2 && movedescriptor.isMoveDescriptor(arguments[0]) && typeof arguments[1] === 'boolean') {
+		else if(arguments.length === 2 && moveDescriptor.isMoveDescriptor(arguments[0]) && typeof arguments[1] === 'boolean') {
 			return uci.getNotation(this._impl, arguments[0], arguments[1]);
 		}
 		else if(arguments.length === 1 && typeof arguments[0] === 'string') {
@@ -3972,10 +3901,9 @@
 			return uci.parseNotation(this._impl, arguments[0], arguments[1]);
 		}
 		else {
-			throw new exception.IllegalArgument('Position#uci()');
+			throw new exception$2.IllegalArgument('Position#uci()');
 		}
 	};
-	});
 
 	/******************************************************************************
 	 *                                                                            *
@@ -3998,14 +3926,12 @@
 	 *                                                                            *
 	 ******************************************************************************/
 
-	var game = createCommonjsModule(function (module, exports) {
 
+	var bt = basetypes;
+	var exception$1 = exception$7;
+	var i18n$1 = i18n$6;
 
-
-
-
-
-	var Position = position$1.Position;
+	var Position$1 = position$1.Position;
 
 
 
@@ -4020,7 +3946,7 @@
 	 *            and some meta-data such as the name of the players, the date of the game,
 	 *            the name of the tournament, etc...
 	 */
-	var Game = exports.Game = function() {
+	var Game = function() {
 		this._playerName  = [undefined, undefined];
 		this._playerElo   = [undefined, undefined];
 		this._playerTitle = [undefined, undefined];
@@ -4029,9 +3955,9 @@
 		this._date      = undefined;
 		this._site      = undefined;
 		this._annotator = undefined;
-		this._result    = basetypes.LINE;
+		this._result    = bt.LINE;
 
-		this._initialPosition = new Position();
+		this._initialPosition = new Position$1();
 		this._fullMoveNumber = 1;
 		this._mainVariationInfo = createVariationInfo(true);
 	};
@@ -4051,8 +3977,8 @@
 	 * @param {string?} value
 	 */
 	Game.prototype.playerName = function(color, value) {
-		color = basetypes.colorFromString(color);
-		if(color < 0) { throw new exception.IllegalArgument('Game#playerName()'); }
+		color = bt.colorFromString(color);
+		if(color < 0) { throw new exception$1.IllegalArgument('Game#playerName()'); }
 		if(arguments.length === 1) { return this._playerName[color]; }
 		else { this._playerName[color] = value; }
 	};
@@ -4072,8 +3998,8 @@
 	 * @param {string?} value
 	 */
 	Game.prototype.playerElo = function(color, value) {
-		color = basetypes.colorFromString(color);
-		if(color < 0) { throw new exception.IllegalArgument('Game#playerElo()'); }
+		color = bt.colorFromString(color);
+		if(color < 0) { throw new exception$1.IllegalArgument('Game#playerElo()'); }
 		if(arguments.length === 1) { return this._playerElo[color]; }
 		else { this._playerElo[color] = value; }
 	};
@@ -4093,8 +4019,8 @@
 	 * @param {string?} value
 	 */
 	Game.prototype.playerTitle = function(color, value) {
-		color = basetypes.colorFromString(color);
-		if(color < 0) { throw new exception.IllegalArgument('Game#playerTitle()'); }
+		color = bt.colorFromString(color);
+		if(color < 0) { throw new exception$1.IllegalArgument('Game#playerTitle()'); }
 		if(arguments.length === 1) { return this._playerTitle[color]; }
 		else { this._playerTitle[color] = value; }
 	};
@@ -4163,7 +4089,7 @@
 			this._date = { year: value.year };
 		}
 		else {
-			throw new exception.IllegalArgument('Game#date()');
+			throw new exception$1.IllegalArgument('Game#date()');
 		}
 	};
 
@@ -4215,12 +4141,12 @@
 	 */
 	Game.prototype.result = function(value) {
 		if(arguments.length === 0) {
-			return basetypes.resultToString(this._result);
+			return bt.resultToString(this._result);
 		}
 		else {
-			var result = basetypes.resultFromString(value);
+			var result = bt.resultFromString(value);
 			if(result < 0) {
-				throw new exception.IllegalArgument('Game#result()');
+				throw new exception$1.IllegalArgument('Game#result()');
 			}
 			this._result = result;
 		}
@@ -4256,14 +4182,14 @@
 			return this._initialPosition;
 		}
 		else {
-			if(!(initialPosition instanceof Position)) {
-				throw new exception.IllegalArgument('Game#initialPosition()');
+			if(!(initialPosition instanceof Position$1)) {
+				throw new exception$1.IllegalArgument('Game#initialPosition()');
 			}
 			if(arguments.length === 1) {
 				fullMoveNumber = 1;
 			}
 			else if(typeof fullMoveNumber !== 'number') {
-				throw new exception.IllegalArgument('Game#initialPosition()');
+				throw new exception$1.IllegalArgument('Game#initialPosition()');
 			}
 			this._initialPosition = initialPosition;
 			this._fullMoveNumber = fullMoveNumber;
@@ -4352,11 +4278,11 @@
 	 */
 	function rebuildPositionBeforeIfNecessary(node) {
 		if(!node._positionBefore) {
-			node._positionBefore = new Position(node._parentVariation._initialPosition);
+			node._positionBefore = new Position$1(node._parentVariation._initialPosition);
 			var currentInfo = node._parentVariation._info.first;
 			while(currentInfo !== node._info) {
 				if(currentInfo === undefined) {
-					throw new exception.IllegalArgument('The current node is invalid.');
+					throw new exception$1.IllegalArgument('The current node is invalid.');
 				}
 				applyMoveDescriptor(node._positionBefore, currentInfo);
 				currentInfo = currentInfo.next;
@@ -4392,7 +4318,7 @@
 	 * @returns {Position}
 	 */
 	Node.prototype.positionBefore = function() {
-		return new Position(rebuildPositionBeforeIfNecessary(this));
+		return new Position$1(rebuildPositionBeforeIfNecessary(this));
 	};
 
 
@@ -4614,7 +4540,7 @@
 	function computeMoveDescriptor(position, move) {
 		if(move === '--') {
 			if(!position.isNullMoveLegal()) {
-				throw new exception.InvalidNotation(position, '--', i18n.ILLEGAL_NULL_MOVE);
+				throw new exception$1.InvalidNotation(position, '--', i18n$1.ILLEGAL_NULL_MOVE);
 			}
 			return undefined;
 		}
@@ -4710,7 +4636,7 @@
 	 * @returns {Position}
 	 */
 	Variation.prototype.initialPosition = function() {
-		return new Position(this._initialPosition);
+		return new Position$1(this._initialPosition);
 	};
 
 
@@ -4731,7 +4657,7 @@
 	 */
 	Variation.prototype.first = function() {
 		if(!this._info.first) { return undefined; }
-		return new Node(this._info.first, this, this._initialFullMoveNumber, new Position(this._initialPosition));
+		return new Node(this._info.first, this, this._initialFullMoveNumber, new Position$1(this._initialPosition));
 	};
 
 
@@ -4750,7 +4676,7 @@
 		while(currentNodeInfo) {
 
 			// Compute the "position-before" attribute the current node.
-			var previousPositionBefore = new Position(previousPositionBefore);
+			var previousPositionBefore = new Position$1(previousPositionBefore);
 			if(previousNodeInfo !== null) {
 				applyMoveDescriptor(previousPositionBefore, previousNodeInfo);
 			}
@@ -4869,11 +4795,10 @@
 	 * @throws {module:exception.InvalidNotation} If the move notation cannot be parsed.
 	 */
 	Variation.prototype.play = function(move) {
-		var positionBefore = new Position(this._initialPosition);
+		var positionBefore = new Position$1(this._initialPosition);
 		this._info.first = createNodeInfo(computeMoveDescriptor(positionBefore, move));
 		return new Node(this._info.first, this, this._initialFullMoveNumber, positionBefore);
 	};
-	});
 
 	/******************************************************************************
 	 *                                                                            *
@@ -4896,8 +4821,6 @@
 	 *                                                                            *
 	 ******************************************************************************/
 
-	var database = createCommonjsModule(function (module, exports) {
-
 
 	/**
 	 * @class
@@ -4906,7 +4829,7 @@
 	 * @description This constructor is not exposed in the public Kokopu API. Only internal objects and functions
 	 *              are allowed to instantiate {@link Database} objects.
 	 */
-	var Database = exports.Database = function(impl, gameCountGetter, gameGetter) {
+	var Database = function(impl, gameCountGetter, gameGetter) {
 		this._impl = impl;
 		this._gameCountGetter = gameCountGetter;
 		this._gameGetter = gameGetter;
@@ -4932,7 +4855,6 @@
 	Database.prototype.game = function(index) {
 		return this._gameGetter(this._impl, index);
 	};
-	});
 
 	/******************************************************************************
 	 *                                                                            *
@@ -4955,18 +4877,16 @@
 	 *                                                                            *
 	 ******************************************************************************/
 
-	var tokenstream = createCommonjsModule(function (module, exports) {
 
-
-
-
+	var exception = exception$7;
+	var i18n = i18n$6;
 
 
 	/**
 	 * @class
 	 * @classdesc Stream of tokens.
 	 */
-	var TokenStream = exports.TokenStream = function(pgnString, initialLocation) {
+	var TokenStream = function(pgnString, initialLocation) {
 
 		// Remove the BOM (byte order mark) if any.
 		if(pgnString.codePointAt(0) === 0xFEFF) {
@@ -4999,7 +4919,7 @@
 		this._matchHeaderId = /(\w+)/g;
 		this._matchEnterHeaderValue = /"/g;
 		this._matchMoveNumber = /[1-9][0-9]*\.(?:\.\.)?/g;
-		this._matchMove = /(?:O-O-O|O-O|[KQRBN][a-h]?[1-8]?x?[a-h][1-8]|(?:[a-h]x?)?[a-h][1-8](?:=?[KQRBNP])?)[+#]?|--/g;
+		this._matchMove = /(?:O-O(?:-O)?|0-0(?:-0)?|[KQRBN][a-h]?[1-8]?x?[a-h][1-8]|(?:[a-h]x?)?[a-h][1-8](?:=?[KQRBNP])?)[+#]?|--/g;
 		this._matchNag = /([!?][!?]?|\+\/?[-=]|[-=]\/?\+|=|inf|~)|\$([1-9][0-9]*)/g;
 		this._matchEnterComment = /\{/g;
 		this._matchBeginVariation = /\(/g;
@@ -5368,37 +5288,6 @@
 	TokenStream.prototype.isMoveTextSection = function() {
 		return this._token >= FIRST_MOVE_TEXT_TOKEN && this._token <= LAST_MOVE_TEXT_TOKEN;
 	};
-	});
-
-	/******************************************************************************
-	 *                                                                            *
-	 *    This file is part of Kokopu, a JavaScript chess library.                *
-	 *    Copyright (C) 2018-2021  Yoann Le Montagner <yo35 -at- melix.net>       *
-	 *                                                                            *
-	 *    This program is free software: you can redistribute it and/or           *
-	 *    modify it under the terms of the GNU Lesser General Public License      *
-	 *    as published by the Free Software Foundation, either version 3 of       *
-	 *    the License, or (at your option) any later version.                     *
-	 *                                                                            *
-	 *    This program is distributed in the hope that it will be useful,         *
-	 *    but WITHOUT ANY WARRANTY; without even the implied warranty of          *
-	 *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the            *
-	 *    GNU Lesser General Public License for more details.                     *
-	 *                                                                            *
-	 *    You should have received a copy of the GNU Lesser General               *
-	 *    Public License along with this program. If not, see                     *
-	 *    <http://www.gnu.org/licenses/>.                                         *
-	 *                                                                            *
-	 ******************************************************************************/
-
-
-
-
-
-	position$1.Position;
-	game.Game;
-	database.Database;
-	tokenstream.TokenStream;
 
 	/******************************************************************************
 	 *                                                                            *
@@ -5422,7 +5311,6 @@
 	 ******************************************************************************/
 
 	var Position = position$1.Position;
-	game.Game;
 
 	const position = new Position();
 	const valueMap = {
@@ -5436,7 +5324,7 @@
 
 	let gameState = {
 		numOfMoves: -1,
-		mySide: WHITE$1,
+		mySide: WHITE,
 		boardWidth: 0,
 		overlaySelector: null,
 		fen: null,
@@ -5526,7 +5414,7 @@
 		overlayElement.style.display = 'grid';
 		overlayElement.style.gridTemplate = `repeat(8, 1fr) / repeat(8, 1fr)`;
 
-		if (side === WHITE$1) {
+		if (side === WHITE) {
 			ranks.reverse();
 		} else {
 			files.reverse();
@@ -5610,7 +5498,7 @@
 		evalBarElement.style.height = element.style.height;
 		evalBarElement.style.width = '12px';
 		evalBarElement.style.left = '-14px';
-		evalBarElement.style.backgroundColor = side === WHITE$1 ? 'black' : 'white';
+		evalBarElement.style.backgroundColor = side === WHITE ? 'black' : 'white';
 
 		let evalBarLevel = document.createElement('div');
 		evalBarLevel.id = `cv-evalbar-level`;
@@ -5619,7 +5507,7 @@
 		evalBarLevel.style.width = '12px';
 		evalBarLevel.style.bottom = '0';
 
-		evalBarLevel.style.backgroundColor = side === WHITE$1 ? 'white' : 'black';
+		evalBarLevel.style.backgroundColor = side === WHITE ? 'white' : 'black';
 
 		evalBarElement.appendChild(evalBarLevel);
 
@@ -5682,8 +5570,8 @@
 
 	function drawArrow(overlay, move, turn, size, side) {
 		const colors = {
-			[BLACK$1]: 'hsla(350, 100%, 50%, 0.66)', // BLACK
-			[WHITE$1]: 'hsla(145, 100%, 50%, 0.66)', // WHITE
+			[BLACK]: 'hsla(350, 100%, 50%, 0.66)', // BLACK
+			[WHITE]: 'hsla(145, 100%, 50%, 0.66)', // WHITE
 		};
 
 		const squareSize = size / 8;
@@ -5737,7 +5625,7 @@
 		const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 		const ranks = range(1, 8);
 
-		side == WHITE$1 ? ranks.reverse() : files.reverse();
+		side == WHITE ? ranks.reverse() : files.reverse();
 
 		let [file, rank] = square.split('');
 		rank = parseInt(rank);
@@ -5751,14 +5639,20 @@
 	/** Detect free variable `global` from Node.js. */
 	var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
 
+	var freeGlobal$1 = freeGlobal;
+
 	/** Detect free variable `self`. */
 	var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
 
 	/** Used as a reference to the global object. */
-	var root = freeGlobal || freeSelf || Function('return this')();
+	var root = freeGlobal$1 || freeSelf || Function('return this')();
+
+	var root$1 = root;
 
 	/** Built-in value references. */
-	var Symbol = root.Symbol;
+	var Symbol = root$1.Symbol;
+
+	var Symbol$1 = Symbol;
 
 	/** Used for built-in method references. */
 	var objectProto$b = Object.prototype;
@@ -5774,7 +5668,7 @@
 	var nativeObjectToString$1 = objectProto$b.toString;
 
 	/** Built-in value references. */
-	var symToStringTag$1 = Symbol ? Symbol.toStringTag : undefined;
+	var symToStringTag$1 = Symbol$1 ? Symbol$1.toStringTag : undefined;
 
 	/**
 	 * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
@@ -5829,7 +5723,7 @@
 	    undefinedTag = '[object Undefined]';
 
 	/** Built-in value references. */
-	var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
+	var symToStringTag = Symbol$1 ? Symbol$1.toStringTag : undefined;
 
 	/**
 	 * The base implementation of `getTag` without fallbacks for buggy environments.
@@ -5900,6 +5794,8 @@
 	 */
 	var isArray = Array.isArray;
 
+	var isArray$1 = isArray;
+
 	/**
 	 * Checks if `value` is the
 	 * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
@@ -5964,11 +5860,13 @@
 	}
 
 	/** Used to detect overreaching core-js shims. */
-	var coreJsData = root['__core-js_shared__'];
+	var coreJsData = root$1['__core-js_shared__'];
+
+	var coreJsData$1 = coreJsData;
 
 	/** Used to detect methods masquerading as native. */
 	var maskSrcKey = (function() {
-	  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
+	  var uid = /[^.]+$/.exec(coreJsData$1 && coreJsData$1.keys && coreJsData$1.keys.IE_PROTO || '');
 	  return uid ? ('Symbol(src)_1.' + uid) : '';
 	}());
 
@@ -6075,7 +5973,9 @@
 	}
 
 	/* Built-in method references that are verified to be native. */
-	var WeakMap = getNative(root, 'WeakMap');
+	var WeakMap = getNative(root$1, 'WeakMap');
+
+	var WeakMap$1 = WeakMap;
 
 	/** Used as references for various `Number` constants. */
 	var MAX_SAFE_INTEGER$1 = 9007199254740991;
@@ -6282,6 +6182,8 @@
 	    !propertyIsEnumerable$1.call(value, 'callee');
 	};
 
+	var isArguments$1 = isArguments;
+
 	/**
 	 * This method returns `false`.
 	 *
@@ -6309,7 +6211,7 @@
 	var moduleExports$1 = freeModule$1 && freeModule$1.exports === freeExports$1;
 
 	/** Built-in value references. */
-	var Buffer = moduleExports$1 ? root.Buffer : undefined;
+	var Buffer = moduleExports$1 ? root$1.Buffer : undefined;
 
 	/* Built-in method references for those with the same name as other `lodash` methods. */
 	var nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined;
@@ -6332,6 +6234,8 @@
 	 * // => false
 	 */
 	var isBuffer = nativeIsBuffer || stubFalse;
+
+	var isBuffer$1 = isBuffer;
 
 	/** `Object#toString` result references. */
 	var argsTag$1 = '[object Arguments]',
@@ -6411,7 +6315,7 @@
 	var moduleExports = freeModule && freeModule.exports === freeExports;
 
 	/** Detect free variable `process` from Node.js. */
-	var freeProcess = moduleExports && freeGlobal.process;
+	var freeProcess = moduleExports && freeGlobal$1.process;
 
 	/** Used to access faster Node.js helpers. */
 	var nodeUtil = (function() {
@@ -6428,8 +6332,10 @@
 	  } catch (e) {}
 	}());
 
+	var nodeUtil$1 = nodeUtil;
+
 	/* Node.js helper references. */
-	var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
+	var nodeIsTypedArray = nodeUtil$1 && nodeUtil$1.isTypedArray;
 
 	/**
 	 * Checks if `value` is classified as a typed array.
@@ -6450,6 +6356,8 @@
 	 */
 	var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
 
+	var isTypedArray$1 = isTypedArray;
+
 	/** Used for built-in method references. */
 	var objectProto$6 = Object.prototype;
 
@@ -6465,10 +6373,10 @@
 	 * @returns {Array} Returns the array of property names.
 	 */
 	function arrayLikeKeys(value, inherited) {
-	  var isArr = isArray(value),
-	      isArg = !isArr && isArguments(value),
-	      isBuff = !isArr && !isArg && isBuffer(value),
-	      isType = !isArr && !isArg && !isBuff && isTypedArray(value),
+	  var isArr = isArray$1(value),
+	      isArg = !isArr && isArguments$1(value),
+	      isBuff = !isArr && !isArg && isBuffer$1(value),
+	      isType = !isArr && !isArg && !isBuff && isTypedArray$1(value),
 	      skipIndexes = isArr || isArg || isBuff || isType,
 	      result = skipIndexes ? baseTimes(value.length, String) : [],
 	      length = result.length;
@@ -6508,6 +6416,8 @@
 	/* Built-in method references for those with the same name as other `lodash` methods. */
 	var nativeKeys = overArg(Object.keys, Object);
 
+	var nativeKeys$1 = nativeKeys;
+
 	/** Used for built-in method references. */
 	var objectProto$5 = Object.prototype;
 
@@ -6523,7 +6433,7 @@
 	 */
 	function baseKeys(object) {
 	  if (!isPrototype(object)) {
-	    return nativeKeys(object);
+	    return nativeKeys$1(object);
 	  }
 	  var result = [];
 	  for (var key in Object(object)) {
@@ -6569,6 +6479,8 @@
 	/* Built-in method references that are verified to be native. */
 	var nativeCreate = getNative(Object, 'create');
 
+	var nativeCreate$1 = nativeCreate;
+
 	/**
 	 * Removes all key-value entries from the hash.
 	 *
@@ -6577,7 +6489,7 @@
 	 * @memberOf Hash
 	 */
 	function hashClear() {
-	  this.__data__ = nativeCreate ? nativeCreate(null) : {};
+	  this.__data__ = nativeCreate$1 ? nativeCreate$1(null) : {};
 	  this.size = 0;
 	}
 
@@ -6617,7 +6529,7 @@
 	 */
 	function hashGet(key) {
 	  var data = this.__data__;
-	  if (nativeCreate) {
+	  if (nativeCreate$1) {
 	    var result = data[key];
 	    return result === HASH_UNDEFINED$2 ? undefined : result;
 	  }
@@ -6641,7 +6553,7 @@
 	 */
 	function hashHas(key) {
 	  var data = this.__data__;
-	  return nativeCreate ? (data[key] !== undefined) : hasOwnProperty$2.call(data, key);
+	  return nativeCreate$1 ? (data[key] !== undefined) : hasOwnProperty$2.call(data, key);
 	}
 
 	/** Used to stand-in for `undefined` hash values. */
@@ -6660,7 +6572,7 @@
 	function hashSet(key, value) {
 	  var data = this.__data__;
 	  this.size += this.has(key) ? 0 : 1;
-	  data[key] = (nativeCreate && value === undefined) ? HASH_UNDEFINED$1 : value;
+	  data[key] = (nativeCreate$1 && value === undefined) ? HASH_UNDEFINED$1 : value;
 	  return this;
 	}
 
@@ -6829,7 +6741,9 @@
 	ListCache.prototype.set = listCacheSet;
 
 	/* Built-in method references that are verified to be native. */
-	var Map = getNative(root, 'Map');
+	var Map = getNative(root$1, 'Map');
+
+	var Map$1 = Map;
 
 	/**
 	 * Removes all key-value entries from the map.
@@ -6842,7 +6756,7 @@
 	  this.size = 0;
 	  this.__data__ = {
 	    'hash': new Hash,
-	    'map': new (Map || ListCache),
+	    'map': new (Map$1 || ListCache),
 	    'string': new Hash
 	  };
 	}
@@ -7052,7 +6966,7 @@
 	  var data = this.__data__;
 	  if (data instanceof ListCache) {
 	    var pairs = data.__data__;
-	    if (!Map || (pairs.length < LARGE_ARRAY_SIZE - 1)) {
+	    if (!Map$1 || (pairs.length < LARGE_ARRAY_SIZE - 1)) {
 	      pairs.push([key, value]);
 	      this.size = ++data.size;
 	      return this;
@@ -7155,6 +7069,8 @@
 	  });
 	};
 
+	var getSymbols$1 = getSymbols;
+
 	/**
 	 * The base implementation of `getAllKeys` and `getAllKeysIn` which uses
 	 * `keysFunc` and `symbolsFunc` to get the enumerable property names and
@@ -7168,7 +7084,7 @@
 	 */
 	function baseGetAllKeys(object, keysFunc, symbolsFunc) {
 	  var result = keysFunc(object);
-	  return isArray(object) ? result : arrayPush(result, symbolsFunc(object));
+	  return isArray$1(object) ? result : arrayPush(result, symbolsFunc(object));
 	}
 
 	/**
@@ -7179,17 +7095,23 @@
 	 * @returns {Array} Returns the array of property names and symbols.
 	 */
 	function getAllKeys(object) {
-	  return baseGetAllKeys(object, keys, getSymbols);
+	  return baseGetAllKeys(object, keys, getSymbols$1);
 	}
 
 	/* Built-in method references that are verified to be native. */
-	var DataView = getNative(root, 'DataView');
+	var DataView = getNative(root$1, 'DataView');
+
+	var DataView$1 = DataView;
 
 	/* Built-in method references that are verified to be native. */
-	var Promise$1 = getNative(root, 'Promise');
+	var Promise$1 = getNative(root$1, 'Promise');
+
+	var Promise$2 = Promise$1;
 
 	/* Built-in method references that are verified to be native. */
-	var Set$1 = getNative(root, 'Set');
+	var Set$1 = getNative(root$1, 'Set');
+
+	var Set$2 = Set$1;
 
 	/** `Object#toString` result references. */
 	var mapTag$1 = '[object Map]',
@@ -7201,11 +7123,11 @@
 	var dataViewTag$1 = '[object DataView]';
 
 	/** Used to detect maps, sets, and weakmaps. */
-	var dataViewCtorString = toSource(DataView),
-	    mapCtorString = toSource(Map),
-	    promiseCtorString = toSource(Promise$1),
-	    setCtorString = toSource(Set$1),
-	    weakMapCtorString = toSource(WeakMap);
+	var dataViewCtorString = toSource(DataView$1),
+	    mapCtorString = toSource(Map$1),
+	    promiseCtorString = toSource(Promise$2),
+	    setCtorString = toSource(Set$2),
+	    weakMapCtorString = toSource(WeakMap$1);
 
 	/**
 	 * Gets the `toStringTag` of `value`.
@@ -7217,11 +7139,11 @@
 	var getTag = baseGetTag;
 
 	// Fallback for data views, maps, sets, and weak maps in IE 11 and promises in Node.js < 6.
-	if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag$1) ||
-	    (Map && getTag(new Map) != mapTag$1) ||
-	    (Promise$1 && getTag(Promise$1.resolve()) != promiseTag) ||
-	    (Set$1 && getTag(new Set$1) != setTag$1) ||
-	    (WeakMap && getTag(new WeakMap) != weakMapTag)) {
+	if ((DataView$1 && getTag(new DataView$1(new ArrayBuffer(1))) != dataViewTag$1) ||
+	    (Map$1 && getTag(new Map$1) != mapTag$1) ||
+	    (Promise$2 && getTag(Promise$2.resolve()) != promiseTag) ||
+	    (Set$2 && getTag(new Set$2) != setTag$1) ||
+	    (WeakMap$1 && getTag(new WeakMap$1) != weakMapTag)) {
 	  getTag = function(value) {
 	    var result = baseGetTag(value),
 	        Ctor = result == objectTag$1 ? value.constructor : undefined,
@@ -7243,7 +7165,9 @@
 	var getTag$1 = getTag;
 
 	/** Built-in value references. */
-	var Uint8Array = root.Uint8Array;
+	var Uint8Array = root$1.Uint8Array;
+
+	var Uint8Array$1 = Uint8Array;
 
 	/** Used to stand-in for `undefined` hash values. */
 	var HASH_UNDEFINED = '__lodash_hash_undefined__';
@@ -7464,7 +7388,7 @@
 	    dataViewTag = '[object DataView]';
 
 	/** Used to convert symbols to primitives and strings. */
-	var symbolProto = Symbol ? Symbol.prototype : undefined,
+	var symbolProto = Symbol$1 ? Symbol$1.prototype : undefined,
 	    symbolValueOf = symbolProto ? symbolProto.valueOf : undefined;
 
 	/**
@@ -7496,7 +7420,7 @@
 
 	    case arrayBufferTag:
 	      if ((object.byteLength != other.byteLength) ||
-	          !equalFunc(new Uint8Array(object), new Uint8Array(other))) {
+	          !equalFunc(new Uint8Array$1(object), new Uint8Array$1(other))) {
 	        return false;
 	      }
 	      return true;
@@ -7665,8 +7589,8 @@
 	 * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
 	 */
 	function baseIsEqualDeep(object, other, bitmask, customizer, equalFunc, stack) {
-	  var objIsArr = isArray(object),
-	      othIsArr = isArray(other),
+	  var objIsArr = isArray$1(object),
+	      othIsArr = isArray$1(other),
 	      objTag = objIsArr ? arrayTag : getTag$1(object),
 	      othTag = othIsArr ? arrayTag : getTag$1(other);
 
@@ -7677,8 +7601,8 @@
 	      othIsObj = othTag == objectTag,
 	      isSameTag = objTag == othTag;
 
-	  if (isSameTag && isBuffer(object)) {
-	    if (!isBuffer(other)) {
+	  if (isSameTag && isBuffer$1(object)) {
+	    if (!isBuffer$1(other)) {
 	      return false;
 	    }
 	    objIsArr = true;
@@ -7686,7 +7610,7 @@
 	  }
 	  if (isSameTag && !objIsObj) {
 	    stack || (stack = new Stack);
-	    return (objIsArr || isTypedArray(object))
+	    return (objIsArr || isTypedArray$1(object))
 	      ? equalArrays(object, other, bitmask, customizer, equalFunc, stack)
 	      : equalByTag(object, other, objTag, bitmask, customizer, equalFunc, stack);
 	  }
@@ -7776,9 +7700,10 @@
 		lastEvent: '',
 		evalPercent: 50.0,
 		triggerUpdate: false,
-		turn: WHITE$1,
+		turn: WHITE,
 		multiPVSquares: {},
 		multiPV: localStorage.getItem('cv-multi-pv') || 1,
+		calculating: false,
 	};
 
 	stockfish.postMessage('uci');
@@ -7790,6 +7715,12 @@
 
 	function playMove(fen, depth) {
 		if (fen) {
+			if (state.calculating) {
+				console.log('Stopping calculation');
+				stockfish.postMessage(`stop`);
+			}
+			console.log('Starting calculation');
+			state.calculating = true;
 			stockfish.postMessage(`position fen ${fen}`);
 			stockfish.postMessage(`go depth ${depth}`);
 		}
@@ -7802,7 +7733,7 @@
 
 		state.lastEvent = event;
 
-		// console.log(event);
+		console.log(event);
 		// console.log('Turn: ' + position.turn());
 		// console.log('Side: ' + gameState.mySide);
 		if (!event) {
@@ -7811,6 +7742,8 @@
 		let args = event.split(' ');
 
 		if (event.includes('bestmove')) {
+			state.calculating = false;
+			console.log('No longer calculating');
 			let index = args.findIndex(x => x == 'bestmove');
 			let value = args[index + 1];
 			if (value.includes('none')) {
@@ -7819,6 +7752,7 @@
 			state.bestMove = value;
 			try {
 				state.bestMoveSAN = position.notation(position.uci(state.bestMove));
+				console.log(state.bestMoveSAN);
 			} catch (err) {
 				console.log(err);
 				// Fuck it
@@ -7871,19 +7805,19 @@
 				const square = f + r;
 				// Initialize the square
 				squares[square] = {
-					[WHITE$1]: [],
-					[BLACK$1]: [],
+					[WHITE]: [],
+					[BLACK]: [],
 				};
 
-				findAttackers(position, squares, square, WHITE$1);
-				findAttackers(position, squares, square, BLACK$1);
+				findAttackers(position, squares, square, WHITE);
+				findAttackers(position, squares, square, BLACK);
 			}
 		}
 		return squares;
 	}
 
 	function drawControlledSquares(squares, mySide, debug) {
-		const opSide = mySide === WHITE$1 ? BLACK$1 : WHITE$1;
+		const opSide = mySide === WHITE ? BLACK : WHITE;
 
 		for (const [square, attackers] of Object.entries(squares)) {
 			let myAttackers = attackers[mySide];
@@ -7933,7 +7867,7 @@
 		let attackedSquareColor = squareColor(square);
 
 		const mySide = side;
-		const opSide = mySide === WHITE$1 ? BLACK$1 : WHITE$1;
+		const opSide = mySide === WHITE ? BLACK : WHITE;
 		let myPieces = [...myAttackers];
 		let opPieces = [...opAttackers];
 		let myTotalCost = 0;
@@ -7954,20 +7888,32 @@
 			const opPiece = opPieces.length > i ? opPieces[i] : null;
 			let opCost = opPiece ? squareValue(opPiece) : 0;
 
-			// Trade
+			// Trade = Both have an attacking piece
 			if (attackedSquareColor !== null && myPiece && opPiece) {
-				if (myAttackers.length > i) {
-					opTotalCost += opCost;
+				// Only trade when the cost is less or equal to the attacker
+				if ((attackedSquareColor === mySide && opCost <= myCost)
+					 || (attackedSquareColor === opSide && myCost <= opCost)
+					 || (opTotalCost == 0 && myTotalCost == 0)
+					 || (attackedSquareColor === opSide && opAttackers.length - i <= 0)
+					 || (attackedSquareColor === mySide && myAttackers.length - i <= 0)
+				) {
+					if (myAttackers.length > i) {
+						opTotalCost += opCost;
+					}
+					if (opAttackers.length > i) {
+						myTotalCost += myCost;
+					}
 				}
-				if (opAttackers.length > i) {
-					myTotalCost += myCost;
+				else {
+					// If there was a trade, but it wasn't worth it, don't check future moves
+					break;
 				}
 			}
-			// They capture
+			// They capture, since I don't have a defender
 			if (attackedSquareColor === mySide && opPiece && !myPiece) {
 				myTotalCost += myCost;
 			}
-			// I capture
+			// I capture, since they don't have a defender
 			if (attackedSquareColor === opSide && !opPiece && myPiece) {
 				opTotalCost += opCost;
 			}
@@ -8019,7 +7965,7 @@
 		}
 		position.square(to, fromPiece);
 
-		const isKingChecked = position.isAttacked(position.kingSquare(side), side === WHITE$1 ? BLACK$1 : WHITE$1);
+		const isKingChecked = position.isAttacked(position.kingSquare(side), side === WHITE ? BLACK : WHITE);
 
 		position.square(from, fromPiece);
 		position.square(to, toPiece);
@@ -8075,8 +8021,16 @@
 		return attackers.reduce((a, b) => a + squareValue(b), 0);
 	}
 
-	/* UTILS */
+	var dist = {};
 
+	var shortcut = {};
+
+	var consts = {};
+
+	var utils = {};
+
+	/* UTILS */
+	Object.defineProperty(utils, "__esModule", { value: true });
 	var Utils = {
 	    plusesRe: /\+{2,}/gi,
 	    whitespaceRe: /\s+/gi,
@@ -8101,15 +8055,11 @@
 	    },
 	};
 	/* EXPORT */
-	var _default$4 = Utils;
-
-	var utils = /*#__PURE__*/Object.defineProperty({
-		default: _default$4
-	}, '__esModule', {value: true});
+	utils.default = Utils;
 
 	/* IMPORT */
-
-
+	Object.defineProperty(consts, "__esModule", { value: true });
+	var utils_1$3 = utils;
 	/* CONSTS */
 	var Consts = {
 	    key2id: {
@@ -8122,8 +8072,8 @@
 	        ctrl: 1024,
 	        control: 1024,
 	        shift: 2048,
-	        cmdorctrl: utils.default.isMac ? 512 : 1024,
-	        commandorcontrol: utils.default.isMac ? 512 : 1024,
+	        cmdorctrl: utils_1$3.default.isMac ? 512 : 1024,
+	        commandorcontrol: utils_1$3.default.isMac ? 512 : 1024,
 	        /* SPECIAL CHARACTERS */
 	        backspace: 1,
 	        capslock: 2,
@@ -8727,28 +8677,24 @@
 	    shortcutRe: /^\s*?(?:(?:^|\s|\+)(?:alt|option|cmd|command|meta|ctrl|control|shift|cmdorctrl|commandorcontrol|backspace|capslock|del|delete|down|end|enter|return|esc|escape|home|insert|left|pagedown|pageup|right|space|spacebar|tab|up|plus|\d|[a-z]|f(?:\d|1\d|2[0-4])|numpad\d|[!"#$%&'()*+,./:;<=>?@[\]^_`{|}~-]))+\s*$/i // Regex that matches a shortcut
 	};
 	/* EXPORT */
-	var _default$3 = Consts;
-
-	var consts = /*#__PURE__*/Object.defineProperty({
-		default: _default$3
-	}, '__esModule', {value: true});
+	consts.default = Consts;
 
 	/* IMPORT */
-
-
-
+	Object.defineProperty(shortcut, "__esModule", { value: true });
+	var consts_1 = consts;
+	var utils_1$2 = utils;
 	/* SHORTCUT */
 	var Shortcut = {
 	    /* MODIFIER KEY */
 	    getModifierKey: function (id) {
-	        return consts.default.modifierKeyBitmask & id;
+	        return consts_1.default.modifierKeyBitmask & id;
 	    },
 	    hasModifierKey: function (id) {
 	        return !!Shortcut.getModifierKey(id);
 	    },
 	    /* TRIGGER KEY */
 	    getTriggerKey: function (id) {
-	        return consts.default.triggerKeyBitmask & id;
+	        return consts_1.default.triggerKeyBitmask & id;
 	    },
 	    hasTriggerKey: function (id) {
 	        return !!Shortcut.getTriggerKey(id);
@@ -8757,16 +8703,16 @@
 	    event2id: function (event) {
 	        /* TRIGGER */
 	        var isKeypress = (event.type === 'keypress'), code = event.which || event['keyCode'] || 0, char = String.fromCharCode(code).toLowerCase(), key = event['key'];
-	        var id = isKeypress ? consts.default.key2id[key] || consts.default.key2id[char] || 0 : consts.default.code2id[code] || consts.default.key2id[char] || consts.default.key2id[key] || 0;
+	        var id = isKeypress ? consts_1.default.key2id[key] || consts_1.default.key2id[char] || 0 : consts_1.default.code2id[code] || consts_1.default.key2id[char] || consts_1.default.key2id[key] || 0;
 	        /* MODIFIERS */
 	        if (event.ctrlKey)
-	            id |= consts.default.key2id.ctrl;
+	            id |= consts_1.default.key2id.ctrl;
 	        if (event.altKey)
-	            id |= consts.default.key2id.alt;
+	            id |= consts_1.default.key2id.alt;
 	        if (event.shiftKey)
-	            id |= consts.default.key2id.shift;
+	            id |= consts_1.default.key2id.shift;
 	        if (event.metaKey)
-	            id |= consts.default.key2id.cmd;
+	            id |= consts_1.default.key2id.cmd;
 	        return id;
 	    },
 	    event2shortcut: function (event) {
@@ -8779,10 +8725,10 @@
 	        return Shortcut.id2symbols([Shortcut.event2id(event)]);
 	    },
 	    /* CHORD */
-	    chord2id: utils.default.memoize(function (chord) {
-	        var keys = chord.replace(utils.default.plusesRe, '+Plus').toLowerCase().split('+');
+	    chord2id: utils_1$2.default.memoize(function (chord) {
+	        var keys = chord.replace(utils_1$2.default.plusesRe, '+Plus').toLowerCase().split('+');
 	        return keys.reduce(function (keyCode, key) {
-	            return keyCode | (consts.default.key2id[key] || 0);
+	            return keyCode | (consts_1.default.key2id[key] || 0);
 	        }, 0);
 	    }),
 	    chord2accelerator: function (chord) {
@@ -8793,7 +8739,7 @@
 	    },
 	    /* SHORTCUT */
 	    isValidShortcut: function (shortcut) {
-	        return consts.default.shortcutRe.test(shortcut);
+	        return consts_1.default.shortcutRe.test(shortcut);
 	    },
 	    checkValidShortcut: function (shortcut) {
 	        var isValid = Shortcut.isValidShortcut(shortcut);
@@ -8801,14 +8747,14 @@
 	            console.error("Invalid shortcut: \"" + shortcut + "\"");
 	        return isValid;
 	    },
-	    shortcut2id: utils.default.memoize(function (shortcut) {
-	        var chords = shortcut.trim().split(utils.default.whitespaceRe);
+	    shortcut2id: utils_1$2.default.memoize(function (shortcut) {
+	        var chords = shortcut.trim().split(utils_1$2.default.whitespaceRe);
 	        return chords.map(Shortcut.chord2id);
 	    }),
-	    shortcut2accelerator: utils.default.memoize(function (shortcut) {
+	    shortcut2accelerator: utils_1$2.default.memoize(function (shortcut) {
 	        return Shortcut.id2accelerator(Shortcut.shortcut2id(shortcut));
 	    }),
-	    shortcut2symbols: utils.default.memoize(function (shortcut) {
+	    shortcut2symbols: utils_1$2.default.memoize(function (shortcut) {
 	        return Shortcut.id2symbols(Shortcut.shortcut2id(shortcut));
 	    }),
 	    /* ID */
@@ -8825,7 +8771,7 @@
 	        if (outputMap === void 0) { outputMap = {}; }
 	        if (chordSeparator === void 0) { chordSeparator = '+'; }
 	        if (sequenceSeparator === void 0) { sequenceSeparator = ' '; }
-	        var _a = consts.default.key2id, ctrl = _a.ctrl, alt = _a.alt, shift = _a.shift, cmd = _a.cmd;
+	        var _a = consts_1.default.key2id, ctrl = _a.ctrl, alt = _a.alt, shift = _a.shift, cmd = _a.cmd;
 	        return id.map(function (id) {
 	            var keys = [];
 	            if (ctrl & id)
@@ -8842,42 +8788,40 @@
 	            return keys.join(chordSeparator);
 	        }).join(sequenceSeparator);
 	    },
-	    id2shortcut: utils.default.memoize(function (id) {
-	        return Shortcut.id2output(id, consts.default.id2shortcut);
+	    id2shortcut: utils_1$2.default.memoize(function (id) {
+	        return Shortcut.id2output(id, consts_1.default.id2shortcut);
 	    }),
-	    id2accelerator: utils.default.memoize(function (id) {
-	        return Shortcut.id2output(id, consts.default.id2accelerator);
+	    id2accelerator: utils_1$2.default.memoize(function (id) {
+	        return Shortcut.id2output(id, consts_1.default.id2accelerator);
 	    }),
-	    id2symbols: utils.default.memoize(function (id) {
-	        return Shortcut.id2output(id, consts.default.id2symbol, '');
+	    id2symbols: utils_1$2.default.memoize(function (id) {
+	        return Shortcut.id2output(id, consts_1.default.id2symbol, '');
 	    })
 	};
 	/* EXPORT */
-	var _default$2 = Shortcut;
+	shortcut.default = Shortcut;
 
-	var shortcut = /*#__PURE__*/Object.defineProperty({
-		default: _default$2
-	}, '__esModule', {value: true});
+	var shortcuts = {};
+
+	var enums = {};
 
 	/* ENUMS */
-
+	Object.defineProperty(enums, "__esModule", { value: true });
 	var ListenerResult;
 	(function (ListenerResult) {
 	    ListenerResult[ListenerResult["HANDLED"] = 0] = "HANDLED";
 	    ListenerResult[ListenerResult["UNHANDLED"] = 1] = "UNHANDLED";
 	    ListenerResult[ListenerResult["UNHANDLEABLE"] = 2] = "UNHANDLEABLE"; // No handler caught that, and there are no deeper handlers that could catch that
 	})(ListenerResult || (ListenerResult = {}));
-	var ListenerResult_1 = ListenerResult;
+	enums.ListenerResult = ListenerResult;
 
-	var enums = /*#__PURE__*/Object.defineProperty({
-		ListenerResult: ListenerResult_1
-	}, '__esModule', {value: true});
+	var listener = {};
 
 	/* IMPORT */
-
-
-
-
+	Object.defineProperty(listener, "__esModule", { value: true });
+	var enums_1$1 = enums;
+	var shortcut_1$2 = shortcut;
+	var utils_1$1 = utils;
 	/* LISTENER */
 	var Listener = /** @class */ (function () {
 	    function Listener(options) {
@@ -8901,7 +8845,7 @@
 	                _this.triggeredNextKeypress = true;
 	                return;
 	            }
-	            var id = shortcut.default.event2id(event), triggerKey = shortcut.default.getTriggerKey(id);
+	            var id = shortcut_1$2.default.event2id(event), triggerKey = shortcut_1$2.default.getTriggerKey(id);
 	            if (isKeydown) {
 	                _this.lastKeydownID = id;
 	            }
@@ -8920,7 +8864,7 @@
 	                _this.resetNextKeydownShortcutID = false;
 	            }
 	            shortcutID.push(id);
-	            if (isKeypress && utils.default.isEqual(_this.currentKeydownShortcutID, shortcutID)) { // Avoiding handling keypress for the same detected shortcut in order to maximize performance. Unless the handler for this shortcut has been added between keydown and keypress (weird) this won't be a problem
+	            if (isKeypress && utils_1$1.default.isEqual(_this.currentKeydownShortcutID, shortcutID)) { // Avoiding handling keypress for the same detected shortcut in order to maximize performance. Unless the handler for this shortcut has been added between keydown and keypress (weird) this won't be a problem
 	                if (_this.resetNextKeydownShortcutID) {
 	                    _this.currentKeypressShortcutID.length = 0;
 	                }
@@ -8928,12 +8872,12 @@
 	                return;
 	            }
 	            var result = _this.options.handler(shortcutID, event);
-	            if (result === enums.ListenerResult.HANDLED) { // Resetting all shortcuts
+	            if (result === enums_1$1.ListenerResult.HANDLED) { // Resetting all shortcuts
 	                _this.resetNextKeydownShortcutID = true;
 	                _this.currentKeypressShortcutID.length = 0;
 	                _this.currentKeyupShortcutID.length = 0;
 	            }
-	            else if (result === enums.ListenerResult.UNHANDLEABLE) { // Resetting only the current shortcut
+	            else if (result === enums_1$1.ListenerResult.UNHANDLEABLE) { // Resetting only the current shortcut
 	                if (isKeydown) {
 	                    _this.resetNextKeydownShortcutID = true;
 	                }
@@ -8949,7 +8893,7 @@
 	                shortcutID, [0, Infinity].concat(result));
 	            }
 	            if (!isKeyup) {
-	                _this.ignoreNextKeypress = isKeydown && result === enums.ListenerResult.HANDLED;
+	                _this.ignoreNextKeypress = isKeydown && result === enums_1$1.ListenerResult.HANDLED;
 	                _this.triggeredNextKeypress = isKeypress;
 	            }
 	        };
@@ -8980,18 +8924,14 @@
 	    return Listener;
 	}());
 	/* EXPORT */
-	var _default$1 = Listener;
-
-	var listener = /*#__PURE__*/Object.defineProperty({
-		default: _default$1
-	}, '__esModule', {value: true});
+	listener.default = Listener;
 
 	/* IMPORT */
-
-
-
-
-
+	Object.defineProperty(shortcuts, "__esModule", { value: true });
+	var enums_1 = enums;
+	var listener_1 = listener;
+	var shortcut_1$1 = shortcut;
+	var utils_1 = utils;
 	/* SHORTCUTS */
 	var Shortcuts$1 = /** @class */ (function () {
 	    function Shortcuts(options) {
@@ -8999,8 +8939,8 @@
 	        if (options === void 0) { options = {}; }
 	        this.handler = function (id, event) {
 	            if (_this.recordHandler) { // Recording
-	                _this.recordHandler(shortcut.default.id2accelerator(id));
-	                return enums.ListenerResult.UNHANDLED;
+	                _this.recordHandler(shortcut_1$1.default.id2accelerator(id));
+	                return enums_1.ListenerResult.UNHANDLED;
 	            }
 	            var handleable = false, firstHandleableIndex = -1;
 	            outer: for (var i = 0, l = id.length; i < l; i++) { // Trying all possible combinations (e.g 'A B C' => ['A B C', 'B C ', 'C'])
@@ -9009,7 +8949,7 @@
 	                    target = target[id[ci]];
 	                    if (!target) {
 	                        if (!handleable && i === (l - 1))
-	                            return enums.ListenerResult.UNHANDLEABLE; // Can't be handled by any deeper shortcuts
+	                            return enums_1.ListenerResult.UNHANDLEABLE; // Can't be handled by any deeper shortcuts
 	                        continue outer;
 	                    }
 	                }
@@ -9023,15 +8963,15 @@
 	                            event.preventDefault();
 	                            event.stopPropagation();
 	                        }
-	                        return enums.ListenerResult.HANDLED;
+	                        return enums_1.ListenerResult.HANDLED;
 	                    }
 	                }
 	            }
 	            if (firstHandleableIndex > 0)
 	                return id.slice(firstHandleableIndex); // Simplifying the shortcut, no point in checking unhandleable combinations
-	            return enums.ListenerResult.UNHANDLED;
+	            return enums_1.ListenerResult.UNHANDLED;
 	        };
-	        this.listener = new listener.default({
+	        this.listener = new listener_1.default({
 	            capture: options.capture,
 	            handler: this.handler,
 	            target: options.target,
@@ -9056,12 +8996,12 @@
 	        if (!(descriptors instanceof Array))
 	            return this.add([descriptors]);
 	        descriptors.forEach(function (descriptor) {
-	            var shortcut$1 = descriptor.shortcut, handler = descriptor.handler;
-	            if (shortcut$1[0] === '-')
-	                return _this.remove([{ shortcut: shortcut$1, handler: handler }]);
+	            var shortcut = descriptor.shortcut, handler = descriptor.handler;
+	            if (shortcut[0] === '-')
+	                return _this.remove([{ shortcut: shortcut, handler: handler }]);
 	            if (!handler)
-	                return console.error("Can't add shortcut \"" + shortcut$1 + "\" which has no handler");
-	            var id = shortcut.default.shortcut2id(shortcut$1);
+	                return console.error("Can't add shortcut \"" + shortcut + "\" which has no handler");
+	            var id = shortcut_1$1.default.shortcut2id(shortcut);
 	            // if ( !Shortcut.checkValidID ( id ) ) return; //TODO: Maybe enable this check, sacrificing some performance for some user friendliness
 	            _this.descriptors.push(descriptor);
 	            var lastIndex = id.length - 1;
@@ -9083,17 +9023,24 @@
 	        });
 	        this._updateListener();
 	    };
+	    Shortcuts.prototype.register = function (descriptors) {
+	        var _this = this;
+	        this.add(descriptors);
+	        return function () {
+	            _this.remove(descriptors);
+	        };
+	    };
 	    Shortcuts.prototype.remove = function (descriptors) {
 	        var _this = this;
 	        if (!(descriptors instanceof Array))
 	            return this.remove([descriptors]);
 	        descriptors.forEach(function (descriptor) {
-	            var shortcut$1 = descriptor.shortcut, handler = descriptor.handler;
-	            if (shortcut$1[0] === '-')
-	                shortcut$1 = shortcut$1.slice(1);
-	            var id = shortcut.default.shortcut2id(shortcut$1);
+	            var shortcut = descriptor.shortcut, handler = descriptor.handler;
+	            if (shortcut[0] === '-')
+	                shortcut = shortcut.slice(1);
+	            var id = shortcut_1$1.default.shortcut2id(shortcut);
 	            // if ( !Shortcut.checkValidID ( id ) ) return; //TODO: Maybe enable this check, sacrificing some performance for some user friendliness
-	            _this.descriptors = _this.descriptors.filter(function (d) { return (d.shortcut !== shortcut$1 && !utils.default.isEqual(shortcut.default.shortcut2id(d.shortcut), id)) || (handler && d.handler !== handler); });
+	            _this.descriptors = _this.descriptors.filter(function (d) { return (d.shortcut !== shortcut && !utils_1.default.isEqual(shortcut_1$1.default.shortcut2id(d.shortcut), id)) || (handler && d.handler !== handler); });
 	            var lastIndex = id.length - 1;
 	            id.reduce(function (parent, id, index) {
 	                var child = parent[id];
@@ -9129,28 +9076,26 @@
 	    Shortcuts.prototype.record = function (handler) {
 	        var _this = this;
 	        this.recordHandler = handler;
-	        return function () { return delete _this.recordHandler; };
+	        return function () {
+	            delete _this.recordHandler;
+	        };
 	    };
-	    Shortcuts.prototype.trigger = function (shortcut$1) {
-	        var id = typeof shortcut$1 === 'string' ? shortcut.default.shortcut2id(shortcut$1) : shortcut$1;
+	    Shortcuts.prototype.trigger = function (shortcut) {
+	        var id = typeof shortcut === 'string' ? shortcut_1$1.default.shortcut2id(shortcut) : shortcut;
 	        // if ( !Shortcut.checkValidID ( id ) ) return ListenerResult.UNHANDLEABLE; //TODO: Maybe enable this check, sacrificing some performance for some user friendliness
-	        return this.handler(id) === enums.ListenerResult.HANDLED;
+	        return this.handler(id) === enums_1.ListenerResult.HANDLED;
 	    };
 	    return Shortcuts;
 	}());
 	/* EXPORT */
-	var _default = Shortcuts$1;
-
-	var shortcuts = /*#__PURE__*/Object.defineProperty({
-		default: _default
-	}, '__esModule', {value: true});
+	shortcuts.default = Shortcuts$1;
 
 	/* IMPORT */
-
-
-	shortcut.default;
-
-	var Shortcuts = shortcuts.default;
+	Object.defineProperty(dist, "__esModule", { value: true });
+	var shortcut_1 = shortcut;
+	dist.Shortcut = shortcut_1.default;
+	var shortcuts_1 = shortcuts;
+	var Shortcuts = dist.Shortcuts = shortcuts_1.default;
 
 	const eco = {
 		'rn1qkbnr/ppp2ppp/8/3p4/5p2/6PB/PPPPP2P/RNBQK2R w KQkq -': {
@@ -26208,8 +26153,6 @@
 					handler: () => {
 						gameState.enableArrow = !gameState.enableArrow;
 						gameState.triggerUpdate = true;
-						gameState.depth = 4;
-						state.multiPV = 1;
 					},
 				},
 			]);
@@ -26220,8 +26163,6 @@
 					handler: () => {
 						gameState.enableMultiPV = !gameState.enableMultiPV;
 						gameState.triggerUpdate = true;
-						gameState.depth = 9;
-						state.multiPV = 3;
 					},
 				},
 			]);
@@ -26229,7 +26170,7 @@
 			console.log('Starting main loop');
 
 			while (true) {
-				await sleep(16.667);
+				await sleep(4);
 				const parsedSide = parser.getSide();
 				const moves = parser.parseMoves();
 				if (typeof parser.getFen !== 'undefined') {

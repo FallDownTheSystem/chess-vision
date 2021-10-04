@@ -9,16 +9,16 @@
 		"lint": "eslint --ext .js ."
 	},
 	"dependencies": {
-		"kokopu": "^1.8.0",
+		"kokopu": "^1.10.2",
 		"lodash-es": "^4.17.21",
-		"shortcuts": "^1.7.0"
+		"shortcuts": "^1.8.0"
 	},
 	"devDependencies": {
-		"@rollup/plugin-commonjs": "^18.0.0",
-		"@rollup/plugin-node-resolve": "^11.2.1",
-		"eslint": "^7.25.0",
-		"eslint-config-prettier": "8.2.0",
-		"rollup": "^2.46.0",
-		"rollup-plugin-userscript-metablock": "^0.3.0"
+		"@rollup/plugin-commonjs": "^20.0.0",
+		"@rollup/plugin-node-resolve": "^13.0.4",
+		"eslint": "^7.32.0",
+		"eslint-config-prettier": "8.3.0",
+		"rollup": "^2.56.3",
+		"rollup-plugin-userscript-metablock": "^0.3.1"
 	}
 }

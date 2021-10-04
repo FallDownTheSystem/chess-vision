@@ -15,6 +15,7 @@ export let state = {
 	turn: WHITE,
 	multiPVSquares: {},
 	multiPV: localStorage.getItem('cv-multi-pv') || 1,
+	calculating: false,
 };
 
 stockfish.postMessage('uci');
@@ -26,6 +27,12 @@ stockfish.postMessage('ucinewgame');
 
 export function playMove(fen, depth) {
 	if (fen) {
+		if (state.calculating) {
+			console.log('Stopping calculation')
+			stockfish.postMessage(`stop`);
+		}
+		console.log('Starting calculation')
+		state.calculating = true;
 		stockfish.postMessage(`position fen ${fen}`);
 		stockfish.postMessage(`go depth ${depth}`);
 	}
@@ -38,7 +45,7 @@ stockfish.onmessage = async function (event) {
 
 	state.lastEvent = event;
 
-	// console.log(event);
+	console.log(event);
 	// console.log('Turn: ' + position.turn());
 	// console.log('Side: ' + gameState.mySide);
 	if (!event) {
@@ -47,6 +54,8 @@ stockfish.onmessage = async function (event) {
 	let args = event.split(' ');
 
 	if (event.includes('bestmove')) {
+		state.calculating = false;
+		console.log('No longer calculating')
 		let index = args.findIndex(x => x == 'bestmove');
 		let value = args[index + 1];
 		if (value.includes('none')) {
@@ -55,6 +64,7 @@ stockfish.onmessage = async function (event) {
 		state.bestMove = value;
 		try {
 			state.bestMoveSAN = position.notation(position.uci(state.bestMove));
+			console.log(state.bestMoveSAN);
 		} catch (err) {
 			console.log(err);
 			// Fuck it

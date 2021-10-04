@@ -30,8 +30,6 @@ const main = async () => {
 				handler: () => {
 					gameState.enableArrow = !gameState.enableArrow;
 					gameState.triggerUpdate = true;
-					gameState.depth = 4;
-					state.multiPV = 1;
 				},
 			},
 		]);
@@ -42,8 +40,6 @@ const main = async () => {
 				handler: () => {
 					gameState.enableMultiPV = !gameState.enableMultiPV;
 					gameState.triggerUpdate = true;
-					gameState.depth = 9;
-					state.multiPV = 3;
 				},
 			},
 		]);

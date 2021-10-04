@@ -98,20 +98,32 @@ function calculateContestedSquare(square, myAttackers, opAttackers, side) {
 		const opPiece = opPieces.length > i ? opPieces[i] : null;
 		let opCost = opPiece ? squareValue(opPiece) : 0;
 
-		// Trade
+		// Trade = Both have an attacking piece
 		if (attackedSquareColor !== null && myPiece && opPiece) {
-			if (myAttackers.length > i) {
-				opTotalCost += opCost;
+			// Only trade when the cost is less or equal to the attacker
+			if ((attackedSquareColor === mySide && opCost <= myCost)
+				 || (attackedSquareColor === opSide && myCost <= opCost)
+				 || (opTotalCost == 0 && myTotalCost == 0)
+				 || (attackedSquareColor === opSide && opAttackers.length - i <= 0)
+				 || (attackedSquareColor === mySide && myAttackers.length - i <= 0)
+			) {
+				if (myAttackers.length > i) {
+					opTotalCost += opCost;
+				}
+				if (opAttackers.length > i) {
+					myTotalCost += myCost;
+				}
 			}
-			if (opAttackers.length > i) {
-				myTotalCost += myCost;
+			else {
+				// If there was a trade, but it wasn't worth it, don't check future moves
+				break;
 			}
 		}
-		// They capture
+		// They capture, since I don't have a defender
 		if (attackedSquareColor === mySide && opPiece && !myPiece) {
 			myTotalCost += myCost;
 		}
-		// I capture
+		// I capture, since they don't have a defender
 		if (attackedSquareColor === opSide && !opPiece && myPiece) {
 			opTotalCost += opCost;
 		}
