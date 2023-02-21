@@ -2,7 +2,7 @@ import { sleep, oppositeColor, opponentColor } from './helpers';
 import { siteParser } from './parser';
 import { position, replay, replayFen, gameState } from './game';
 import { controlledSquares, drawControlledSquares } from './vision';
-import { createOverlay, drawEvalBar, drawArrow, drawSlider, drawECO, drawSquare, drawTextBelow } from './draw';
+import { createOverlay, drawEvalBar, drawArrow, drawSlider, drawECO, drawSquare, drawTextBelow, hideAll } from './draw';
 import { playMove, state, stockfish } from './engine';
 import { Shortcuts } from 'shortcuts';
 import { eco } from './eco';
@@ -44,6 +44,17 @@ const main = async () => {
 			},
 		]);
 
+		
+		shortcuts.add([
+			{
+				shortcut: 'q q q q',
+				handler: () => {
+					gameState.hideOverlay = !gameState.hideOverlay;
+					gameState.triggerUpdate = true;
+				},
+			},
+		]);
+
 		console.log('Starting main loop');
 
 		while (true) {
@@ -60,6 +71,16 @@ const main = async () => {
 
 			if (width === 0) {
 				gameState.overlaySelector = parser.getOverlay();
+			}
+
+			if (gameState.hideOverlay) {
+				hideAll([
+					'cv-overlay',
+					'cv-overlay-text',
+					'cv-overlay-svg',
+					'cv-eco',
+				]);
+				continue;
 			}
 
 			// If the number of moves, the mySide or the size of the board changes, redraw all the things!

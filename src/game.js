@@ -19,6 +19,7 @@ export let gameState = {
 	fen: null,
 	parsedFen: null,
 	enableArrow: false,
+	hideOverlay: false,
 	enableMultiPV: false,
 	triggerUpdate: true,
 	depth: localStorage.getItem('cv-depth') || 8,

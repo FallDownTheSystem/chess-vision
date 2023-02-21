@@ -22,6 +22,15 @@ export function drawText(square, position, text) {
 	textElement.innerText = text;
 }
 
+export function hideAll(ids) {
+	for (const id of ids) {
+		const element = document.getElementById(id);
+		if (element) {
+			element.remove();
+		}
+	}
+}
+
 export function createOverlay(id, element, side, zIndex, addText, svg) {
 	let overlay = document.getElementById(id);
 	if (overlay) {

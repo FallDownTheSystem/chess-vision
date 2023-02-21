@@ -11,14 +11,14 @@
 	"dependencies": {
 		"kokopu": "^1.10.2",
 		"lodash-es": "^4.17.21",
-		"shortcuts": "^1.8.0"
+		"shortcuts": "^1.8.1"
 	},
 	"devDependencies": {
 		"@rollup/plugin-commonjs": "^20.0.0",
-		"@rollup/plugin-node-resolve": "^13.0.4",
+		"@rollup/plugin-node-resolve": "^13.3.0",
 		"eslint": "^7.32.0",
 		"eslint-config-prettier": "8.3.0",
-		"rollup": "^2.56.3",
+		"rollup": "^2.79.1",
 		"rollup-plugin-userscript-metablock": "^0.3.1"
 	}
 }

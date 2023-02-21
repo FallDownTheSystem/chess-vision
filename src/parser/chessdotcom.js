@@ -22,7 +22,7 @@ export class ChessDotComParser {
 	}
 
 	getOverlay() {
-		return document.querySelector('chess-board.board, .board-layout-chessboard');
+		return document.querySelector('chess-board.board', '#board.board');
 	}
 
 	isReady() {

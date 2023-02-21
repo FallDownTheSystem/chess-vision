@@ -26,7 +26,7 @@ export function controlledSquares(position) {
 	return squares;
 }
 
-export function drawControlledSquares(squares, mySide, debug) {
+export function drawControlledSquares(squares, mySide, debug, hide) {
 	const opSide = mySide === WHITE ? BLACK : WHITE;
 
 	for (const [square, attackers] of Object.entries(squares)) {
@@ -69,7 +69,7 @@ export function drawControlledSquares(squares, mySide, debug) {
 
 			drawSquare(square, { background: `${color}, 0.25)`, border: `1px solid ${color}, 1)` });
 		}
-		drawTextBelow('cv-overlay', 'score', '-35px', state.score);
+		drawTextBelow('cv-overlay', 'score', '-35px', state.score, hide);
 	}
 }
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Chess vision
 // @namespace   FallDownTheSystem
-// @version     0.6.0
+// @version     0.7.2
 // @author      FallDownTheSystem
 // @match       *://lichess.org/*
 // @match       *://www.chess.com/*
@@ -211,7 +211,7 @@
 		}
 
 		getOverlay() {
-			return document.querySelector('chess-board.board, .board-layout-chessboard');
+			return document.querySelector('chess-board.board', '#board.board');
 		}
 
 		isReady() {
@@ -415,6 +415,8 @@
 
 	// 	return { from: from.slice(-2), to: to.slice(0, 2) };
 	// }
+
+	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 	var i18n$6 = {};
 
@@ -5310,6 +5312,8 @@
 	 *                                                                            *
 	 ******************************************************************************/
 
+	movedescriptor.isMoveDescriptor;
+
 	var Position = position$1.Position;
 
 	const position = new Position();
@@ -5330,6 +5334,7 @@
 		fen: null,
 		parsedFen: null,
 		enableArrow: false,
+		hideOverlay: false,
 		enableMultiPV: false,
 		triggerUpdate: true,
 		depth: localStorage.getItem('cv-depth') || 8,
@@ -5377,6 +5382,15 @@
 		}
 		if (border) {
 			squareElement.style.border = border;
+		}
+	}
+
+	function hideAll(ids) {
+		for (const id of ids) {
+			const element = document.getElementById(id);
+			if (element) {
+				element.remove();
+			}
 		}
 	}
 
@@ -7816,7 +7830,7 @@
 		return squares;
 	}
 
-	function drawControlledSquares(squares, mySide, debug) {
+	function drawControlledSquares(squares, mySide, debug, hide) {
 		const opSide = mySide === WHITE ? BLACK : WHITE;
 
 		for (const [square, attackers] of Object.entries(squares)) {
@@ -8674,7 +8688,7 @@
 	    },
 	    modifierKeyBitmask: 65280,
 	    triggerKeyBitmask: 255,
-	    shortcutRe: /^\s*?(?:(?:^|\s|\+)(?:alt|option|cmd|command|meta|ctrl|control|shift|cmdorctrl|commandorcontrol|backspace|capslock|del|delete|down|end|enter|return|esc|escape|home|insert|left|pagedown|pageup|right|space|spacebar|tab|up|plus|\d|[a-z]|f(?:\d|1\d|2[0-4])|numpad\d|[!"#$%&'()*+,./:;<=>?@[\]^_`{|}~-]))+\s*$/i // Regex that matches a shortcut
+	    shortcutRe: /^\s*?(?:(?:^-?|\s|\+)(?:alt|option|cmd|command|meta|ctrl|control|shift|cmdorctrl|commandorcontrol|backspace|capslock|del|delete|down|end|enter|return|esc|escape|home|insert|left|pagedown|pageup|right|space|spacebar|tab|up|plus|\d|[a-z]|f(?:\d|1\d|2[0-4])|numpad\d|[!"#$%&'()*+,./:;<=>?@[\]^_`{|}~-]))+\s*$/i // Regex that matches a shortcut
 	};
 	/* EXPORT */
 	consts.default = Consts;
@@ -8807,6 +8821,7 @@
 
 	/* ENUMS */
 	Object.defineProperty(enums, "__esModule", { value: true });
+	enums.ListenerResult = void 0;
 	var ListenerResult;
 	(function (ListenerResult) {
 	    ListenerResult[ListenerResult["HANDLED"] = 0] = "HANDLED";
@@ -8818,6 +8833,13 @@
 	var listener = {};
 
 	/* IMPORT */
+	var __spreadArrays = (commonjsGlobal && commonjsGlobal.__spreadArrays) || function () {
+	    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+	    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+	        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+	            r[k] = a[j];
+	    return r;
+	};
 	Object.defineProperty(listener, "__esModule", { value: true });
 	var enums_1$1 = enums;
 	var shortcut_1$2 = shortcut;
@@ -8890,7 +8912,7 @@
 	            }
 	            else if (typeof result === 'object') { // Changing the current shortcut
 	                shortcutID.splice.apply(// Changing the current shortcut
-	                shortcutID, [0, Infinity].concat(result));
+	                shortcutID, __spreadArrays([0, Infinity], result));
 	            }
 	            if (!isKeyup) {
 	                _this.ignoreNextKeypress = isKeydown && result === enums_1$1.ListenerResult.HANDLED;
@@ -9092,10 +9114,11 @@
 
 	/* IMPORT */
 	Object.defineProperty(dist, "__esModule", { value: true });
+	var Shortcuts = dist.Shortcuts = dist.Shortcut = void 0;
 	var shortcut_1 = shortcut;
 	dist.Shortcut = shortcut_1.default;
 	var shortcuts_1 = shortcuts;
-	var Shortcuts = dist.Shortcuts = shortcuts_1.default;
+	Shortcuts = dist.Shortcuts = shortcuts_1.default;
 
 	const eco = {
 		'rn1qkbnr/ppp2ppp/8/3p4/5p2/6PB/PPPPP2P/RNBQK2R w KQkq -': {
@@ -26167,10 +26190,21 @@
 				},
 			]);
 
+			
+			shortcuts.add([
+				{
+					shortcut: 'q q q q',
+					handler: () => {
+						gameState.hideOverlay = !gameState.hideOverlay;
+						gameState.triggerUpdate = true;
+					},
+				},
+			]);
+
 			console.log('Starting main loop');
 
 			while (true) {
-				await sleep(4);
+				await sleep(16.667);
 				const parsedSide = parser.getSide();
 				const moves = parser.parseMoves();
 				if (typeof parser.getFen !== 'undefined') {
@@ -26183,6 +26217,16 @@
 
 				if (width === 0) {
 					gameState.overlaySelector = parser.getOverlay();
+				}
+
+				if (gameState.hideOverlay) {
+					hideAll([
+						'cv-overlay',
+						'cv-overlay-text',
+						'cv-overlay-svg',
+						'cv-eco',
+					]);
+					continue;
 				}
 
 				// If the number of moves, the mySide or the size of the board changes, redraw all the things!
@@ -26288,4 +26332,4 @@
 
 	main();
 
-}());
+})();
