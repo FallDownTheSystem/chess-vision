@@ -8,7 +8,7 @@ export class ChessDotComParser {
 	}
 
 	parseMoves() {
-		const moves = [...document.querySelectorAll('.move .node, .move-list-controls-move, .move-text-component')]
+		const moves = [...document.querySelectorAll('.move .node, .move-list-controls-move, .move-text-component, .move-list-row .node')]
 			.map((x) => cleanse(x.innerText))
 			.filter((x) => x !== '');
 
@@ -16,13 +16,20 @@ export class ChessDotComParser {
 	}
 
 	getSide() {
-		return document.querySelector('.clock-black .main-clock-bottom, .layout-bottom-player .move-time-dark, .board.flipped') !== null
-			? BLACK
-			: WHITE;
+		return document.querySelector(`
+			.clock-black.clock-bottom,
+			.layout-bottom-player .move-time-dark,
+			.board.flipped
+		`) !== null ? BLACK : WHITE;
 	}
 
 	getOverlay() {
-		return document.querySelector('chess-board.board', '#board.board');
+		return document.querySelector(`
+			chess-board.board,
+			#board.board,
+			wc-chess-board.board,
+			#board-single.board
+		`);
 	}
 
 	isReady() {
@@ -32,7 +39,7 @@ export class ChessDotComParser {
 	getFen(side) {
 		let files = getFiles();
 		let ranks = getRanks();
-		let pieces = [...document.querySelectorAll('chess-board .piece')];
+		let pieces = [...this.getOverlay().querySelectorAll('.piece')];
 		let occupiedSquares = {};
 
 		if (!pieces.length) {

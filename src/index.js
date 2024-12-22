@@ -51,6 +51,7 @@ const main = async () => {
 				handler: () => {
 					gameState.hideOverlay = !gameState.hideOverlay;
 					gameState.triggerUpdate = true;
+					state.triggerUpdate = true;
 				},
 			},
 		]);

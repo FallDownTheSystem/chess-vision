@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Chess vision
 // @namespace   FallDownTheSystem
-// @version     0.7.2
+// @version     0.7.4
 // @author      FallDownTheSystem
 // @match       *://lichess.org/*
 // @match       *://www.chess.com/*
@@ -197,7 +197,7 @@
 		}
 
 		parseMoves() {
-			const moves = [...document.querySelectorAll('.move .node, .move-list-controls-move, .move-text-component')]
+			const moves = [...document.querySelectorAll('.move .node, .move-list-controls-move, .move-text-component, .move-list-row .node')]
 				.map((x) => cleanse(x.innerText))
 				.filter((x) => x !== '');
 
@@ -205,13 +205,20 @@
 		}
 
 		getSide() {
-			return document.querySelector('.clock-black .main-clock-bottom, .layout-bottom-player .move-time-dark, .board.flipped') !== null
-				? BLACK
-				: WHITE;
+			return document.querySelector(`
+			.clock-black.clock-bottom,
+			.layout-bottom-player .move-time-dark,
+			.board.flipped
+		`) !== null ? BLACK : WHITE;
 		}
 
 		getOverlay() {
-			return document.querySelector('chess-board.board', '#board.board');
+			return document.querySelector(`
+			chess-board.board,
+			#board.board,
+			wc-chess-board.board,
+			#board-single.board
+		`);
 		}
 
 		isReady() {
@@ -221,7 +228,7 @@
 		getFen(side) {
 			let files = getFiles();
 			let ranks = getRanks();
-			let pieces = [...document.querySelectorAll('chess-board .piece')];
+			let pieces = [...this.getOverlay().querySelectorAll('.piece')];
 			let occupiedSquares = {};
 
 			if (!pieces.length) {
@@ -296,38 +303,6 @@
 		}
 	}
 
-	// analysisSelector: '.with-analysis',
-
-	class Chess24Parser {
-		constructor() {
-			this.moveSelector = '.move';
-			this.sideSelector = '.bottom .playerInfo.black';
-			this.overlaySelector = '.chess-board > .svg';
-			this.gameSelector = '.Moves';
-			this.zIndex = '10';
-		}
-
-		parseMoves() {
-			const moves = [...document.querySelectorAll(this.moveSelector)]
-				.map((x) => cleanse(x.innerText))
-				.filter((x) => x !== '');
-
-			return moves;
-		}
-
-		getSide() {
-			return document.querySelector(this.sideSelector) !== null ? BLACK : WHITE;
-		}
-
-		getOverlay() {
-			return document.querySelector(this.overlaySelector);
-		}
-
-		isReady() {
-			return document.querySelector(this.gameSelector) !== null && this.getOverlay() != null;
-		}
-	}
-
 	// analysisSelector: '.analyse__tools',
 
 	const parseFideSAN = (x) => {
@@ -380,8 +355,6 @@
 				return new LichessParser();
 			case 'www.chess.com':
 				return new ChessDotComParser();
-			case 'chess24.com':
-				return new Chess24Parser();
 			case 'arena.myfide.net':
 				return new FideArenaParser();
 			default:
@@ -26197,6 +26170,7 @@
 					handler: () => {
 						gameState.hideOverlay = !gameState.hideOverlay;
 						gameState.triggerUpdate = true;
+						state.triggerUpdate = true;
 					},
 				},
 			]);

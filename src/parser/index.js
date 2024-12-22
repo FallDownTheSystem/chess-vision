@@ -1,6 +1,5 @@
 import { LichessParser } from './lichess';
 import { ChessDotComParser } from './chessdotcom';
-import { Chess24Parser } from './chess24';
 import { FideArenaParser } from './fidearena';
 
 export const siteParser = (host) => {
@@ -9,8 +8,6 @@ export const siteParser = (host) => {
 			return new LichessParser();
 		case 'www.chess.com':
 			return new ChessDotComParser();
-		case 'chess24.com':
-			return new Chess24Parser();
 		case 'arena.myfide.net':
 			return new FideArenaParser();
 		default:
