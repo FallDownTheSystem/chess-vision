@@ -4,7 +4,7 @@
 	"author": "FallDownTheSystem",
 	"namespace": "FallDownTheSystem",
 	"grant": ["none"],
-	"match": ["*://lichess.org/*", "*://www.chess.com/*", "*://chess24.com/*", "*://arena.myfide.net/*"],
+	"match": ["*://lichess.org/*", "*://www.chess.com/*", "*://chessarena.com/*"],
 	"inject-into": "content",
 	"require": "https://raw.githubusercontent.com/nmrugg/stockfish.js/Stockfish11/src/stockfish.asm.js"
 }

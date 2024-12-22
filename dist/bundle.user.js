@@ -5,8 +5,7 @@
 // @author      FallDownTheSystem
 // @match       *://lichess.org/*
 // @match       *://www.chess.com/*
-// @match       *://chess24.com/*
-// @match       *://arena.myfide.net/*
+// @match       *://chessarena.com/*
 // @inject-into content
 // @require     https://raw.githubusercontent.com/nmrugg/stockfish.js/Stockfish11/src/stockfish.asm.js
 // @grant       none
@@ -303,41 +302,67 @@
 		}
 	}
 
-	// analysisSelector: '.analyse__tools',
-
-	const parseFideSAN = (x) => {
-		let innerText = x.innerText;
-		if (innerText.includes('0-0')) {
-			innerText = innerText.replace(/0/g, 'O');
-		}
-		const img = x.querySelector('img');
-		if (img == null) {
-			return innerText;
-		}
-		const src = img.src.split('/');
-		const piece = src[src.length - 1].replace('.svg', '').split('')[1];
-		return piece === 'P' ? innerText : piece + innerText;
-	};
-
-	class FideArenaParser {
+	class ChessArenaParser {
 		constructor() {
-			this.moveSelector = '.notifications__move';
-			this.sideSelector = '.orientation-white';
-			this.overlaySelector = '.cg-board';
-			this.gameSelector = '.notifications__table';
+			this.moveContainerSelector = '[data-component="GameLayoutDashboardNotation"]';
+			this.moveButtonSelector = 'button[id^="move_"]';
+			this.whiteSideSelector = '[data-component="WhiteSideIcon"]';
+			this.blackSideSelector = '[data-component="BlackSideIcon"]';
+			this.overlaySelector = 'cg-board';
+			this.gameSelector = '[data-component="GameLayoutDashboardNotation"]';
 			this.zIndex = '101';
 		}
 
 		parseMoves() {
-			const moves = [...document.querySelectorAll(this.moveSelector)]
-				.map((x) => cleanse(parseFideSAN(x)))
-				.filter((x) => x !== '');
+			const moves = [...document.querySelectorAll(`${this.moveContainerSelector} ${this.moveButtonSelector}`)]
+				.map(moveBtn => {
+					// First check if it's a castling move
+					const castleText = moveBtn.children[0]?.textContent;
+					if (castleText === 'O-O' || castleText === 'O-O-O') {
+						return cleanse(castleText);
+					}
+
+					// Otherwise process normal piece moves
+					const moveTextDiv = moveBtn.children[1];
+					const moveText = moveTextDiv?.textContent;
+					const pieceDiv = moveBtn.querySelector('[data-component="Chesspiece"]');
+					const pieceType = pieceDiv?.getAttribute('data-type');
+
+					let piece = '';
+					if (pieceType) {
+						const basicPiece = pieceType.replace(/Chesspiece|Stoke|Stroke/g, '');
+						switch (basicPiece) {
+							case 'Knight': piece = 'N'; break;
+							case 'Bishop': piece = 'B'; break;
+							case 'Rook': piece = 'R'; break;
+							case 'Queen': piece = 'Q'; break;
+							case 'King': piece = 'K'; break;
+							case 'Pawn': piece = ''; break;
+						}
+					}
+
+					return cleanse(piece + moveText);
+				})
+				.filter(x => x !== '');
 
 			return moves;
 		}
 
 		getSide() {
-			return document.querySelector(this.sideSelector) !== null ? WHITE : BLACK;
+			const whiteIcon = document.querySelector(this.whiteSideSelector);
+			const blackIcon = document.querySelector(this.blackSideSelector);
+
+			if (!whiteIcon || !blackIcon) {
+				return WHITE;
+			}
+
+			const comparison = whiteIcon.compareDocumentPosition(blackIcon);
+
+			if (comparison & Node.DOCUMENT_POSITION_FOLLOWING) {
+				return BLACK;
+			} else {
+				return WHITE;
+			}
 		}
 
 		getOverlay() {
@@ -355,8 +380,8 @@
 				return new LichessParser();
 			case 'www.chess.com':
 				return new ChessDotComParser();
-			case 'arena.myfide.net':
-				return new FideArenaParser();
+			case 'chessarena.com':
+				return new ChessArenaParser();
 			default:
 				throw 'Unknown host';
 		}
@@ -4219,7 +4244,7 @@
 	 * @description This constructor is not exposed in the public Kokopu API. Only internal objects and functions
 	 *              are allowed to instantiate {@link Node} objects.
 	 */
-	function Node(info, parentVariation, fullMoveNumber, positionBefore) {
+	function Node$1(info, parentVariation, fullMoveNumber, positionBefore) {
 		this._info = info;
 		this._parentVariation = parentVariation;
 		this._fullMoveNumber = fullMoveNumber;
@@ -4272,7 +4297,7 @@
 	 *
 	 * @returns {string}
 	 */
-	Node.prototype.notation = function() {
+	Node$1.prototype.notation = function() {
 		return this._info.moveDescriptor === undefined ? '--' : rebuildPositionBeforeIfNecessary(this).notation(this._info.moveDescriptor);
 	};
 
@@ -4282,7 +4307,7 @@
 	 *
 	 * @returns {string} Chess pieces are represented with their respective unicode character, instead of the first letter of their English name.
 	 */
-	Node.prototype.figurineNotation = function() {
+	Node$1.prototype.figurineNotation = function() {
 		return this._info.moveDescriptor === undefined ? '--' : rebuildPositionBeforeIfNecessary(this).figurineNotation(this._info.moveDescriptor);
 	};
 
@@ -4292,7 +4317,7 @@
 	 *
 	 * @returns {Position}
 	 */
-	Node.prototype.positionBefore = function() {
+	Node$1.prototype.positionBefore = function() {
 		return new Position$1(rebuildPositionBeforeIfNecessary(this));
 	};
 
@@ -4302,7 +4327,7 @@
 	 *
 	 * @returns {Position}
 	 */
-	Node.prototype.position = function() {
+	Node$1.prototype.position = function() {
 		var position = this.positionBefore();
 		if(this._info.moveDescriptor === undefined) {
 			position.playNullMove();
@@ -4319,7 +4344,7 @@
 	 *
 	 * @returns {number}
 	 */
-	Node.prototype.fullMoveNumber = function() {
+	Node$1.prototype.fullMoveNumber = function() {
 		return this._fullMoveNumber;
 	};
 
@@ -4329,7 +4354,7 @@
 	 *
 	 * @returns {Color}
 	 */
-	Node.prototype.moveColor = function() {
+	Node$1.prototype.moveColor = function() {
 		return rebuildPositionBeforeIfNecessary(this).turn();
 	};
 
@@ -4362,10 +4387,10 @@
 	 *
 	 * @returns {Node?} `undefined` if the current move is the last move of the variation, or a node corresponding to the next move otherwise.
 	 */
-	Node.prototype.next = function() {
+	Node$1.prototype.next = function() {
 		if(!this._info.next) { return undefined; }
 		var next = computePositionBeforeAndFullMoveNumberForNextNode(this);
-		return new Node(this._info.next, this._parentVariation, next.fullMoveNumber, next.positionBefore);
+		return new Node$1(this._info.next, this._parentVariation, next.fullMoveNumber, next.positionBefore);
 	};
 
 
@@ -4374,7 +4399,7 @@
 	 *
 	 * @returns {Variation[]}
 	 */
-	Node.prototype.variations = function() {
+	Node$1.prototype.variations = function() {
 		if(this._info.variations.length === 0) {
 			return [];
 		}
@@ -4393,7 +4418,7 @@
 	 *
 	 * @returns {number[]}
 	 */
-	Node.prototype.nags = function() {
+	Node$1.prototype.nags = function() {
 		var result = [];
 		for(var key in this._info.nags) {
 			result.push(key);
@@ -4408,7 +4433,7 @@
 	 * @param {number} nag
 	 * @returns {boolean}
 	 */
-	Node.prototype.hasNag = function(nag) {
+	Node$1.prototype.hasNag = function(nag) {
 		return Boolean(this._info.nags[nag]);
 	};
 
@@ -4418,7 +4443,7 @@
 	 *
 	 * @param {number} nag
 	 */
-	Node.prototype.addNag = function(nag) {
+	Node$1.prototype.addNag = function(nag) {
 		this._info.nags[nag] = true;
 	};
 
@@ -4428,7 +4453,7 @@
 	 *
 	 * @param {number} nag
 	 */
-	Node.prototype.removeNag = function(nag) {
+	Node$1.prototype.removeNag = function(nag) {
 		delete this._info.nags[nag];
 	};
 
@@ -4438,7 +4463,7 @@
 	 *
 	 * @returns {string[]}
 	 */
-	Node.prototype.tags = function() {
+	Node$1.prototype.tags = function() {
 		var result = [];
 		for(var key in this._info.tags) {
 			result.push(key);
@@ -4460,7 +4485,7 @@
 	 * @param {string} tagKey
 	 * @param {string?} value
 	 */
-	Node.prototype.tag = function(tagKey, value) {
+	Node$1.prototype.tag = function(tagKey, value) {
 		if(arguments.length === 1) {
 			return this._info.tags[tagKey];
 		}
@@ -4482,7 +4507,7 @@
 	 * @param {string} value
 	 * @param {boolean} [isLongComment=false]
 	 */
-	Node.prototype.comment = function(value, isLongComment) {
+	Node$1.prototype.comment = function(value, isLongComment) {
 		if(arguments.length === 0) {
 			return this._info.comment;
 		}
@@ -4498,7 +4523,7 @@
 	 *
 	 * @returns {boolean}
 	 */
-	Node.prototype.isLongComment = function() {
+	Node$1.prototype.isLongComment = function() {
 		return this._parentVariation._withinLongVariation && this._info.isLongComment;
 	};
 
@@ -4532,10 +4557,10 @@
 	 * @returns {Node} A new node, pointing at the new position.
 	 * @throws {module:exception.InvalidNotation} If the move notation cannot be parsed.
 	 */
-	Node.prototype.play = function(move) {
+	Node$1.prototype.play = function(move) {
 		var next = computePositionBeforeAndFullMoveNumberForNextNode(this);
 		this._info.next = createNodeInfo(computeMoveDescriptor(next.positionBefore, move));
-		return new Node(this._info.next, this._parentVariation, next.fullMoveNumber, next.positionBefore);
+		return new Node$1(this._info.next, this._parentVariation, next.fullMoveNumber, next.positionBefore);
 	};
 
 
@@ -4545,7 +4570,7 @@
 	 * @param {boolean} isLongVariation
 	 * @returns {Variation}
 	 */
-	Node.prototype.addVariation = function(isLongVariation) {
+	Node$1.prototype.addVariation = function(isLongVariation) {
 		this._info.variations.push(createVariationInfo(isLongVariation));
 		return new Variation(this._info.variations[this._info.variations.length - 1], this._fullMoveNumber, this.positionBefore(), this._parentVariation._withinLongVariation);
 	};
@@ -4632,7 +4657,7 @@
 	 */
 	Variation.prototype.first = function() {
 		if(!this._info.first) { return undefined; }
-		return new Node(this._info.first, this, this._initialFullMoveNumber, new Position$1(this._initialPosition));
+		return new Node$1(this._info.first, this, this._initialFullMoveNumber, new Position$1(this._initialPosition));
 	};
 
 
@@ -4660,7 +4685,7 @@
 			previousFullMoveNumber = previousNodeInfo !== null && previousPositionBefore.turn() === 'w' ? previousFullMoveNumber + 1 : previousFullMoveNumber;
 
 			// Push the current node.
-			result.push(new Node(currentNodeInfo, this, previousFullMoveNumber, previousPositionBefore));
+			result.push(new Node$1(currentNodeInfo, this, previousFullMoveNumber, previousPositionBefore));
 
 			// Increment the counters.
 			previousNodeInfo = currentNodeInfo;
@@ -4677,7 +4702,7 @@
 	 * @returns {number[]}
 	 * @function
 	 */
-	Variation.prototype.nags = Node.prototype.nags;
+	Variation.prototype.nags = Node$1.prototype.nags;
 
 
 	/**
@@ -4687,7 +4712,7 @@
 	 * @returns {boolean}
 	 * @function
 	 */
-	Variation.prototype.hasNag = Node.prototype.hasNag;
+	Variation.prototype.hasNag = Node$1.prototype.hasNag;
 
 
 	/**
@@ -4696,7 +4721,7 @@
 	 * @param {number} nag
 	 * @function
 	 */
-	Variation.prototype.addNag = Node.prototype.addNag;
+	Variation.prototype.addNag = Node$1.prototype.addNag;
 
 
 	/**
@@ -4705,7 +4730,7 @@
 	 * @param {number} nag
 	 * @function
 	 */
-	Variation.prototype.removeNag = Node.prototype.removeNag;
+	Variation.prototype.removeNag = Node$1.prototype.removeNag;
 
 
 	/**
@@ -4714,7 +4739,7 @@
 	 * @returns {string[]}
 	 * @function
 	 */
-	Variation.prototype.tags = Node.prototype.tags;
+	Variation.prototype.tags = Node$1.prototype.tags;
 
 
 	/**
@@ -4732,7 +4757,7 @@
 	 * @param {string?} value
 	 * @function
 	 */
-	Variation.prototype.tag = Node.prototype.tag;
+	Variation.prototype.tag = Node$1.prototype.tag;
 
 
 	/**
@@ -4749,7 +4774,7 @@
 	 * @param {boolean} [isLongComment=false]
 	 * @function
 	 */
-	Variation.prototype.comment = Node.prototype.comment;
+	Variation.prototype.comment = Node$1.prototype.comment;
 
 
 	/**
@@ -4772,7 +4797,7 @@
 	Variation.prototype.play = function(move) {
 		var positionBefore = new Position$1(this._initialPosition);
 		this._info.first = createNodeInfo(computeMoveDescriptor(positionBefore, move));
-		return new Node(this._info.first, this, this._initialFullMoveNumber, positionBefore);
+		return new Node$1(this._info.first, this, this._initialFullMoveNumber, positionBefore);
 	};
 
 	/******************************************************************************

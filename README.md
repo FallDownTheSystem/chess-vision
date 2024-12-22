@@ -9,7 +9,7 @@ A userscript that shows attacked and defended squares, for various chess sites.
 
 - Lichess.org
 - Chess.com
-- arena.myfide.net
+- chessarena.com
 
 Controlled squares are marked by different colors.
 
