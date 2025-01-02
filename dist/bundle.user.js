@@ -58,7 +58,7 @@
 
 	class LichessParser {
 		constructor() {
-			this.moveSelector = '.buttons + * > *:nth-child(3n-1), .buttons + * > *:nth-child(3n), move > san, .puzzle__moves move';
+			this.moveSelector = '.buttons + * > *:nth-child(3n-1), .buttons + * > *:nth-child(3n), move > san, .puzzle__moves move, kwdb';
 			this.sideSelector = '.orientation-white';
 			this.overlaySelector = 'cg-board';
 			this.gameSelector = 'cg-board';
@@ -126,8 +126,8 @@
 				let squareSize = document.querySelector('cg-board').clientWidth / 8;
 				let position = pieceElement.style.transform;
 				let [x, y] = position.replace('translate(', '').replace(')', '').replaceAll('px', '').split(', ');
-				x = x / squareSize;
-				y = y / squareSize;
+				x = Math.round(x / squareSize);
+				y = Math.round(y / squareSize);
 				let file = files[x];
 				let rank = ranks[y];
 				let square = file + rank;
